@@ -3,6 +3,7 @@ import { Exo_2, Rajdhani } from "next/font/google";
 import "./globals.css";
 import { SiteHeader } from "@/components/site-header";
 import { socialLinks } from "@/lib/site-config";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const exo = Exo_2({ subsets: ["latin", "cyrillic"], variable: "--font-exo" });
 const rajdhani = Rajdhani({
@@ -37,6 +38,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </div>
           </div>
         </footer>
+        <SpeedInsights />
       </body>
     </html>
   );
