@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LDUFK League — портал навчального кіберспорту України</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Exo+2:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --gold:#e8c84a;--silver:#a8b4c0;--bronze:#cd7f32;
+  --accent:#00d5ff;--accent2:#7c3aed;--violet:#a78bfa;
+  --bg:#070a10;--surface:#0d1420;--surface2:#111b2a;--surface3:#172235;
+  --border:#1f2c40;--border2:#2d405c;
+  --text:#edf4ff;--text2:#9aaec5;--text3:#5e728c;
+  --univ:#00d5ff;--school:#a78bfa;
+  --green:#22c55e;--red:#ef4444;--orange:#f97316;
+}
+body{background:var(--bg);color:var(--text);font-family:'Exo 2',sans-serif;min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background:linear-gradient(180deg,rgba(0,213,255,.05),transparent 28%),radial-gradient(ellipse 60% 36% at 18% 8%,rgba(0,213,255,.08),transparent 62%),radial-gradient(ellipse 55% 34% at 84% 2%,rgba(167,139,250,.07),transparent 62%);pointer-events:none;z-index:0}
+.container{max-width:1120px;margin:0 auto;padding:0 18px;position:relative;z-index:1}
+button{font-family:inherit}
+nav{border-bottom:1px solid var(--border);background:rgba(7,10,16,.94);position:sticky;top:0;z-index:100;backdrop-filter:blur(16px)}
+.nav-inner{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:0 20px;min-height:62px;max-width:1120px;margin:0 auto}
+.logo{display:flex;align-items:center;gap:11px;cursor:pointer;min-width:max-content}
+.logo-icon{width:38px;height:38px;background:linear-gradient(135deg,var(--univ),var(--accent2));border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:14px;color:#fff;letter-spacing:-.5px;box-shadow:0 0 28px rgba(0,213,255,.18)}
+.logo-text{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:18px;letter-spacing:1.2px;color:var(--text)}
+.logo-sub{font-size:9px;color:var(--text3);letter-spacing:2px;font-weight:500;text-transform:uppercase;margin-top:1px}
+.nav-tabs{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}
+.nav-tab{padding:8px 13px;border-radius:7px;border:1px solid transparent;background:none;color:var(--text2);font-size:13px;font-weight:600;cursor:pointer;letter-spacing:.2px;transition:all .18s}
+.nav-tab:hover{color:var(--text);background:rgba(255,255,255,.045)}
+.nav-tab.active{color:var(--accent);background:rgba(0,213,255,.09);border-color:rgba(0,213,255,.18)}
+.page{display:none;padding-bottom:12px}.page.active{display:block}
+.hero{padding:38px 0 24px}.center-hero{text-align:center}.hero-badge{display:inline-flex;align-items:center;gap:7px;padding:5px 13px;border-radius:999px;border:1px solid rgba(0,213,255,.2);background:rgba(0,213,255,.055);font-size:10px;font-weight:700;letter-spacing:1.8px;color:var(--accent);text-transform:uppercase;margin-bottom:14px}.hero-badge span{width:6px;height:6px;border-radius:50%;background:var(--accent);display:inline-block;animation:blink 2s infinite}@keyframes blink{0%,100%{opacity:1}50%{opacity:.35}}
+.hero h1{font-family:'Rajdhani',sans-serif;font-size:42px;font-weight:700;letter-spacing:1.4px;line-height:1.04;color:var(--text);margin-bottom:8px}.hero h1 span{color:var(--accent)}.hero p{color:var(--text2);font-size:14px;font-weight:300;letter-spacing:.2px;max-width:680px}.center-hero p{margin:0 auto}
+.photo-slot{position:relative;overflow:hidden;background:linear-gradient(135deg,rgba(0,213,255,.18),rgba(232,200,74,.13) 45%,rgba(167,139,250,.16));border:1px solid rgba(255,255,255,.08)}.photo-slot::before{content:'';position:absolute;inset:0;background:linear-gradient(120deg,rgba(255,255,255,.13),transparent 30%,transparent 60%,rgba(255,255,255,.08));opacity:.5;pointer-events:none}.photo-label{position:relative;z-index:1;color:rgba(237,244,255,.74);font-size:11px;letter-spacing:1.6px;text-transform:uppercase;font-weight:700}
+.home-hero{padding:18px 0 10px}.league-intro{display:flex;flex-direction:column;align-items:center;text-align:center;padding:18px 12px 8px}.league-intro .hero-badge{margin-bottom:12px}.league-intro h1{font-family:'Rajdhani',sans-serif;font-size:46px;line-height:1.02;letter-spacing:2.2px;font-weight:700}.league-intro h1 span{color:var(--accent)}.league-intro p{max-width:660px;margin-top:10px;color:var(--text2);font-size:15px;letter-spacing:.45px;line-height:1.45}.league-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:100%;max-width:500px;margin-top:14px}.league-stat{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:8px;padding:8px}.league-stat strong{display:block;font-family:'Rajdhani',sans-serif;font-size:19px;color:var(--text)}.league-stat span{display:block;margin-top:1px;color:var(--text3);font-size:9px;letter-spacing:1.2px;text-transform:uppercase;font-weight:800}.champ-stack{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:14px}.champ-card{background:linear-gradient(180deg,rgba(17,27,42,.96),rgba(13,20,32,.96));border:1px solid var(--border);border-radius:14px;padding:14px;display:grid;grid-template-columns:180px 1fr;gap:13px;align-items:center}.champ-card.school{border-color:rgba(167,139,250,.24)}.section-eyebrow{font-size:10px;color:var(--text3);letter-spacing:1.8px;text-transform:uppercase;font-weight:800}.champ-photo{height:118px;border-radius:10px;display:flex;align-items:end;padding:12px;background-image:url('assets/winners-hero.png');background-size:cover;background-position:center 28%}.champ-card.school .champ-photo{background-position:center 54%;filter:hue-rotate(24deg) saturate(1.05)}.champ-info{display:flex;flex-direction:column;gap:9px}.champ-title{font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700}.champ-meta{display:grid;grid-template-columns:1fr 1fr;gap:8px}.meta-box{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:9px}.meta-box span{display:block;font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}.meta-box strong{font-size:13px;color:var(--text)}.primary-btn,.ghost-btn{border:none;border-radius:8px;padding:10px 13px;font-size:13px;font-weight:700;cursor:pointer;transition:.18s}.primary-btn{background:var(--accent);color:#061018}.primary-btn:hover{filter:brightness(1.08);transform:translateY(-1px)}.ghost-btn{background:rgba(255,255,255,.045);border:1px solid var(--border2);color:var(--text)}.ghost-btn:hover{border-color:rgba(0,213,255,.35);color:var(--accent)}
+.content-grid,.division-top-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin-top:16px}.panel{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px}.panel-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}.panel-title{font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;letter-spacing:.6px}.top-teams-list,.top-players-list{display:flex;flex-direction:column;gap:8px}.top-team,.top-player{display:grid;grid-template-columns:34px 34px 1fr auto;gap:10px;align-items:center;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px;cursor:pointer;transition:.18s}.top-team:hover,.top-player:hover{border-color:rgba(0,213,255,.35);transform:translateY(-1px)}.mini-rank{font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;color:var(--gold);text-align:center}.mini-logo,.team-logo-sq,.player-portrait{display:flex;align-items:center;justify-content:center;font-family:'Rajdhani',sans-serif;font-weight:800}.mini-logo{width:34px;height:34px;border-radius:8px;font-size:11px}.player-portrait{width:34px;height:34px;border-radius:50%;font-size:11px;color:#fff;background:linear-gradient(135deg,var(--accent),var(--accent2));box-shadow:0 0 18px rgba(0,213,255,.12)}.mini-name{font-size:13px;font-weight:700}.mini-org{font-size:11px;color:var(--text3);margin-top:2px}.mini-points{font-family:'Rajdhani',sans-serif;font-size:17px;font-weight:700;color:var(--text)}
+.home-news-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.news-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;transition:.18s;cursor:pointer}.news-card:hover{border-color:rgba(0,213,255,.34);transform:translateY(-1px)}.news-preview{height:116px;display:flex;align-items:end;padding:12px}.news-body{padding:13px}.news-tag{display:inline-flex;font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;margin-bottom:7px}.news-headline{font-size:15px;font-weight:700;color:var(--text);line-height:1.35;margin-bottom:6px}.news-desc{font-size:12px;color:var(--text2);line-height:1.55;margin-bottom:9px}.news-meta{font-size:11px;color:var(--text3)}.news-tag.ann{color:var(--accent)}.news-tag.res{color:var(--green)}.news-tag.lan{color:var(--orange)}.news-tag.gc{color:#ce93d8}
+.division-toggle{display:flex;align-items:center;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:4px;margin:0 auto 24px;width:fit-content;gap:0}.div-btn{padding:10px 28px;border-radius:7px;border:1px solid transparent;background:none;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:14px;letter-spacing:1px;cursor:pointer;transition:all .22s;color:var(--text2);display:flex;align-items:center;gap:8px}.div-btn .dot{width:7px;height:7px;border-radius:50%;transition:all .25s;background:var(--border2)}.div-btn.univ-btn.active{background:rgba(0,213,255,.1);color:var(--univ);border-color:rgba(0,213,255,.22)}.div-btn.univ-btn.active .dot{background:var(--univ);box-shadow:0 0 8px var(--univ)}.div-btn.school-btn.active{background:rgba(167,139,250,.1);color:var(--school);border-color:rgba(167,139,250,.22)}.div-btn.school-btn.active .dot{background:var(--school);box-shadow:0 0 8px var(--school)}
+.qual-legend{display:flex;align-items:center;gap:16px;font-size:12px;color:var(--text2);margin-bottom:12px;padding-left:4px}.qual-legend span{display:flex;align-items:center;gap:7px}.qual-legend span::before{content:'';display:inline-block;width:4px;height:17px;border-radius:2px}.ql-univ::before{background:var(--accent)}.ql-school::before{background:var(--school)}.ranking-wrap{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:24px}.rank-header-row,.team-main{display:grid;grid-template-columns:58px 1fr 155px 92px 76px;align-items:center}.rank-header-row{padding:10px 18px;background:var(--surface2);border-bottom:1px solid var(--border)}.rank-header-row span{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);font-weight:700}.team-main{padding:14px 18px;border-bottom:1px solid rgba(31,44,64,.56);cursor:pointer;transition:.16s;user-select:none}.team-main:hover{background:rgba(255,255,255,.025)}.team-main.expanded{background:rgba(0,213,255,.045);border-bottom:none}.team-main.top1{background:linear-gradient(90deg,rgba(232,200,74,.11),rgba(0,213,255,.03) 46%,transparent)}.team-main.top2{background:linear-gradient(90deg,rgba(168,180,192,.07),transparent 44%)}.team-main.top3{background:linear-gradient(90deg,rgba(205,127,50,.075),transparent 44%)}.team-main.qualified{border-left:3px solid var(--accent)}.team-main.qualified-school{border-left:3px solid var(--school)}.rank-num{font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:var(--text3);text-align:center}.rank-num.gold{color:var(--gold)}.rank-num.silver{color:var(--silver)}.rank-num.bronze{color:var(--bronze)}.team-id{display:flex;align-items:center;gap:12px}.team-logo-sq{width:38px;height:38px;border-radius:9px;font-size:12px;flex-shrink:0;border:1px solid transparent}.team-name-txt{font-weight:700;font-size:15px;color:var(--text);letter-spacing:.15px}.team-org-txt{font-size:11px;color:var(--text3);margin-top:2px}.badges{display:flex;gap:5px;flex-wrap:wrap}.team-badge{font-size:9px;letter-spacing:.8px;text-transform:uppercase;font-weight:800;border-radius:999px;padding:4px 7px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.045);color:var(--text2)}.team-badge.invite{color:var(--accent);border-color:rgba(0,213,255,.22);background:rgba(0,213,255,.07)}.team-badge.champ{color:var(--gold);border-color:rgba(232,200,74,.24);background:rgba(232,200,74,.07)}.team-badge.top4{color:#c4b5fd;border-color:rgba(167,139,250,.24);background:rgba(167,139,250,.07)}.chevron{font-size:11px;color:var(--text3);margin-left:6px;transition:transform .2s;display:inline-block}.chevron.open{transform:rotate(180deg)}.pts-cell{font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;color:var(--text);text-align:center}.trend-cell{text-align:right;font-size:12px;font-weight:700}.trend-cell.up{color:var(--green)}.trend-cell.dn{color:var(--red)}.trend-cell.eq{color:var(--text3)}.roster-panel{display:none;background:rgba(0,0,0,.22);border-bottom:1px solid rgba(31,44,64,.7);padding:15px 18px 18px 72px}.roster-panel.open{display:block}.roster-title{font-size:10px;letter-spacing:1.7px;text-transform:uppercase;color:var(--text3);margin-bottom:12px;font-weight:800}.roster-grid{display:grid;grid-template-columns:repeat(5,minmax(118px,1fr));gap:10px}.player-card{display:flex;align-items:center;gap:9px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:9px;min-width:0}.player-av{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Rajdhani',sans-serif;font-weight:800;font-size:12px;flex-shrink:0}.player-nick{font-size:12px;font-weight:700;color:var(--text);letter-spacing:.15px}.player-role{font-size:10px;color:var(--text3);margin-top:1px}
+.tourn-section-title{font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin:22px 0 10px}.tourn-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:22px}.tourn-card{background:var(--surface);border:1px solid var(--border);border-radius:13px;overflow:hidden;transition:.18s;position:relative;cursor:pointer}.tourn-card:hover{border-color:rgba(0,213,255,.34);transform:translateY(-1px)}.tourn-banner{height:96px;display:flex;align-items:end;padding:12px}.tourn-content{padding:14px}.tourn-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:9px;gap:10px}.tourn-name{font-family:'Rajdhani',sans-serif;font-size:17px;font-weight:700;letter-spacing:.2px;color:var(--text)}.tourn-badge{padding:3px 8px;border-radius:5px;font-size:10px;font-weight:800;letter-spacing:.4px;white-space:nowrap}.badge-done{background:rgba(34,197,94,.1);color:var(--green);border:1px solid rgba(34,197,94,.22)}.badge-live{background:rgba(239,68,68,.12);color:var(--red);border:1px solid rgba(239,68,68,.25);animation:blink 1.5s infinite}.badge-soon{background:rgba(0,213,255,.08);color:var(--accent);border:1px solid rgba(0,213,255,.2)}.badge-lan{background:rgba(249,115,22,.1);color:var(--orange);border:1px solid rgba(249,115,22,.25)}.tourn-meta{display:flex;gap:9px;flex-wrap:wrap;font-size:11px;color:var(--text3);margin-bottom:8px}.tourn-winner{font-size:12px;color:var(--text2);margin-top:7px}.tourn-winner strong{color:var(--gold)}.detail-btn{margin-top:12px;width:100%;background:rgba(255,255,255,.045);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:9px;font-size:12px;font-weight:800;cursor:pointer}.detail-btn:hover{border-color:rgba(0,213,255,.32);color:var(--accent)}
+.detail-shell{max-width:860px;margin:30px auto}.back-btn{border:1px solid var(--border2);background:rgba(255,255,255,.045);color:var(--text);border-radius:8px;padding:9px 12px;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:14px}.back-btn:hover{color:var(--accent);border-color:rgba(0,213,255,.32)}.detail-hero{border-radius:14px;min-height:210px;padding:22px;display:flex;flex-direction:column;justify-content:flex-end;margin-bottom:14px}.detail-title{position:relative;z-index:1;font-family:'Rajdhani',sans-serif;font-size:34px;line-height:1.08;letter-spacing:.4px}.detail-meta{position:relative;z-index:1;color:var(--text2);font-size:12px;margin-top:8px}.detail-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px}.detail-card p{color:var(--text2);line-height:1.8;font-size:14px}.detail-list{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;margin-top:14px}.detail-item{background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:11px}.detail-item span{display:block;color:var(--text3);font-size:10px;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}.detail-item strong{font-size:13px}.participant-list{display:flex;gap:7px;flex-wrap:wrap;margin-top:14px}.participant-pill{padding:6px 9px;border-radius:999px;background:rgba(255,255,255,.045);border:1px solid var(--border);font-size:12px;color:var(--text2)}
+.rules-box{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:16px}.rules-title{font-family:'Rajdhani',sans-serif;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-bottom:14px;font-weight:700}.pts-table{width:100%;border-collapse:collapse}.pts-table th{text-align:left;padding:8px 10px;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);font-weight:600;border-bottom:1px solid var(--border)}.pts-table th:not(:first-child),.pts-table td:not(:first-child){text-align:center}.pts-table td{padding:10px;font-size:13px;border-bottom:1px solid rgba(31,44,64,.48)}.pts-table td:not(:first-child){font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700}.pts-table tr:last-child td{border-bottom:none}.rule-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.rule-item{padding:13px;background:var(--surface2);border-radius:9px;border:1px solid var(--border)}.rule-item-title{font-size:12px;font-weight:700;color:var(--text);margin-bottom:5px}.rule-item-desc{font-size:11px;color:var(--text3);line-height:1.65}.rules-two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+footer{border-top:1px solid var(--border);padding:18px 0;text-align:center;margin-top:32px;position:relative;z-index:1}footer p{font-size:11px;color:var(--text3);letter-spacing:.5px}footer strong{color:var(--accent);font-weight:700}
+@media(max-width:860px){.nav-inner{align-items:flex-start;flex-direction:column;padding:12px 16px}.nav-tabs{justify-content:flex-start}.content-grid,.division-top-grid,.champ-stack{grid-template-columns:1fr}.league-intro h1{font-size:40px}.champ-card{grid-template-columns:150px 1fr}.rank-header-row,.team-main{grid-template-columns:44px 1fr 78px 58px}.rank-header-row span:nth-child(3),.team-main .badges{display:none}.roster-panel{padding-left:18px}.roster-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.tourn-grid,.home-news-grid{grid-template-columns:1fr}.detail-list,.rules-two,.rule-grid{grid-template-columns:1fr}}
+@media(max-width:520px){.container{padding:0 12px}.nav-tab{font-size:12px;padding:7px 9px}.hero h1{font-size:30px}.league-intro{padding:18px 8px 8px}.league-intro h1{font-size:32px;letter-spacing:1.4px}.league-intro p{font-size:14px}.league-stats,.champ-meta{grid-template-columns:1fr}.champ-card{grid-template-columns:1fr}.champ-photo{height:132px}.division-toggle{width:100%}.div-btn{flex:1;justify-content:center;padding:9px 8px;font-size:12px}.rank-header-row,.team-main{grid-template-columns:36px 1fr 64px 48px;padding-left:10px;padding-right:10px}.team-logo-sq{width:32px;height:32px}.team-name-txt{font-size:13px}.team-org-txt{font-size:10px}.roster-grid{grid-template-columns:1fr}.detail-title{font-size:27px}}
+</style>
+</head>
+<body>
+<nav>
+  <div class="nav-inner">
+    <div class="logo" onclick="showPage('general')">
+      <div class="logo-icon">LD</div>
+      <div><div class="logo-text">LDUFK LEAGUE</div><div class="logo-sub">CS2 · Season 2026</div></div>
+    </div>
+    <div class="nav-tabs">
+      <button class="nav-tab active" onclick="showPage('general',this)">Загальна</button>
+      <button class="nav-tab" onclick="showPage('ranking',this)">Рейтинг</button>
+      <button class="nav-tab" onclick="showPage('tournaments',this)">Турніри</button>
+      <button class="nav-tab" onclick="showPage('news',this)">Анонси</button>
+      <button class="nav-tab" onclick="showPage('rules',this)">Правила</button>
+    </div>
+  </div>
+</nav>
+<div class="container">
+<div id="page-general" class="page active">
+  <section class="home-hero">
+    <div class="league-intro">
+      <div class="hero-badge"><span></span> Сезон 2026 · Активний</div>
+      <h1>LDUFK <span>CS2</span> League</h1>
+      <p>Офіційний портал університетської та шкільної кіберспортивної ліги України</p>
+      <div class="league-stats">
+        <div class="league-stat"><strong>2</strong><span>Дивізіони</span></div>
+        <div class="league-stat"><strong>40</strong><span>Команд</span></div>
+        <div class="league-stat"><strong>2026</strong><span>Сезон</span></div>
+      </div>
+    </div>
+    <aside class="champ-stack">
+      <div class="champ-card"><div class="champ-photo photo-slot"><div class="photo-label">Фото переможців</div></div><div class="champ-info"><div class="section-eyebrow">Переможець University Division</div><div><div class="champ-title" id="champ-title-univ"></div><div class="news-meta" id="champ-subtitle-univ"></div></div><div class="champ-meta" id="champ-meta-univ"></div><button class="primary-btn" id="champ-button-univ">Детальніше</button></div></div>
+      <div class="champ-card school"><div class="champ-photo photo-slot"><div class="photo-label">Фото переможців</div></div><div class="champ-info"><div class="section-eyebrow">Переможець School Division</div><div><div class="champ-title" id="champ-title-school"></div><div class="news-meta" id="champ-subtitle-school"></div></div><div class="champ-meta" id="champ-meta-school"></div><button class="primary-btn" id="champ-button-school">Детальніше</button></div></div>
+    </aside>
+  </section>
+  <section class="division-top-grid">
+    <div class="panel"><div class="panel-head"><div><div class="section-eyebrow">University Ranking</div><div class="panel-title">Топ університетів</div></div><button class="ghost-btn" onclick="goToDivision('univ')">Весь топ</button></div><div class="top-teams-list" id="home-univ-teams"></div></div>
+    <div class="panel"><div class="panel-head"><div><div class="section-eyebrow">School Ranking</div><div class="panel-title">Топ шкіл</div></div><button class="ghost-btn" onclick="goToDivision('school')">Весь топ</button></div><div class="top-teams-list" id="home-school-teams"></div></div>
+  </section>
+  <section class="content-grid">
+    <div class="panel"><div class="panel-head"><div><div class="section-eyebrow">Player watch</div><div class="panel-title">Топ-гравці</div></div></div><div class="top-players-list" id="home-top-players"></div></div>
+    <div class="panel"><div class="panel-head"><div><div class="section-eyebrow">Новини ліги</div><div class="panel-title">Останні анонси</div></div><button class="ghost-btn" onclick="showPage('news')">Всі новини</button></div><div class="home-news-grid" id="home-news"></div></div>
+  </section>
+</div>
+<div id="page-ranking" class="page">
+  <div class="hero center-hero"><div class="hero-badge"><span></span> Сезон 2026 · Активний</div><h1>Рейтинг <span>LDUFK</span></h1><p>Окремі дивізіони для університетів і шкіл. Топ-1 відкритий одразу, топ-4 у зоні прямого LAN Invite.</p></div>
+  <div style="display:flex;justify-content:center;margin-bottom:24px"><div class="division-toggle"><button class="div-btn univ-btn active" onclick="switchDiv('univ')"><div class="dot"></div>University Division</button><button class="div-btn school-btn" onclick="switchDiv('school')"><div class="dot"></div>School Division</button></div></div>
+  <div id="div-univ"><div class="qual-legend"><span class="ql-univ">Топ-4: пряме запрошення на LAN Finals</span></div><div class="ranking-wrap"><div class="rank-header-row"><span style="text-align:center">#</span><span>Команда</span><span>Статус</span><span style="text-align:center">Очки</span><span style="text-align:right">Тренд</span></div><div id="univ-rows"></div></div></div>
+  <div id="div-school" style="display:none"><div class="qual-legend"><span class="ql-school">Топ-4: пряме запрошення на LAN Finals</span></div><div class="ranking-wrap"><div class="rank-header-row"><span style="text-align:center">#</span><span>Команда</span><span>Статус</span><span style="text-align:center">Очки</span><span style="text-align:right">Тренд</span></div><div id="school-rows"></div></div></div>
+</div>
+<div id="page-tournaments" class="page"><div class="hero center-hero"><div class="hero-badge"><span></span> Турнірна сітка 2026</div><h1>Турніри <span>LDUFK</span></h1><p>University, School та відкритий Global Championship з деталями формату, учасників, очок і переможців.</p></div><div class="tourn-section-title">University Division</div><div class="tourn-grid" id="tourn-univ"></div><div class="tourn-section-title">School Division</div><div class="tourn-grid" id="tourn-school"></div><div class="tourn-section-title" style="color:#ce93d8">Global Championship</div><div class="tourn-grid" id="tourn-global"></div></div>
+<div id="page-news" class="page"><div class="hero center-hero"><div class="hero-badge"><span></span> Новини та анонси</div><h1>Новини <span>Ліги</span></h1><p>Результати турнірів, LAN Finals, реєстрація та ключові оголошення LDUFK League.</p></div><div class="home-news-grid" id="news-list"></div></div>
+<div id="page-news-detail" class="page"><div class="detail-shell" id="news-detail"></div></div>
+<div id="page-tournament-detail" class="page"><div class="detail-shell" id="tournament-detail"></div></div>
+<div id="page-rules" class="page"><div class="hero center-hero"><div class="hero-badge"><span></span> Система рейтингу</div><h1>Правила <span>Ліги</span></h1><p>Прозора система LDUFK Points для навчальних команд України.</p></div><div class="rules-box"><div class="rules-title">Таблиця нарахування очок</div><table class="pts-table"><thead><tr><th>Місце</th><th>Відкритий тур</th><th>Rivals</th><th>Bounty</th><th>LAN Finals</th></tr></thead><tbody><tr><td style="color:var(--gold);font-weight:700">1 місце</td><td style="color:var(--gold)">150</td><td style="color:var(--gold)">180</td><td style="color:var(--gold)">120</td><td style="color:var(--gold)">400</td></tr><tr><td style="color:var(--silver);font-weight:700">2 місце</td><td style="color:var(--silver)">100</td><td style="color:var(--silver)">120</td><td style="color:var(--silver)">80</td><td style="color:var(--silver)">280</td></tr><tr><td style="color:var(--bronze);font-weight:700">3 місце</td><td style="color:var(--bronze)">70</td><td style="color:var(--bronze)">85</td><td style="color:var(--bronze)">55</td><td style="color:var(--bronze)">180</td></tr><tr><td>4 місце</td><td>50</td><td>60</td><td>40</td><td>120</td></tr><tr><td>5-8 місце</td><td>25</td><td>30</td><td>20</td><td>60</td></tr><tr><td>Участь</td><td>10</td><td>10</td><td>10</td><td>20</td></tr></tbody></table></div><div class="rules-box"><div class="rules-title">Хто потрапляє в рейтинг</div><div class="rule-grid"><div class="rule-item"><div class="rule-item-title" style="color:var(--accent)">Тільки учасники турнірів</div><div class="rule-item-desc">У рейтинг потрапляють команди, які брали участь хоча б в одному офіційному турнірі LDUFK League протягом сезону.</div></div><div class="rule-item"><div class="rule-item-title" style="color:var(--accent)">Окремі дивізіони</div><div class="rule-item-desc">University Division і School Division мають окремі рейтинги, турніри та чемпіонів.</div></div><div class="rule-item"><div class="rule-item-title" style="color:var(--accent)">Накопичення очок</div><div class="rule-item-desc">Очки сумуються з усіх турнірів сезону. Після кожного турніру рейтинг оновлюється.</div></div></div></div><div class="rules-box"><div class="rules-title">Умови участі</div><div class="rules-two"><div><div style="font-size:13px;font-weight:700;color:var(--univ);margin-bottom:8px">University Division</div><div style="font-size:11px;color:var(--text3);line-height:1.8">· Команда представляє акредитований ЗВО<br>· Усі гравці — студенти цього університету<br>· Мінімум 5 гравців у заявці CS2</div></div><div><div style="font-size:13px;font-weight:700;color:var(--school);margin-bottom:8px">School Division</div><div style="font-size:11px;color:var(--text3);line-height:1.8">· Команда представляє загальноосвітній заклад<br>· Вік гравців: до 18 років включно<br>· Мінімум 5 гравців у заявці CS2</div></div></div></div></div>
+</div>
+<footer><p><strong>LDUFK League</strong> &nbsp;·&nbsp; Львівський державний університет фізичної культури &nbsp;·&nbsp; CS2 · Сезон 2026</p></footer>
+<script>
+// =============================================
+// DATA: TEAMS. Тут можна міняти команди, очки, кольори та склади.
+// =============================================
+const univTeams = [
+  { name:'LDUFK Alpha',      org:'ЛДУФК',                          pts:1840, trend:0,   color:'#0ea5e9',
+    players:[{nick:'s1ren',role:'Entry'},{nick:'fr0z3n',role:'Support'},{nick:'k1ng_ua',role:'IGL'},{nick:'nxt_lv',role:'Rifler'},{nick:'zeroG',role:'AWP'}] },
+  { name:'Polytechnica ESC', org:'НУ "Львівська Політехніка"',      pts:1620, trend:1,   color:'#6366f1',
+    players:[{nick:'polyX',role:'Entry'},{nick:'vect0r',role:'IGL'},{nick:'st4lker',role:'AWP'},{nick:'reflex_',role:'Rifler'},{nick:'nut0r',role:'Support'}] },
+  { name:'LNU Foxes',        org:'ЛНУ ім. І. Франка',              pts:1490, trend:-1,  color:'#ec4899',
+    players:[{nick:'f0xxie',role:'AWP'},{nick:'lynx_ua',role:'Entry'},{nick:'quick',role:'IGL'},{nick:'d3lta',role:'Rifler'},{nick:'ghost7',role:'Support'}] },
+  { name:'UCU Storm',        org:'УКУ',                             pts:1340, trend:2,   color:'#f59e0b',
+    players:[{nick:'storm1',role:'IGL'},{nick:'rain_ua',role:'AWP'},{nick:'thunder_',role:'Entry'},{nick:'flash5',role:'Rifler'},{nick:'w1nd',role:'Support'}] },
+  { name:'LDUFK Beta',       org:'ЛДУФК',                          pts:1210, trend:-2,  color:'#0ea5e9',
+    players:[{nick:'b3ta',role:'IGL'},{nick:'hex_ua',role:'AWP'},{nick:'cr0wn',role:'Entry'},{nick:'strik3r',role:'Rifler'},{nick:'puls3',role:'Support'}] },
+  { name:'Med Wolves',       org:'ЛНМУ ім. Данила Галицького',      pts:1080, trend:3,   color:'#14b8a6',
+    players:[{nick:'medic',role:'Support'},{nick:'doktor_',role:'IGL'},{nick:'cure_ua',role:'AWP'},{nick:'syrinx',role:'Entry'},{nick:'bl00d',role:'Rifler'}] },
+  { name:'KPI Snipers',      org:'КПІ ім. Сікорського',            pts:980,  trend:0,   color:'#84cc16',
+    players:[{nick:'kpi_1',role:'AWP'},{nick:'kpi_2',role:'IGL'},{nick:'kpi_3',role:'Entry'},{nick:'kpi_4',role:'Rifler'},{nick:'kpi_5',role:'Support'}] },
+  { name:'Agrarian Aces',    org:'ЛНАЕМ',                          pts:870,  trend:-3,  color:'#22c55e',
+    players:[{nick:'ace_1',role:'IGL'},{nick:'agr0',role:'AWP'},{nick:'farma',role:'Entry'},{nick:'field_',role:'Rifler'},{nick:'gr0wth',role:'Support'}] },
+  { name:'Poly Titans',      org:'НУ "Львівська Політехніка"',      pts:760,  trend:1,   color:'#6366f1',
+    players:[{nick:'titan1',role:'Entry'},{nick:'titan2',role:'AWP'},{nick:'titan3',role:'IGL'},{nick:'titan4',role:'Rifler'},{nick:'titan5',role:'Support'}] },
+  { name:'LNU Blaze',        org:'ЛНУ ім. І. Франка',              pts:690,  trend:2,   color:'#ec4899',
+    players:[{nick:'blaze_',role:'AWP'},{nick:'fyr3ua',role:'Entry'},{nick:'sp4rk',role:'IGL'},{nick:'h3at',role:'Rifler'},{nick:'ember',role:'Support'}] },
+  { name:'NaUKMA Recon',     org:'НаУКМА',                         pts:610,  trend:-1,  color:'#a855f7',
+    players:[{nick:'rec0n',role:'IGL'},{nick:'spy_ua',role:'AWP'},{nick:'hunt_',role:'Entry'},{nick:'trace',role:'Rifler'},{nick:'scan_',role:'Support'}] },
+  { name:'HNU Strike',       org:'ХНУ ім. Каразіна',               pts:530,  trend:0,   color:'#f97316',
+    players:[{nick:'kz_str',role:'Entry'},{nick:'kz_awp',role:'AWP'},{nick:'kz_igl',role:'IGL'},{nick:'kz_rfl',role:'Rifler'},{nick:'kz_sup',role:'Support'}] },
+  { name:'KNEU Digital',     org:'КНЕУ ім. Гетьмана',              pts:470,  trend:4,   color:'#38bdf8',
+    players:[{nick:'econ_1',role:'IGL'},{nick:'econ_2',role:'AWP'},{nick:'econ_3',role:'Entry'},{nick:'econ_4',role:'Rifler'},{nick:'econ_5',role:'Support'}] },
+  { name:'DonNU Force',      org:'ДонНУ ім. Стуса',                pts:400,  trend:-2,  color:'#fb7185',
+    players:[{nick:'forc3_',role:'Entry'},{nick:'push_ua',role:'IGL'},{nick:'driv3',role:'AWP'},{nick:'solid_',role:'Rifler'},{nick:'wall_ua',role:'Support'}] },
+  { name:'ZNU Ravens',       org:'ЗНУ',                            pts:350,  trend:1,   color:'#818cf8',
+    players:[{nick:'raven1',role:'AWP'},{nick:'raven2',role:'Entry'},{nick:'raven3',role:'IGL'},{nick:'raven4',role:'Rifler'},{nick:'raven5',role:'Support'}] },
+  { name:'ONU Neptune',      org:'ОНУ ім. Мечникова',              pts:300,  trend:0,   color:'#2dd4bf',
+    players:[{nick:'nept_1',role:'IGL'},{nick:'nept_2',role:'AWP'},{nick:'nept_3',role:'Entry'},{nick:'nept_4',role:'Rifler'},{nick:'nept_5',role:'Support'}] },
+  { name:'SumDU Phantom',    org:'СумДУ',                          pts:250,  trend:-1,  color:'#c084fc',
+    players:[{nick:'phntm1',role:'AWP'},{nick:'phntm2',role:'Entry'},{nick:'phntm3',role:'IGL'},{nick:'phntm4',role:'Rifler'},{nick:'phntm5',role:'Support'}] },
+  { name:'ChNU Falcons',     org:'ЧНУ ім. Федьковича',             pts:200,  trend:2,   color:'#fdba74',
+    players:[{nick:'falc_1',role:'Entry'},{nick:'falc_2',role:'AWP'},{nick:'falc_3',role:'IGL'},{nick:'falc_4',role:'Rifler'},{nick:'falc_5',role:'Support'}] },
+  { name:'VNTU Vipers',      org:'ВНТУ',                           pts:150,  trend:0,   color:'#4ade80',
+    players:[{nick:'viper1',role:'IGL'},{nick:'viper2',role:'AWP'},{nick:'viper3',role:'Entry'},{nick:'viper4',role:'Rifler'},{nick:'viper5',role:'Support'}] },
+  { name:'TDATU Rookies',    org:'ТДАТУ',                          pts:100,  trend:-1,  color:'#94a3b8',
+    players:[{nick:'rook_1',role:'IGL'},{nick:'rook_2',role:'AWP'},{nick:'rook_3',role:'Entry'},{nick:'rook_4',role:'Rifler'},{nick:'rook_5',role:'Support'}] },
+];
+
+// =============================================
+// DATA: SCHOOL TEAMS. Тут можна міняти шкільні команди та гравців.
+// =============================================
+const schoolTeams = [
+  { name:'Lyceum 8 Wolves',   org:'Ліцей №8 (Львів)',           pts:1760, trend:0,  color:'#a78bfa',
+    players:[{nick:'w0lf_ua',role:'IGL'},{nick:'fang_',role:'AWP'},{nick:'pack_',role:'Entry'},{nick:'hunt3r',role:'Rifler'},{nick:'alpha_',role:'Support'}] },
+  { name:'School 45 Rush',    org:'ЗОШ №45 (Львів)',            pts:1590, trend:1,  color:'#f472b6',
+    players:[{nick:'rush_1',role:'Entry'},{nick:'rush_2',role:'IGL'},{nick:'rush_3',role:'AWP'},{nick:'rush_4',role:'Rifler'},{nick:'rush_5',role:'Support'}] },
+  { name:'Lyceum IT Stars',   org:'Ліцей "Престиж" (Львів)',    pts:1430, trend:2,  color:'#fbbf24',
+    players:[{nick:'star_1',role:'AWP'},{nick:'star_2',role:'IGL'},{nick:'star_3',role:'Entry'},{nick:'star_4',role:'Rifler'},{nick:'star_5',role:'Support'}] },
+  { name:'Gymnasium 1 Elite', org:'Гімназія №1 (Львів)',        pts:1280, trend:-1, color:'#34d399',
+    players:[{nick:'elit3_',role:'IGL'},{nick:'prime_',role:'AWP'},{nick:'top_ua',role:'Entry'},{nick:'clas_s',role:'Rifler'},{nick:'finsh_',role:'Support'}] },
+  { name:'Lyceum 23 Squad',   org:'Ліцей №23 (Львів)',          pts:1140, trend:3,  color:'#60a5fa',
+    players:[{nick:'sq23_1',role:'Entry'},{nick:'sq23_2',role:'AWP'},{nick:'sq23_3',role:'IGL'},{nick:'sq23_4',role:'Rifler'},{nick:'sq23_5',role:'Support'}] },
+  { name:'School 10 Crew',    org:'ЗОШ №10 (Львів)',            pts:1000, trend:-2, color:'#f87171',
+    players:[{nick:'cr3w_1',role:'IGL'},{nick:'cr3w_2',role:'AWP'},{nick:'cr3w_3',role:'Entry'},{nick:'cr3w_4',role:'Rifler'},{nick:'cr3w_5',role:'Support'}] },
+  { name:'Sch.55 Thunder',    org:'ЗОШ №55 (Львів)',            pts:880,  trend:0,  color:'#818cf8',
+    players:[{nick:'thnd1',role:'AWP'},{nick:'thnd2',role:'Entry'},{nick:'thnd3',role:'IGL'},{nick:'thnd4',role:'Rifler'},{nick:'thnd5',role:'Support'}] },
+  { name:'Gymnasium 6 Lions', org:'Гімназія №6 (Львів)',        pts:760,  trend:1,  color:'#2dd4bf',
+    players:[{nick:'l10n_1',role:'Entry'},{nick:'l10n_2',role:'AWP'},{nick:'l10n_3',role:'IGL'},{nick:'l10n_4',role:'Rifler'},{nick:'l10n_5',role:'Support'}] },
+  { name:'Lyceum 36 Phoenix', org:'Ліцей №36 (Львів)',          pts:650,  trend:2,  color:'#fb923c',
+    players:[{nick:'ph0x_1',role:'AWP'},{nick:'ph0x_2',role:'IGL'},{nick:'ph0x_3',role:'Entry'},{nick:'ph0x_4',role:'Rifler'},{nick:'ph0x_5',role:'Support'}] },
+  { name:'Lyceum 54 Vipers',  org:'Ліцей №54 (Київ)',           pts:560,  trend:-1, color:'#4ade80',
+    players:[{nick:'vip5_1',role:'IGL'},{nick:'vip5_2',role:'AWP'},{nick:'vip5_3',role:'Entry'},{nick:'vip5_4',role:'Rifler'},{nick:'vip5_5',role:'Support'}] },
+  { name:'NVK Hackers',       org:'НВК №1 (Харків)',            pts:480,  trend:4,  color:'#38bdf8',
+    players:[{nick:'hack_1',role:'Entry'},{nick:'hack_2',role:'IGL'},{nick:'hack_3',role:'AWP'},{nick:'hack_4',role:'Rifler'},{nick:'hack_5',role:'Support'}] },
+  { name:'School 3 Ghosts',   org:'ЗОШ №3 (Одеса)',             pts:410,  trend:0,  color:'#c084fc',
+    players:[{nick:'gh0st1',role:'AWP'},{nick:'gh0st2',role:'IGL'},{nick:'gh0st3',role:'Entry'},{nick:'gh0st4',role:'Rifler'},{nick:'gh0st5',role:'Support'}] },
+  { name:'Lyceum 2 Apex',     org:'Ліцей №2 (Дніпро)',          pts:350,  trend:-2, color:'#fda4af',
+    players:[{nick:'apex_1',role:'IGL'},{nick:'apex_2',role:'AWP'},{nick:'apex_3',role:'Entry'},{nick:'apex_4',role:'Rifler'},{nick:'apex_5',role:'Support'}] },
+  { name:'Gymnasium 14 Nx',   org:'Гімназія №14 (Запоріжжя)',   pts:290,  trend:1,  color:'#a3e635',
+    players:[{nick:'nx_1ua',role:'AWP'},{nick:'nx_2ua',role:'Entry'},{nick:'nx_3ua',role:'IGL'},{nick:'nx_4ua',role:'Rifler'},{nick:'nx_5ua',role:'Support'}] },
+  { name:'School 7 Ravens',   org:'ЗОШ №7 (Вінниця)',           pts:240,  trend:0,  color:'#94a3b8',
+    players:[{nick:'rv7_1',role:'Entry'},{nick:'rv7_2',role:'IGL'},{nick:'rv7_3',role:'AWP'},{nick:'rv7_4',role:'Rifler'},{nick:'rv7_5',role:'Support'}] },
+  { name:'NVK 5 Spartans',    org:'НВК №5 (Полтава)',            pts:200,  trend:2,  color:'#fdba74',
+    players:[{nick:'sp5_1',role:'IGL'},{nick:'sp5_2',role:'AWP'},{nick:'sp5_3',role:'Entry'},{nick:'sp5_4',role:'Rifler'},{nick:'sp5_5',role:'Support'}] },
+  { name:'Lyceum 9 Cobras',   org:'Ліцей №9 (Луцьк)',           pts:160,  trend:-1, color:'#6ee7b7',
+    players:[{nick:'cbr_1',role:'AWP'},{nick:'cbr_2',role:'Entry'},{nick:'cbr_3',role:'IGL'},{nick:'cbr_4',role:'Rifler'},{nick:'cbr_5',role:'Support'}] },
+  { name:'School 21 Fury',    org:'ЗОШ №21 (Рівне)',            pts:120,  trend:0,  color:'#fca5a5',
+    players:[{nick:'fury1',role:'Entry'},{nick:'fury2',role:'AWP'},{nick:'fury3',role:'IGL'},{nick:'fury4',role:'Rifler'},{nick:'fury5',role:'Support'}] },
+  { name:'Gymnasium 3 Zero',  org:'Гімназія №3 (Тернопіль)',    pts:80,   trend:1,  color:'#67e8f9',
+    players:[{nick:'zer0_1',role:'AWP'},{nick:'zer0_2',role:'IGL'},{nick:'zer0_3',role:'Entry'},{nick:'zer0_4',role:'Rifler'},{nick:'zer0_5',role:'Support'}] },
+  { name:'School 12 Newbies', org:'ЗОШ №12 (Івано-Франківськ)',  pts:40,   trend:0,  color:'#c4b5fd',
+    players:[{nick:'new_1',role:'IGL'},{nick:'new_2',role:'AWP'},{nick:'new_3',role:'Entry'},{nick:'new_4',role:'Rifler'},{nick:'new_5',role:'Support'}] },
+];
+
+// =============================================
+// DATA: TOURNAMENTS. Тут можна міняти турніри, фото/banner, формат і деталі.
+// =============================================
+const tournUniv = [
+  { id:'univ-spring-open-2026', division:'University', name:'LDUFK University Spring Open 2026', type:'online', date:'Лютий 2026', teams:16, status:'done', winner:'LDUFK Alpha', points:'150 LDUFK Points переможцю', prize:'Прямі очки рейтингу', format:'Single Elimination BO1 до півфіналу, BO3 фінал', participants:['LDUFK Alpha','Polytechnica ESC','LNU Foxes','UCU Storm','LDUFK Beta'], description:'Перший відкритий тур сезону для університетських команд, який сформував стартовий рейтинг і показав претендентів на LAN Finals.' },
+  { id:'univ-rivals-2026', division:'University', name:'LDUFK University Spring Rivals 2026', type:'online', date:'Квітень 2026', teams:16, status:'live', winner:null, points:'180 LDUFK Points переможцю', prize:'Підвищений рейтинг-коефіцієнт', format:'Swiss Stage + Playoffs BO3', participants:['LDUFK Alpha','Polytechnica ESC','LNU Foxes','UCU Storm'], description:'Rivals-турнір з підвищеною вагою для команд, які вже набрали очки у Spring Open.' },
+  { id:'univ-bounty-2026', division:'University', name:'LDUFK University Bounty 2026', type:'online', date:'Жовтень 2026', teams:16, status:'soon', winner:null, points:'120 LDUFK Points переможцю', prize:'Bounty-бонуси за перемоги над топ-4', format:'Groups + Playoffs', participants:['Top 16 University Division'], description:'Осінній тур із бонусними очками за перемоги над командами верхньої частини рейтингу.' },
+  { id:'univ-winter-open-2026', division:'University', name:'LDUFK University Winter Open 2026', type:'online', date:'Листопад 2026', teams:16, status:'soon', winner:null, points:'150 LDUFK Points переможцю', prize:'Фінальний шанс перед Winter Rivals', format:'Single Elimination', participants:['Open registration'], description:'Зимовий відкритий тур для нових і чинних команд університетського дивізіону.' },
+  { id:'univ-winter-rivals-2026', division:'University', name:'LDUFK University Winter Rivals 2026', type:'online', date:'Грудень 2026', teams:16, status:'soon', winner:null, points:'180 LDUFK Points переможцю', prize:'Вирішальні очки сезону', format:'Swiss Stage + Playoffs', participants:['Top registered university teams'], description:'Останній великий онлайн-тур сезону для розподілу місць у рейтингу.' },
+  { id:'univ-finals-2026', division:'University', name:'LDUFK University Finals 2026', type:'lan', date:'Травень 2026', teams:6, status:'soon', winner:null, points:'400 LDUFK Points переможцю', prize:'Кубок University Division', format:'Топ-4 рейтингу + 2 wildcard, LAN BO3', participants:['LDUFK Alpha','Polytechnica ESC','LNU Foxes','UCU Storm','Wildcard #1','Wildcard #2'], description:'LAN Finals для найсильніших університетських команд сезону у Львові.' },
+];
+const tournSchool = [
+  { id:'school-spring-open-2026', division:'School', name:'LDUFK School Spring Open 2026', type:'online', date:'Лютий 2026', teams:16, status:'done', winner:'Lyceum 8 Wolves', points:'150 LDUFK Points переможцю', prize:'Старт рейтингу School Division', format:'Single Elimination BO1, BO3 фінал', participants:['Lyceum 8 Wolves','School 45 Rush','Lyceum IT Stars','Gymnasium 1 Elite'], description:'Перший шкільний тур сезону, який відкрив боротьбу за прямі LAN-інвайти.' },
+  { id:'school-rivals-2026', division:'School', name:'LDUFK School Spring Rivals 2026', type:'online', date:'Квітень 2026', teams:16, status:'live', winner:null, points:'180 LDUFK Points переможцю', prize:'Підвищені рейтингові очки', format:'Swiss Stage + Playoffs', participants:['Lyceum 8 Wolves','School 45 Rush','Lyceum IT Stars','Gymnasium 1 Elite'], description:'Турнір для найактивніших шкільних команд першої половини сезону.' },
+  { id:'school-bounty-2026', division:'School', name:'LDUFK School Bounty 2026', type:'online', date:'Жовтень 2026', teams:16, status:'soon', winner:null, points:'120 LDUFK Points переможцю', prize:'Bounty-бонуси', format:'Groups + Playoffs', participants:['Top 16 School Division'], description:'Осінній тур із бонусними очками за перемоги над лідерами шкільного рейтингу.' },
+  { id:'school-winter-open-2026', division:'School', name:'LDUFK School Winter Open 2026', type:'online', date:'Листопад 2026', teams:16, status:'soon', winner:null, points:'150 LDUFK Points переможцю', prize:'Очки перед фінальним ривком', format:'Single Elimination', participants:['Open registration'], description:'Відкритий зимовий тур для шкільних команд України.' },
+  { id:'school-winter-rivals-2026', division:'School', name:'LDUFK School Winter Rivals 2026', type:'online', date:'Грудень 2026', teams:16, status:'soon', winner:null, points:'180 LDUFK Points переможцю', prize:'Фінальні очки сезону', format:'Swiss Stage + Playoffs', participants:['Top registered school teams'], description:'Фінальний онлайн-тур шкільного дивізіону перед підбиттям підсумків сезону.' },
+  { id:'school-finals-2026', division:'School', name:'LDUFK School Finals 2026', type:'lan', date:'Травень 2026', teams:6, status:'soon', winner:null, points:'400 LDUFK Points переможцю', prize:'Кубок School Division', format:'Топ-4 рейтингу + 2 wildcard, LAN BO3', participants:['Lyceum 8 Wolves','School 45 Rush','Lyceum IT Stars','Gymnasium 1 Elite','Wildcard #1','Wildcard #2'], description:'LAN Finals для найсильніших шкільних команд сезону у Львові.' },
+];
+const tournGlobal = [
+  { id:'global-qual-1', division:'Global', name:'LDUFK Global Championship — Online Qual #1', type:'online', date:'Березень 2026', teams:32, status:'done', winner:'KyivRush', points:'Поза рейтингом LDUFK', prize:'Слот у LAN Playoffs', format:'Open Qualifier BO1/BO3', participants:['KyivRush','Dnipro Five','Lviv Aim','Odesa Core'], description:'Відкрита кваліфікація для команд з усієї України без привʼязки до навчального закладу.' },
+  { id:'global-qual-2', division:'Global', name:'LDUFK Global Championship — Online Qual #2', type:'online', date:'Квітень 2026', teams:32, status:'live', winner:null, points:'Поза рейтингом LDUFK', prize:'Слот у LAN Playoffs', format:'Open Qualifier BO1/BO3', participants:['Open registration'], description:'Другий шанс пройти до відкритого Global LAN Playoffs.' },
+  { id:'global-lan-finals', division:'Global', name:'LDUFK Global Championship — LAN Finals', type:'lan', date:'Червень 2026', teams:6, status:'soon', winner:null, points:'Поза рейтингом LDUFK', prize:'Global Championship Trophy', format:'6 команд, LAN BO3', participants:['Online Qual #1','Online Qual #2','Invited teams'], description:'Окрема LAN-подія без впливу на рейтинги University та School Division.' },
+];
+
+// =============================================
+// DATA: NEWS. Тут можна міняти новини, превʼю, текст і теги.
+// =============================================
+const newsItems = [
+  { id:'lan-finals-may', tag:'lan', tagLabel:'LAN', title:'LDUFK School та University Finals 2026 пройдуть у травні у Львові', date:'6 травня 2026', preview:'Топ-4 кожного дивізіону отримують пряме запрошення, ще по два місця розіграють wildcard-команди.', body:'LAN Finals стане центральною подією сезону LDUFK League. University та School Division отримають окремі фінальні дні, окремі кубки та прозору систему посіву за рейтингом. Головна мета — зробити фінал зрозумілим для команд, глядачів і навчальних закладів.', image:'Місце під фото LAN Finals' },
+  { id:'ldufk-alpha-win', tag:'res', tagLabel:'Результат', title:'LDUFK Alpha перемагає у University Spring Open 2026', date:'3 травня 2026', preview:'Команда ЛДУФК виграла стартовий університетський тур і очолила рейтинг сезону.', body:'LDUFK Alpha закрила гранд-фінал з рахунком 2:0 і стала першою командою сезону, яка підтвердила статус фаворита University Division. Перемога дала команді 150 рейтингових очок і сильну позицію у боротьбі за LAN Invite.', image:'Фото переможців University Spring Open' },
+  { id:'lyceum-8-win', tag:'res', tagLabel:'Результат', title:'Lyceum 8 Wolves — чемпіони School Spring Open 2026', date:'3 травня 2026', preview:'Шкільний дивізіон отримав першого лідера рейтингу після впевненої перемоги Lyceum 8 Wolves.', body:'Lyceum 8 Wolves пройшли плейоф без поразок і стали першими чемпіонами School Division у сезоні 2026. Команда отримала стартову перевагу в рейтингу та входить у LAN Race як головний претендент на прямий інвайт.', image:'Фото чемпіонів School Division' },
+  { id:'spring-rivals-live', tag:'ann', tagLabel:'Анонс', title:'Spring Rivals 2026 розпочато: матчі обох дивізіонів вже йдуть', date:'28 квітня 2026', preview:'Rivals-формат дає більше очок і сильніше впливає на позиції перед LAN Finals.', body:'Spring Rivals 2026 збирає найактивніші команди після Spring Open. Турнір має підвищену вагу у рейтингу, тому перемога тут може швидко змінити розподіл топ-4 і боротьбу за прямі LAN-інвайти.', image:'Превʼю Spring Rivals' },
+  { id:'registration-open', tag:'ann', tagLabel:'Реєстрація', title:'LDUFK League відкрита для нових шкіл та університетів України', date:'20 квітня 2026', preview:'Команди можуть подати заявку на участь у наступних турах сезону без членських внесків.', body:'Ліга відкрита для навчальних закладів, які хочуть розвивати кіберспорт у структурованому форматі. Для заявки потрібен склад з мінімум пʼяти гравців, назва команди та підтвердження навчального закладу.', image:'Превʼю реєстрації' },
+  { id:'global-announced', tag:'gc', tagLabel:'Global', title:'Global Championship оголошено як окрему відкриту подію', date:'10 квітня 2026', preview:'Global Championship не впливає на рейтинги дивізіонів, але відкритий для команд з усієї України.', body:'Global Championship створений як окрема подія для ширшої української CS2-сцени. Він не забирає фокус з University та School Division, але дозволяє провести більший відкритий LAN-фінал у межах екосистеми LDUFK.', image:'Превʼю Global Championship' },
+];
+
+// =============================================
+// DATA: TOP PLAYERS. Тут можна міняти стартовий список топ-гравців.
+// Також їх можна додавати через редактор на головній сторінці.
+// =============================================
+const topPlayers = [
+  { nick:'s1ren', team:'LDUFK Alpha', role:'Entry', rating:'1.34', color:'#00d5ff' },
+  { nick:'fang_', team:'Lyceum 8 Wolves', role:'AWP', rating:'1.29', color:'#a78bfa' },
+  { nick:'polyX', team:'Polytechnica ESC', role:'Entry', rating:'1.24', color:'#6366f1' },
+  { nick:'f0xxie', team:'LNU Foxes', role:'AWP', rating:'1.21', color:'#ec4899' },
+  { nick:'storm1', team:'UCU Storm', role:'IGL', rating:'1.17', color:'#f59e0b' },
+];
+
+function initials(text){return text.replace(/[^A-Za-zА-Яа-яІіЇїЄєҐґ0-9]/g,' ').trim().split(/\s+/).map(w=>w[0]).join('').slice(0,3).toUpperCase();}
+function allTournaments(){return [...tournUniv,...tournSchool,...tournGlobal];}
+function tournamentById(id){return allTournaments().find(t=>t.id===id);}
+function getNewsData(){return newsItems;}
+function getTopPlayersData(){return topPlayers;}
+function newsById(id){return newsItems.find(n=>n.id===id);}
+function gradientStyle(seed){return 'background:linear-gradient(135deg,'+seed+'33,rgba(0,213,255,.13),rgba(232,200,74,.12))';}
+function statusBadge(t){const cls=t.status==='done'?'badge-done':t.status==='live'?'badge-live':'badge-soon';const txt=t.status==='done'?'Завершено':t.status==='live'?'Live':'Незабаром';return '<span class="tourn-badge '+cls+'">'+txt+'</span>';}
+function typeBadge(t){return t.type==='lan'?'<span class="tourn-badge badge-lan">LAN</span>':'<span style="font-size:10px;color:var(--accent);font-weight:800">Online</span>';}
+function renderRows(teams, containerId, isSchool){
+  const el=document.getElementById(containerId);
+  const qualClass=isSchool?'qualified-school':'qualified';
+  el.innerHTML=teams.map((t,i)=>{
+    const r=i+1;
+    const rnkCls=r===1?'gold':r===2?'silver':r===3?'bronze':'';
+    const rowCls=r<=3?'top'+r:'';
+    const qualMark=r<=4?qualClass:'';
+    const open=i===0;
+    const badges=[];
+    if(r<=4)badges.push('<span class="team-badge invite">LAN Invite</span>','<span class="team-badge top4">Top 4</span>');
+    if(r===1)badges.push('<span class="team-badge champ">Champion Form</span>');
+    const trend=t.trend>0?`<span class="trend-cell up">▲ ${t.trend}</span>`:t.trend<0?`<span class="trend-cell dn">▼ ${Math.abs(t.trend)}</span>`:'<span class="trend-cell eq">—</span>';
+    const roster=t.players.map(p=>{
+      const av=p.nick.replace(/[^A-Za-z0-9_]/g,'').slice(0,2).toUpperCase();
+      return `<div class="player-card"><div class="player-av" style="background:${t.color}22;border:1px solid ${t.color}55;color:${t.color}">${av}</div><div><div class="player-nick">${p.nick}</div><div class="player-role">${p.role}</div></div></div>`;
+    }).join('');
+    return `<div class="team-block" id="team-${containerId}-${i}">
+      <div class="team-main ${rowCls} ${qualMark}${open?' expanded':''}" onclick="toggleRoster(this,'roster-${containerId}-${i}')">
+        <div class="rank-num ${rnkCls}">${r}</div>
+        <div class="team-id"><div class="team-logo-sq" style="background:${t.color}22;border-color:${t.color}44;color:${t.color}">${initials(t.name)}</div><div><div class="team-name-txt">${t.name} <span class="chevron ${open?'open':''}" id="chev-${containerId}-${i}">▾</span></div><div class="team-org-txt">${t.org}</div></div></div>
+        <div class="badges">${badges.join('')}</div>
+        <div class="pts-cell">${t.pts.toLocaleString('uk-UA')}</div>
+        ${trend}
+      </div>
+      <div class="roster-panel ${open?'open':''}" id="roster-${containerId}-${i}"><div class="roster-title">Склад CS2 · ${r<=4?'LAN Invite Zone':'Ranking Team'}</div><div class="roster-grid">${roster}</div></div>
+    </div>`;
+  }).join('');
+}
+function toggleRoster(mainEl,rosterId){const panel=document.getElementById(rosterId);const chev=document.getElementById(rosterId.replace('roster-','chev-'));const isOpen=panel.classList.contains('open');panel.classList.toggle('open',!isOpen);if(chev)chev.classList.toggle('open',!isOpen);mainEl.classList.toggle('expanded',!isOpen);}
+function renderTournaments(list,containerId){
+  document.getElementById(containerId).innerHTML=list.map(t=>`<article class="tourn-card" onclick="openTournament('${t.id}')"><div class="tourn-banner photo-slot"><div class="photo-label">Tournament banner</div></div><div class="tourn-content"><div class="tourn-head"><div class="tourn-name">${t.name}</div>${statusBadge(t)}</div><div class="tourn-meta">${typeBadge(t)}<span>${t.date}</span><span>${t.teams} команд</span><span>${t.division}</span></div>${t.winner?`<div class="tourn-winner">Переможець: <strong>${t.winner}</strong></div>`:'<div class="tourn-winner">Переможець: <strong>буде визначено</strong></div>'}<button class="detail-btn" onclick="event.stopPropagation();openTournament('${t.id}')">Детальніше</button></div></article>`).join('');
+}
+function newsCard(n){return `<article class="news-card" onclick="openNews('${n.id}')"><div class="news-preview photo-slot"><div class="photo-label">${n.image}</div></div><div class="news-body"><div class="news-tag ${n.tag}">${n.tagLabel}</div><div class="news-headline">${n.title}</div><div class="news-desc">${n.preview}</div><div class="news-meta">${n.date}</div></div></article>`;}
+function renderNews(){const data=getNewsData();document.getElementById('news-list').innerHTML=data.map(newsCard).join('');document.getElementById('home-news').innerHTML=data.slice(0,4).map(newsCard).join('');}
+function renderTopPlayers(){
+  document.getElementById('home-top-players').innerHTML=getTopPlayersData().slice(0,6).map((p,idx)=>{
+    const color=p.color||'#00d5ff';
+    return `<div class="top-player"><div class="mini-rank">${idx+1}</div><div class="player-portrait" style="background:linear-gradient(135deg,${color},var(--accent2))">${initials(p.nick)}</div><div><div class="mini-name">${p.nick}</div><div class="mini-org">${p.team} · ${p.role}</div></div><div class="mini-points">${p.rating}</div></div>`;
+  }).join('');
+}
+function renderHome(){
+  const champ=tournUniv[0];
+  const schoolChamp=tournSchool[0];
+  renderChampionCard(champ,'univ');
+  renderChampionCard(schoolChamp,'school');
+  renderHomeDivisionTop(univTeams,'home-univ-teams','univ');
+  renderHomeDivisionTop(schoolTeams,'home-school-teams','school');
+  renderTopPlayers();
+}
+function renderHomeDivisionTop(teams,containerId,div){
+  document.getElementById(containerId).innerHTML=teams.slice(0,5).map((t,idx)=>`<div class="top-team" onclick="goToTeam('${div}',${idx})"><div class="mini-rank">${idx+1}</div><div class="mini-logo" style="background:${t.color}22;border:1px solid ${t.color}44;color:${t.color}">${initials(t.name)}</div><div><div class="mini-name">${t.name}</div><div class="mini-org">${t.org}</div></div><div class="mini-points">${t.pts}</div></div>`).join('');
+}
+function renderChampionCard(champ,kind){
+  document.getElementById(`champ-title-${kind}`).textContent=champ.winner||'Буде визначено';
+  document.getElementById(`champ-subtitle-${kind}`).textContent=champ.name;
+  document.getElementById(`champ-meta-${kind}`).innerHTML=`<div class="meta-box"><span>Дата</span><strong>${champ.date}</strong></div><div class="meta-box"><span>Дивізіон</span><strong>${champ.division}</strong></div>`;
+  document.getElementById(`champ-button-${kind}`).onclick=()=>openTournament(champ.id);
+}
+function openNews(id){
+  const n=newsById(id);
+  if(!n)return;
+  document.getElementById('news-detail').innerHTML=`<button class="back-btn" onclick="showPage('news')">Назад до новин</button><div class="detail-hero photo-slot"><div class="news-tag ${n.tag}">${n.tagLabel}</div><div class="detail-title">${n.title}</div><div class="detail-meta">${n.date}</div></div><div class="detail-card"><p>${n.body}</p></div>`;
+  showPage('news-detail');
+}
+function openTournament(id){
+  const t=tournamentById(id);
+  if(!t)return;
+  document.getElementById('tournament-detail').innerHTML=`<button class="back-btn" onclick="showPage('tournaments')">Назад до турнірів</button><div class="detail-hero photo-slot"><div class="section-eyebrow">${t.division} · ${t.type==='lan'?'LAN':'Online'}</div><div class="detail-title">${t.name}</div><div class="detail-meta">${t.date} · ${t.teams} команд · ${t.status==='done'?'Завершено':t.status==='live'?'Live':'Незабаром'}</div></div><div class="detail-card"><p>${t.description}</p><div class="detail-list"><div class="detail-item"><span>Переможець</span><strong>${t.winner||'Буде визначено'}</strong></div><div class="detail-item"><span>Формат</span><strong>${t.format}</strong></div><div class="detail-item"><span>Призові / очки</span><strong>${t.points}</strong></div><div class="detail-item"><span>Статус</span><strong>${t.status==='done'?'Завершено':t.status==='live'?'Live':'Незабаром'}</strong></div></div><div class="participant-list">${t.participants.map(p=>`<span class="participant-pill">${p}</span>`).join('')}</div></div>`;
+  showPage('tournament-detail');
+}
+function goToTeam(div,index){showPage('ranking');switchDiv(div);setTimeout(()=>{const row=document.getElementById('team-'+div+'-rows-'+index);if(row){row.scrollIntoView({behavior:'smooth',block:'center'});const main=row.querySelector('.team-main');const panel=row.querySelector('.roster-panel');if(panel&&!panel.classList.contains('open'))main.click();}},40);}
+function goToDivision(div){showPage('ranking');switchDiv(div);setTimeout(()=>document.getElementById('page-ranking').scrollIntoView({behavior:'smooth',block:'start'}),40);}
+function switchDiv(div){document.getElementById('div-univ').style.display=div==='univ'?'':'none';document.getElementById('div-school').style.display=div==='school'?'':'none';document.querySelectorAll('.div-btn').forEach(b=>b.classList.remove('active'));document.querySelector('.'+div+'-btn').classList.add('active');}
+function showPage(id,btn){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById('page-'+id).classList.add('active');document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));const navMap={general:0,ranking:1,tournaments:2,'tournament-detail':2,news:3,'news-detail':3,rules:4};if(navMap[id]!==undefined)document.querySelectorAll('.nav-tab')[navMap[id]].classList.add('active');if(btn)btn.classList.add('active');window.scrollTo({top:0,behavior:'smooth'});}
+renderRows(univTeams,'univ-rows',false);renderRows(schoolTeams,'school-rows',true);renderTournaments(tournUniv,'tourn-univ');renderTournaments(tournSchool,'tourn-school');renderTournaments(tournGlobal,'tourn-global');renderNews();renderHome();renderTopPlayers();
+</script>
+</body>
+</html>
