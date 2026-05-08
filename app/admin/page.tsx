@@ -6,7 +6,7 @@ import { signIn, signOut } from "@/lib/admin-actions";
 export const dynamic = "force-dynamic";
 
 export default async function AdminPage({ searchParams }: { searchParams: { error?: string } }) {
-  const { user, email } = await requireAdmin();
+  const { user, email, role } = await requireAdmin();
 
   if (!user) {
     return (
@@ -36,15 +36,16 @@ export default async function AdminPage({ searchParams }: { searchParams: { erro
 
   return (
     <div className="py-8">
-      <AdminNav />
+      <AdminNav role={role} />
       <div className="rounded-2xl border border-line bg-surface p-5">
         <h1 className="font-rajdhani text-4xl font-bold">Admin dashboard</h1>
-        <p className="mt-2 text-slate-400">Увійшов як {user.email}</p>
+        <p className="mt-2 text-slate-400">Увійшов як {user.email} · роль: {role}</p>
         <div className="mt-5 grid gap-3 md:grid-cols-4">
-          <Link href="/admin/teams" className="rounded-xl border border-line bg-surface2 p-4 font-bold hover:text-accent">Teams</Link>
-          <Link href="/admin/news" className="rounded-xl border border-line bg-surface2 p-4 font-bold hover:text-accent">News</Link>
-          <Link href="/admin/tournaments" className="rounded-xl border border-line bg-surface2 p-4 font-bold hover:text-accent">Tournaments</Link>
-          <Link href="/admin/players" className="rounded-xl border border-line bg-surface2 p-4 font-bold hover:text-accent">Players</Link>
+          {role === "main_admin" || role === "admin" || role === "moderator" ? <Link href="/admin/teams" className="rounded-xl border border-line bg-surface2 p-4 font-bold hover:text-accent">Teams</Link> : null}
+          {role === "main_admin" || role === "admin" || role === "reporter" ? <Link href="/admin/news" className="rounded-xl border border-line bg-surface2 p-4 font-bold hover:text-accent">News</Link> : null}
+          {role === "main_admin" || role === "admin" ? <Link href="/admin/tournaments" className="rounded-xl border border-line bg-surface2 p-4 font-bold hover:text-accent">Tournaments</Link> : null}
+          {role === "main_admin" || role === "admin" || role === "moderator" ? <Link href="/admin/players" className="rounded-xl border border-line bg-surface2 p-4 font-bold hover:text-accent">Players</Link> : null}
+          {role === "main_admin" ? <Link href="/admin/admins" className="rounded-xl border border-line bg-surface2 p-4 font-bold hover:text-accent">Admins</Link> : null}
         </div>
         <form action={signOut} className="mt-5">
           <button className="rounded-lg border border-line px-4 py-2 text-sm font-bold text-slate-300 hover:text-accent">Вийти</button>

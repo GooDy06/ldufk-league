@@ -7,7 +7,7 @@ import type { Team } from "@/lib/types";
 export const dynamic = "force-dynamic";
 
 export default async function AdminTeamsPage({ searchParams }: { searchParams: { saved?: string; deleted?: string } }) {
-  const { supabase } = await requireAdmin();
+  const { supabase, role } = await requireAdmin();
   const { data } = await supabase.from("teams").select("*").order("division").order("points", { ascending: false });
   const teams = (data || []) as Team[];
   const universityTeams = teams.filter((team) => team.division === "University");
@@ -15,16 +15,18 @@ export default async function AdminTeamsPage({ searchParams }: { searchParams: {
 
   return (
     <div className="py-8">
-      <AdminNav />
+      <AdminNav role={role} />
       <h1 className="mb-4 font-rajdhani text-4xl font-bold">Teams CRUD</h1>
       {searchParams.saved ? <StatusMessage text="Команду збережено." /> : null}
       {searchParams.deleted ? <StatusMessage text="Команду видалено." /> : null}
-      <div className="grid gap-4 lg:grid-cols-2">
-        <TeamForm defaultDivision="University" />
-        <TeamForm defaultDivision="School" />
-      </div>
-      <TeamSection title="University Teams" teams={universityTeams} />
-      <TeamSection title="School Teams" teams={schoolTeams} />
+      {role !== "moderator" ? (
+        <div className="grid gap-4 lg:grid-cols-2">
+          <TeamForm defaultDivision="University" role={role} />
+          <TeamForm defaultDivision="School" role={role} />
+        </div>
+      ) : null}
+      <TeamSection title="University Teams" teams={universityTeams} role={role} />
+      <TeamSection title="School Teams" teams={schoolTeams} role={role} />
     </div>
   );
 }
@@ -33,18 +35,20 @@ function StatusMessage({ text }: { text: string }) {
   return <div className="mb-4 rounded-xl border border-emerald-400/30 bg-emerald-400/10 p-3 text-sm font-bold text-emerald-200">{text}</div>;
 }
 
-function TeamSection({ title, teams }: { title: string; teams: Team[] }) {
+function TeamSection({ title, teams, role }: { title: string; teams: Team[]; role?: string | null }) {
   return (
     <section className="mt-6">
       <h2 className="mb-3 font-rajdhani text-3xl font-bold">{title}</h2>
       <div className="grid gap-4">
-        {teams.map((team) => <TeamForm key={team.id} team={team} />)}
+        {teams.map((team) => <TeamForm key={team.id} team={team} role={role} />)}
       </div>
     </section>
   );
 }
 
-function TeamForm({ team, defaultDivision = "University" }: { team?: Team; defaultDivision?: Team["division"] }) {
+function TeamForm({ team, defaultDivision = "University", role }: { team?: Team; defaultDivision?: Team["division"]; role?: string | null }) {
+  const canDelete = role === "main_admin" || role === "admin";
+
   return (
     <form action={saveTeam} className="grid gap-3 rounded-2xl border border-line bg-surface p-4">
       <input type="hidden" name="id" defaultValue={team?.id} />
@@ -73,7 +77,7 @@ function TeamForm({ team, defaultDivision = "University" }: { team?: Team; defau
           {team ? "Зберегти" : "Створити"}
         </SubmitButton>
       </div>
-      {team ? <DeleteButton action={deleteTeam} id={team.id} /> : null}
+      {team && canDelete ? <DeleteButton action={deleteTeam} id={team.id} /> : null}
     </form>
   );
 }

@@ -1,5 +1,12 @@
 export type Division = "University" | "School";
+export type AdminRole = "main_admin" | "admin" | "moderator" | "reporter";
 export type Publishable = { published: boolean };
+
+export type AdminUser = {
+  email: string;
+  role: AdminRole;
+  created_at: string;
+};
 
 export type HomepageChampion = {
   id: string;
@@ -35,6 +42,12 @@ export type Player = Publishable & {
   role: string;
   rating: number;
   avatar_url: string | null;
+  highlight_youtube_url: string | null;
+  highlight_title: string | null;
+  highlight_tournament: string | null;
+  highlight_map: string | null;
+  highlight_date: string | null;
+  highlight_description: string | null;
   team?: Pick<Team, "name" | "slug" | "division" | "color"> | null;
 };
 
@@ -48,6 +61,7 @@ export type NewsItem = Publishable & {
   image_url: string | null;
   published_at: string | null;
   created_at: string;
+  created_by: string | null;
 };
 
 export type Tournament = Publishable & {

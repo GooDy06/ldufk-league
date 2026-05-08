@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import { createServerClient } from "@supabase/ssr";
 import type { CookieOptions } from "@supabase/ssr";
+import type { AdminRole } from "@/lib/types";
 
 export function createClient() {
   const cookieStore = cookies();
@@ -38,9 +39,20 @@ export async function requireAdmin() {
   const email = data.user?.email?.trim().toLowerCase();
   const adminEmail = process.env.ADMIN_EMAIL?.trim().toLowerCase();
 
-  if (!email || email !== adminEmail) {
-    return { supabase, user: null, email };
+  if (!email) {
+    return { supabase, user: null, email, role: null as AdminRole | null };
   }
 
-  return { supabase, user: data.user, email };
+  if (email === adminEmail) {
+    return { supabase, user: data.user, email, role: "main_admin" as AdminRole };
+  }
+
+  const { data: adminUser } = await supabase.from("admin_users").select("role").eq("email", email).maybeSingle();
+  const role = adminUser?.role as AdminRole | undefined;
+
+  if (!role) {
+    return { supabase, user: null, email, role: null as AdminRole | null };
+  }
+
+  return { supabase, user: data.user, email, role };
 }

@@ -7,21 +7,23 @@ import type { NewsItem } from "@/lib/types";
 export const dynamic = "force-dynamic";
 
 export default async function AdminNewsPage() {
-  const { supabase } = await requireAdmin();
+  const { supabase, role, user } = await requireAdmin();
   const { data } = await supabase.from("news").select("*").order("created_at", { ascending: false });
   const items = (data || []) as NewsItem[];
 
   return (
     <div className="py-8">
-      <AdminNav />
+      <AdminNav role={role} />
       <h1 className="mb-4 font-rajdhani text-4xl font-bold">News CRUD</h1>
       <NewsForm />
-      <div className="mt-6 grid gap-4">{items.map((item) => <NewsForm key={item.id} item={item} />)}</div>
+      <div className="mt-6 grid gap-4">{items.map((item) => <NewsForm key={item.id} item={item} role={role} userId={user?.id} />)}</div>
     </div>
   );
 }
 
-function NewsForm({ item }: { item?: NewsItem }) {
+function NewsForm({ item, role, userId }: { item?: NewsItem; role?: string | null; userId?: string }) {
+  const canDelete = role === "main_admin" || role === "admin" || (role === "reporter" && item?.created_by === userId);
+
   return (
     <form action={saveNews} className="grid gap-3 rounded-2xl border border-line bg-surface p-4">
       <input type="hidden" name="id" defaultValue={item?.id} />
@@ -37,7 +39,7 @@ function NewsForm({ item }: { item?: NewsItem }) {
       <SubmitButton pendingText={item ? "Зберігаю..." : "Створюю..."} className="w-fit rounded-lg bg-accent px-4 py-2 font-bold text-bg">
         {item ? "Зберегти" : "Створити"}
       </SubmitButton>
-      {item ? (
+      {item && canDelete ? (
         <SubmitButton formAction={deleteNews} name="id" value={item.id} pendingText="Видаляю..." className="w-fit rounded-lg border border-red-500/30 px-3 py-2 text-sm font-bold text-red-300">
           Видалити
         </SubmitButton>

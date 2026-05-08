@@ -7,7 +7,7 @@ import type { Team, Tournament } from "@/lib/types";
 export const dynamic = "force-dynamic";
 
 export default async function AdminTournamentsPage() {
-  const { supabase } = await requireAdmin();
+  const { supabase, role } = await requireAdmin();
   const [{ data: tournaments }, { data: teams }] = await Promise.all([
     supabase.from("tournaments").select("*, winner:teams(name, slug)").order("created_at", { ascending: false }),
     supabase.from("teams").select("*").order("name")
@@ -15,17 +15,19 @@ export default async function AdminTournamentsPage() {
 
   return (
     <div className="py-8">
-      <AdminNav />
+      <AdminNav role={role} />
       <h1 className="mb-4 font-rajdhani text-4xl font-bold">Tournaments CRUD</h1>
-      <TournamentForm teams={(teams || []) as Team[]} />
+      <TournamentForm teams={(teams || []) as Team[]} role={role} />
       <div className="mt-6 grid gap-4">
-        {((tournaments || []) as Tournament[]).map((tournament) => <TournamentForm key={tournament.id} tournament={tournament} teams={(teams || []) as Team[]} />)}
+        {((tournaments || []) as Tournament[]).map((tournament) => <TournamentForm key={tournament.id} tournament={tournament} teams={(teams || []) as Team[]} role={role} />)}
       </div>
     </div>
   );
 }
 
-function TournamentForm({ tournament, teams }: { tournament?: Tournament; teams: Team[] }) {
+function TournamentForm({ tournament, teams, role }: { tournament?: Tournament; teams: Team[]; role?: string | null }) {
+  const canDelete = role === "main_admin" || role === "admin";
+
   return (
     <form action={saveTournament} className="grid gap-3 rounded-2xl border border-line bg-surface p-4">
       <input type="hidden" name="id" defaultValue={tournament?.id} />
@@ -57,7 +59,7 @@ function TournamentForm({ tournament, teams }: { tournament?: Tournament; teams:
       <SubmitButton pendingText={tournament ? "Зберігаю..." : "Створюю..."} className="w-fit rounded-lg bg-accent px-4 py-2 font-bold text-bg">
         {tournament ? "Зберегти" : "Створити"}
       </SubmitButton>
-      {tournament ? (
+      {tournament && canDelete ? (
         <SubmitButton formAction={deleteTournament} name="id" value={tournament.id} pendingText="Видаляю..." className="w-fit rounded-lg border border-red-500/30 px-3 py-2 text-sm font-bold text-red-300">
           Видалити
         </SubmitButton>

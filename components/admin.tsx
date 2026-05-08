@@ -1,14 +1,24 @@
 import Link from "next/link";
+import type { AdminRole } from "@/lib/types";
 
-export function AdminNav() {
-  const links = [
-    ["Dashboard", "/admin"],
-    ["Homepage", "/admin/homepage"],
-    ["Teams", "/admin/teams"],
-    ["News", "/admin/news"],
-    ["Tournaments", "/admin/tournaments"],
-    ["Players", "/admin/players"]
-  ];
+export function AdminNav({ role }: { role?: AdminRole | null }) {
+  const links = [["Dashboard", "/admin"]];
+
+  if (role === "main_admin" || role === "admin") {
+    links.push(["Homepage", "/admin/homepage"], ["Teams", "/admin/teams"], ["News", "/admin/news"], ["Tournaments", "/admin/tournaments"], ["Players", "/admin/players"]);
+  }
+
+  if (role === "moderator") {
+    links.push(["Teams", "/admin/teams"], ["Players", "/admin/players"]);
+  }
+
+  if (role === "reporter") {
+    links.push(["News", "/admin/news"]);
+  }
+
+  if (role === "main_admin") {
+    links.push(["Admins", "/admin/admins"]);
+  }
 
   return (
     <nav className="mb-5 flex flex-wrap gap-2">

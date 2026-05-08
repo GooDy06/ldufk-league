@@ -5,12 +5,13 @@ create extension if not exists pgcrypto;
 
 create table if not exists public.admin_users (
   email text primary key,
+  role text not null default 'admin' check (role in ('main_admin', 'admin', 'moderator', 'reporter')),
   created_at timestamptz not null default now()
 );
 
-insert into public.admin_users (email)
-values ('ВСТАВ_ТУТ_СВІЙ_EMAIL')
-on conflict (email) do nothing;
+insert into public.admin_users (email, role)
+values ('ВСТАВ_ТУТ_СВІЙ_EMAIL', 'main_admin')
+on conflict (email) do update set role = 'main_admin';
 
 create or replace function public.is_admin()
 returns boolean
@@ -24,6 +25,29 @@ as $$
     from public.admin_users
     where email = auth.jwt() ->> 'email'
   );
+$$;
+
+create or replace function public.admin_role()
+returns text
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select role
+  from public.admin_users
+  where lower(email) = lower(auth.jwt() ->> 'email')
+  limit 1;
+$$;
+
+create or replace function public.has_admin_role(roles text[])
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select coalesce(public.admin_role() = any(roles), false);
 $$;
 
 create table if not exists public.teams (
@@ -49,6 +73,12 @@ create table if not exists public.players (
   role text not null default 'Rifler',
   rating numeric(4,2) not null default 1.00,
   avatar_url text,
+  highlight_youtube_url text,
+  highlight_title text,
+  highlight_tournament text,
+  highlight_map text,
+  highlight_date text,
+  highlight_description text,
   published boolean not null default false,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
@@ -62,6 +92,7 @@ create table if not exists public.news (
   excerpt text not null default '',
   body text not null default '',
   image_url text,
+  created_by uuid references auth.users(id) on delete set null,
   published boolean not null default false,
   published_at timestamptz,
   created_at timestamptz not null default now(),

@@ -7,7 +7,7 @@ import type { Division, HomepageChampion } from "@/lib/types";
 export const dynamic = "force-dynamic";
 
 export default async function AdminHomepagePage({ searchParams }: { searchParams: { saved?: string } }) {
-  const { supabase } = await requireAdmin();
+  const { supabase, role } = await requireAdmin();
   const { data } = await supabase.from("homepage_champions").select("*").order("slot");
   const champions = (data || []) as HomepageChampion[];
   const university = champions.find((champion) => champion.slot === "University");
@@ -15,7 +15,7 @@ export default async function AdminHomepagePage({ searchParams }: { searchParams
 
   return (
     <div className="py-8">
-      <AdminNav />
+      <AdminNav role={role} />
       <h1 className="mb-4 font-rajdhani text-4xl font-bold">Homepage winners</h1>
       {searchParams.saved ? <div className="mb-4 rounded-xl border border-emerald-400/30 bg-emerald-400/10 p-3 text-sm font-bold text-emerald-200">Головну оновлено.</div> : null}
       <div className="grid gap-4 lg:grid-cols-2">
