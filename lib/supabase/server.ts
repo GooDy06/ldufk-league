@@ -35,8 +35,8 @@ export function createClient() {
 export async function requireAdmin() {
   const supabase = createClient();
   const { data } = await supabase.auth.getUser();
-  const email = data.user?.email?.toLowerCase();
-  const adminEmail = process.env.ADMIN_EMAIL?.toLowerCase();
+  const email = data.user?.email?.trim().toLowerCase();
+  const adminEmail = process.env.ADMIN_EMAIL?.trim().toLowerCase();
 
   if (!email || email !== adminEmail) {
     return { supabase, user: null, email };

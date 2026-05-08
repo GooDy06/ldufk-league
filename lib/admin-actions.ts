@@ -33,7 +33,7 @@ export async function signIn(formData: FormData) {
   });
   if (error) redirect("/admin?error=credentials");
 
-  if (email !== process.env.ADMIN_EMAIL?.toLowerCase()) {
+  if (email !== process.env.ADMIN_EMAIL?.trim().toLowerCase()) {
     await supabase.auth.signOut();
     redirect("/admin?error=email");
   }
