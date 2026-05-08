@@ -26,14 +26,13 @@ async function assertAdmin() {
 export async function signIn(formData: FormData) {
   const supabase = createClient();
   const email = text(formData, "email");
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
-  await supabase.auth.signInWithOtp({
+  const password = text(formData, "password");
+  const { error } = await supabase.auth.signInWithPassword({
     email,
-    options: {
-      emailRedirectTo: `${siteUrl}/auth/callback`
-    }
+    password
   });
-  redirect("/admin?sent=1");
+  if (error) redirect("/admin?error=1");
+  redirect("/admin");
 }
 
 export async function signOut() {
