@@ -25,13 +25,19 @@ async function assertAdmin() {
 
 export async function signIn(formData: FormData) {
   const supabase = createClient();
-  const email = text(formData, "email");
+  const email = text(formData, "email").toLowerCase();
   const password = text(formData, "password");
   const { error } = await supabase.auth.signInWithPassword({
     email,
     password
   });
-  if (error) redirect("/admin?error=1");
+  if (error) redirect("/admin?error=credentials");
+
+  if (email !== process.env.ADMIN_EMAIL?.toLowerCase()) {
+    await supabase.auth.signOut();
+    redirect("/admin?error=email");
+  }
+
   redirect("/admin");
 }
 

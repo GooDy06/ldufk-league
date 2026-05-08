@@ -4,8 +4,7 @@ const links = [
   ["Загальна", "/"],
   ["Рейтинг", "/ranking"],
   ["Турніри", "/tournaments"],
-  ["Новини", "/news"],
-  ["Адмін", "/admin"]
+  ["Новини", "/news"]
 ];
 
 export function SiteHeader() {

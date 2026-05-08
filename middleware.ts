@@ -30,8 +30,8 @@ export async function middleware(request: NextRequest) {
   const { data } = await supabase.auth.getUser();
   const isAdminRoute = request.nextUrl.pathname.startsWith("/admin");
   const isAdminHome = request.nextUrl.pathname === "/admin";
-  const email = data.user?.email;
-  const allowedEmail = process.env.ADMIN_EMAIL;
+  const email = data.user?.email?.toLowerCase();
+  const allowedEmail = process.env.ADMIN_EMAIL?.toLowerCase();
 
   if (isAdminRoute && !isAdminHome && (!email || email !== allowedEmail)) {
     return NextResponse.redirect(new URL("/admin", request.url));

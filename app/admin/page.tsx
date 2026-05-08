@@ -15,9 +15,14 @@ export default async function AdminPage({ searchParams }: { searchParams: { erro
         <p className="mt-2 text-sm leading-6 text-slate-400">
           Доступ дозволений тільки для email з <code>ADMIN_EMAIL</code>. Поточний email: {email || "не залогінено"}.
         </p>
-        {searchParams.error ? (
+        {searchParams.error === "credentials" ? (
           <p className="mt-3 rounded-lg border border-red-400/30 bg-red-500/10 p-3 text-sm text-red-200">
             Не вдалося увійти. Перевір email і пароль.
+          </p>
+        ) : null}
+        {searchParams.error === "email" ? (
+          <p className="mt-3 rounded-lg border border-red-400/30 bg-red-500/10 p-3 text-sm text-red-200">
+            Вхід виконано, але цей email не має доступу до адмінки.
           </p>
         ) : null}
         <form action={signIn} className="mt-5 grid gap-3 rounded-2xl border border-line bg-surface p-4">
