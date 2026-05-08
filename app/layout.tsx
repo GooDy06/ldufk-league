@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Exo_2, Rajdhani } from "next/font/google";
 import "./globals.css";
 import { SiteHeader } from "@/components/site-header";
+import { Analytics } from "@vercel/analytics/next";
 
 const exo = Exo_2({ subsets: ["latin", "cyrillic"], variable: "--font-exo" });
 const rajdhani = Rajdhani({
@@ -24,6 +25,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <footer className="border-t border-line py-6 text-center text-xs tracking-wide text-slate-500">
           <strong className="text-accent">LDUFK League</strong> · CS2 · Season 2026
         </footer>
+        <Analytics />
       </body>
     </html>
   );
