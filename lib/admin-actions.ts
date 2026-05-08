@@ -17,6 +17,13 @@ function bool(formData: FormData, key: string) {
   return formData.get(key) === "on";
 }
 
+function failIfError(error: { message: string } | null, entity: string) {
+  if (error) {
+    console.error(`Supabase ${entity} error:`, error.message);
+    throw new Error(`Не вдалося зберегти ${entity}: ${error.message}`);
+  }
+}
+
 async function assertAdmin() {
   const { supabase, user } = await requireAdmin();
   if (!user) redirect("/admin");
@@ -50,30 +57,38 @@ export async function signOut() {
 export async function saveTeam(formData: FormData) {
   const supabase = await assertAdmin();
   const id = nullableText(formData, "id");
+  const points = Number(text(formData, "points") || 0);
+  const previousPoints = Number(text(formData, "previous_points") || 0);
+  const trend = bool(formData, "auto_trend") && id ? points - previousPoints : Number(text(formData, "trend") || 0);
   const payload = {
     name: text(formData, "name"),
     slug: text(formData, "slug"),
     division: text(formData, "division"),
     org: text(formData, "org"),
-    points: Number(text(formData, "points") || 0),
-    trend: Number(text(formData, "trend") || 0),
+    points,
+    trend,
     color: text(formData, "color") || "#00d5ff",
     logo_url: nullableText(formData, "logo_url"),
     summary: nullableText(formData, "summary"),
     published: bool(formData, "published")
   };
 
-  if (id) await supabase.from("teams").update(payload).eq("id", id);
-  else await supabase.from("teams").insert(payload);
+  const { error } = id ? await supabase.from("teams").update(payload).eq("id", id) : await supabase.from("teams").insert(payload);
+  failIfError(error, "team");
   revalidatePath("/");
+  revalidatePath("/ranking");
   revalidatePath("/admin/teams");
+  redirect("/admin/teams?saved=team");
 }
 
 export async function deleteTeam(formData: FormData) {
   const supabase = await assertAdmin();
-  await supabase.from("teams").delete().eq("id", text(formData, "id"));
+  const { error } = await supabase.from("teams").delete().eq("id", text(formData, "id"));
+  failIfError(error, "team");
   revalidatePath("/");
+  revalidatePath("/ranking");
   revalidatePath("/admin/teams");
+  redirect("/admin/teams?deleted=team");
 }
 
 export async function savePlayer(formData: FormData) {
@@ -88,17 +103,22 @@ export async function savePlayer(formData: FormData) {
     published: bool(formData, "published")
   };
 
-  if (id) await supabase.from("players").update(payload).eq("id", id);
-  else await supabase.from("players").insert(payload);
+  const { error } = id ? await supabase.from("players").update(payload).eq("id", id) : await supabase.from("players").insert(payload);
+  failIfError(error, "player");
   revalidatePath("/");
+  revalidatePath("/ranking");
   revalidatePath("/admin/players");
+  redirect("/admin/players?saved=player");
 }
 
 export async function deletePlayer(formData: FormData) {
   const supabase = await assertAdmin();
-  await supabase.from("players").delete().eq("id", text(formData, "id"));
+  const { error } = await supabase.from("players").delete().eq("id", text(formData, "id"));
+  failIfError(error, "player");
   revalidatePath("/");
+  revalidatePath("/ranking");
   revalidatePath("/admin/players");
+  redirect("/admin/players?deleted=player");
 }
 
 export async function saveNews(formData: FormData) {
@@ -116,19 +136,22 @@ export async function saveNews(formData: FormData) {
     published_at: published ? new Date().toISOString() : null
   };
 
-  if (id) await supabase.from("news").update(payload).eq("id", id);
-  else await supabase.from("news").insert(payload);
+  const { error } = id ? await supabase.from("news").update(payload).eq("id", id) : await supabase.from("news").insert(payload);
+  failIfError(error, "news");
   revalidatePath("/");
   revalidatePath("/news");
   revalidatePath("/admin/news");
+  redirect("/admin/news?saved=news");
 }
 
 export async function deleteNews(formData: FormData) {
   const supabase = await assertAdmin();
-  await supabase.from("news").delete().eq("id", text(formData, "id"));
+  const { error } = await supabase.from("news").delete().eq("id", text(formData, "id"));
+  failIfError(error, "news");
   revalidatePath("/");
   revalidatePath("/news");
   revalidatePath("/admin/news");
+  redirect("/admin/news?deleted=news");
 }
 
 export async function saveTournament(formData: FormData) {
@@ -153,20 +176,44 @@ export async function saveTournament(formData: FormData) {
     description: nullableText(formData, "description"),
     participants,
     banner_url: nullableText(formData, "banner_url"),
+    featured_home: bool(formData, "featured_home"),
     published: bool(formData, "published")
   };
 
-  if (id) await supabase.from("tournaments").update(payload).eq("id", id);
-  else await supabase.from("tournaments").insert(payload);
+  const { error } = id ? await supabase.from("tournaments").update(payload).eq("id", id) : await supabase.from("tournaments").insert(payload);
+  failIfError(error, "tournament");
   revalidatePath("/");
   revalidatePath("/tournaments");
   revalidatePath("/admin/tournaments");
+  redirect("/admin/tournaments?saved=tournament");
 }
 
 export async function deleteTournament(formData: FormData) {
   const supabase = await assertAdmin();
-  await supabase.from("tournaments").delete().eq("id", text(formData, "id"));
+  const { error } = await supabase.from("tournaments").delete().eq("id", text(formData, "id"));
+  failIfError(error, "tournament");
   revalidatePath("/");
   revalidatePath("/tournaments");
   revalidatePath("/admin/tournaments");
+  redirect("/admin/tournaments?deleted=tournament");
+}
+
+export async function saveHomepageChampion(formData: FormData) {
+  const supabase = await assertAdmin();
+  const slot = text(formData, "slot");
+  const payload = {
+    slot,
+    team_name: text(formData, "team_name"),
+    tournament_name: text(formData, "tournament_name"),
+    date_label: text(formData, "date_label"),
+    division_label: text(formData, "division_label"),
+    image_url: nullableText(formData, "image_url"),
+    details_url: nullableText(formData, "details_url")
+  };
+
+  const { error } = await supabase.from("homepage_champions").upsert(payload, { onConflict: "slot" });
+  failIfError(error, "homepage champion");
+  revalidatePath("/");
+  revalidatePath("/admin/homepage");
+  redirect("/admin/homepage?saved=homepage");
 }

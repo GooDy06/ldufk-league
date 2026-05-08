@@ -1,4 +1,5 @@
 import { AdminNav, Field, inputClass } from "@/components/admin";
+import { SubmitButton } from "@/components/submit-button";
 import { deleteNews, saveNews } from "@/lib/admin-actions";
 import { requireAdmin } from "@/lib/supabase/server";
 import type { NewsItem } from "@/lib/types";
@@ -33,8 +34,14 @@ function NewsForm({ item }: { item?: NewsItem }) {
       </div>
       <Field label="Excerpt"><textarea className={inputClass} name="excerpt" defaultValue={item?.excerpt || ""} /></Field>
       <Field label="Body"><textarea className={inputClass} name="body" defaultValue={item?.body || ""} rows={6} /></Field>
-      <button className="w-fit rounded-lg bg-accent px-4 py-2 font-bold text-bg">{item ? "Зберегти" : "Створити"}</button>
-      {item ? <button formAction={deleteNews} name="id" value={item.id} className="w-fit rounded-lg border border-red-500/30 px-3 py-2 text-sm font-bold text-red-300">Видалити</button> : null}
+      <SubmitButton pendingText={item ? "Зберігаю..." : "Створюю..."} className="w-fit rounded-lg bg-accent px-4 py-2 font-bold text-bg">
+        {item ? "Зберегти" : "Створити"}
+      </SubmitButton>
+      {item ? (
+        <SubmitButton formAction={deleteNews} name="id" value={item.id} pendingText="Видаляю..." className="w-fit rounded-lg border border-red-500/30 px-3 py-2 text-sm font-bold text-red-300">
+          Видалити
+        </SubmitButton>
+      ) : null}
     </form>
   );
 }

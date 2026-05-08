@@ -6,7 +6,7 @@ export const dynamic = "force-dynamic";
 
 export default async function NewsPage() {
   const supabase = createClient();
-  const { data } = await supabase.from("news").select("*").eq("published", true).order("published_at", { ascending: false, nullsFirst: false });
+  const { data } = await supabase.from("news").select("*").eq("published", true).order("published_at", { ascending: false, nullsFirst: false }).limit(20);
   const news = (data || []) as NewsItem[];
 
   return (

@@ -1,4 +1,5 @@
 import { AdminNav, Field, inputClass } from "@/components/admin";
+import { SubmitButton } from "@/components/submit-button";
 import { deleteTournament, saveTournament } from "@/lib/admin-actions";
 import { requireAdmin } from "@/lib/supabase/server";
 import type { Team, Tournament } from "@/lib/types";
@@ -44,6 +45,7 @@ function TournamentForm({ tournament, teams }: { tournament?: Tournament; teams:
         </Field>
         <Field label="Banner URL"><input className={inputClass} name="banner_url" defaultValue={tournament?.banner_url || ""} /></Field>
         <Field label="Published"><input name="published" type="checkbox" defaultChecked={tournament?.published} className="h-5 w-5" /></Field>
+        <Field label="Show on homepage"><input name="featured_home" type="checkbox" defaultChecked={tournament?.featured_home} className="h-5 w-5" /></Field>
       </div>
       <div className="grid gap-3 md:grid-cols-3">
         <Field label="Points"><input className={inputClass} name="points" defaultValue={tournament?.points || ""} /></Field>
@@ -52,8 +54,14 @@ function TournamentForm({ tournament, teams }: { tournament?: Tournament; teams:
       </div>
       <Field label="Description"><textarea className={inputClass} name="description" defaultValue={tournament?.description || ""} /></Field>
       <Field label="Participants, one per line"><textarea className={inputClass} name="participants" defaultValue={(tournament?.participants || []).join("\n")} /></Field>
-      <button className="w-fit rounded-lg bg-accent px-4 py-2 font-bold text-bg">{tournament ? "Зберегти" : "Створити"}</button>
-      {tournament ? <button formAction={deleteTournament} name="id" value={tournament.id} className="w-fit rounded-lg border border-red-500/30 px-3 py-2 text-sm font-bold text-red-300">Видалити</button> : null}
+      <SubmitButton pendingText={tournament ? "Зберігаю..." : "Створюю..."} className="w-fit rounded-lg bg-accent px-4 py-2 font-bold text-bg">
+        {tournament ? "Зберегти" : "Створити"}
+      </SubmitButton>
+      {tournament ? (
+        <SubmitButton formAction={deleteTournament} name="id" value={tournament.id} pendingText="Видаляю..." className="w-fit rounded-lg border border-red-500/30 px-3 py-2 text-sm font-bold text-red-300">
+          Видалити
+        </SubmitButton>
+      ) : null}
     </form>
   );
 }

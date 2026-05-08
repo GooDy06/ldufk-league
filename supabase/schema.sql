@@ -68,6 +68,21 @@ create table if not exists public.news (
   updated_at timestamptz not null default now()
 );
 
+create table if not exists public.homepage_champions (
+  id uuid primary key default gen_random_uuid(),
+  slot text not null unique check (slot in ('University', 'School')),
+  team_name text not null,
+  tournament_name text not null,
+  date_label text not null,
+  division_label text not null,
+  image_url text,
+  details_url text,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+grant select on public.homepage_champions to anon, authenticated;
+
 create table if not exists public.tournaments (
   id uuid primary key default gen_random_uuid(),
   slug text not null unique,
@@ -84,6 +99,7 @@ create table if not exists public.tournaments (
   description text,
   participants text[] not null default '{}',
   banner_url text,
+  featured_home boolean not null default false,
   published boolean not null default false,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
@@ -115,10 +131,15 @@ drop trigger if exists tournaments_touch_updated_at on public.tournaments;
 create trigger tournaments_touch_updated_at before update on public.tournaments
 for each row execute function public.touch_updated_at();
 
+drop trigger if exists homepage_champions_touch_updated_at on public.homepage_champions;
+create trigger homepage_champions_touch_updated_at before update on public.homepage_champions
+for each row execute function public.touch_updated_at();
+
 alter table public.admin_users enable row level security;
 alter table public.teams enable row level security;
 alter table public.players enable row level security;
 alter table public.news enable row level security;
+alter table public.homepage_champions enable row level security;
 alter table public.tournaments enable row level security;
 
 drop policy if exists "Admins can read admin users" on public.admin_users;
@@ -166,6 +187,19 @@ to authenticated
 using (public.is_admin())
 with check (public.is_admin());
 
+drop policy if exists "Public can read homepage champions" on public.homepage_champions;
+create policy "Public can read homepage champions"
+on public.homepage_champions for select
+to anon, authenticated
+using (true);
+
+drop policy if exists "Admins can write homepage champions" on public.homepage_champions;
+create policy "Admins can write homepage champions"
+on public.homepage_champions for all
+to authenticated
+using (public.is_admin())
+with check (public.is_admin());
+
 drop policy if exists "Public can read published tournaments" on public.tournaments;
 create policy "Public can read published tournaments"
 on public.tournaments for select
@@ -182,4 +216,5 @@ with check (public.is_admin());
 create index if not exists teams_published_division_points_idx on public.teams (published, division, points desc);
 create index if not exists players_published_rating_idx on public.players (published, rating desc);
 create index if not exists news_published_at_idx on public.news (published, published_at desc nulls last, created_at desc);
+create index if not exists homepage_champions_slot_idx on public.homepage_champions (slot);
 create index if not exists tournaments_published_division_idx on public.tournaments (published, division, created_at desc);

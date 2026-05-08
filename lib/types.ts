@@ -1,6 +1,19 @@
 export type Division = "University" | "School";
 export type Publishable = { published: boolean };
 
+export type HomepageChampion = {
+  id: string;
+  slot: Division;
+  team_name: string;
+  tournament_name: string;
+  date_label: string;
+  division_label: string;
+  image_url: string | null;
+  details_url: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
 export type Team = Publishable & {
   id: string;
   name: string;
@@ -53,5 +66,6 @@ export type Tournament = Publishable & {
   description: string | null;
   participants: string[];
   banner_url: string | null;
+  featured_home?: boolean;
   winner?: Pick<Team, "name" | "slug"> | null;
 };

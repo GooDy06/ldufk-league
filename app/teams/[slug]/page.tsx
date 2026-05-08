@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import type { Player, Team } from "@/lib/types";
 import { Panel } from "@/components/ui";
+import { RosterShowcase } from "@/components/roster-showcase";
 
 export const dynamic = "force-dynamic";
 
@@ -26,14 +27,7 @@ export default async function TeamPage({ params }: { params: { slug: string } })
         </div>
       </div>
       <Panel title="Склад команди" eyebrow="Players">
-        <div className="grid gap-2 md:grid-cols-2">
-          {((players || []) as Player[]).map((player) => (
-            <div key={player.id} className="rounded-xl border border-line bg-surface2 p-4">
-              <div className="font-bold">{player.nick}</div>
-              <div className="text-sm text-slate-500">{player.role} · rating {player.rating}</div>
-            </div>
-          ))}
-        </div>
+        <RosterShowcase players={(players || []) as Player[]} />
       </Panel>
     </div>
   );

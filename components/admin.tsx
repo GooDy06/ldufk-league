@@ -3,6 +3,7 @@ import Link from "next/link";
 export function AdminNav() {
   const links = [
     ["Dashboard", "/admin"],
+    ["Homepage", "/admin/homepage"],
     ["Teams", "/admin/teams"],
     ["News", "/admin/news"],
     ["Tournaments", "/admin/tournaments"],
