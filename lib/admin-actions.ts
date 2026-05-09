@@ -18,6 +18,13 @@ function bool(formData: FormData, key: string) {
   return formData.get(key) === "on";
 }
 
+function dateTime(formData: FormData, key: string) {
+  const value = text(formData, key);
+  if (!value.length) return null;
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? null : date.toISOString();
+}
+
 function failIfError(error: { message: string } | null, entity: string) {
   if (error) {
     console.error(`Supabase ${entity} error:`, error.message);
@@ -170,6 +177,7 @@ export async function saveNews(formData: FormData) {
   const { supabase, user } = await assertAdmin(["main_admin", "admin", "reporter"]);
   const id = nullableText(formData, "id");
   const published = bool(formData, "published");
+  const selectedPublishedAt = dateTime(formData, "published_at");
   const payload = {
     slug: text(formData, "slug"),
     title: text(formData, "title"),
@@ -178,7 +186,7 @@ export async function saveNews(formData: FormData) {
     body: text(formData, "body"),
     image_url: nullableText(formData, "image_url"),
     published,
-    published_at: published ? new Date().toISOString() : null,
+    published_at: published ? selectedPublishedAt || new Date().toISOString() : null,
     created_by: user.id
   };
 
