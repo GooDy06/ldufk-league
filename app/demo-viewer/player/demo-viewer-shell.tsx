@@ -6,6 +6,28 @@ export function DemoViewerShell() {
   const [panelCollapsed, setPanelCollapsed] = useState(false);
 
   useEffect(() => {
+    function updateMobileClass() {
+      const mobile =
+        window.innerWidth <= 900 ||
+        window.matchMedia("(pointer: coarse)").matches ||
+        /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+      document.documentElement.classList.toggle("demo-mobile", mobile);
+      document.body.classList.toggle("demo-mobile", mobile);
+    }
+
+    updateMobileClass();
+    window.addEventListener("resize", updateMobileClass);
+    window.visualViewport?.addEventListener("resize", updateMobileClass);
+
+    return () => {
+      window.removeEventListener("resize", updateMobileClass);
+      window.visualViewport?.removeEventListener("resize", updateMobileClass);
+      document.documentElement.classList.remove("demo-mobile");
+      document.body.classList.remove("demo-mobile");
+    };
+  }, []);
+
+  useEffect(() => {
     let cancelled = false;
     let script: HTMLScriptElement | null = null;
 

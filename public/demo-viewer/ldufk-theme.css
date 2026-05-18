@@ -420,3 +420,173 @@ body {
     bottom: calc(14px + env(safe-area-inset-bottom));
   }
 }
+
+html.demo-mobile,
+body.demo-mobile {
+  height: 100% !important;
+  overflow-x: hidden !important;
+  overflow-y: hidden !important;
+}
+
+body.demo-mobile .grid-container {
+  display: block !important;
+  grid-template-columns: none !important;
+  grid-template-rows: none !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  min-height: 100vh !important;
+  overflow: hidden !important;
+}
+
+body.demo-mobile .grid-container > div {
+  height: 100% !important;
+  min-height: 0 !important;
+  font-size: 18px !important;
+}
+
+body.demo-mobile .grid-container > .map,
+body.demo-mobile .map {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  min-height: 100vh !important;
+  overflow: hidden !important;
+}
+
+body.demo-mobile .grid-container > .infoPanel {
+  position: fixed !important;
+  top: auto !important;
+  right: 10px !important;
+  bottom: calc(10px + env(safe-area-inset-bottom)) !important;
+  left: 10px !important;
+  z-index: 1002 !important;
+  width: auto !important;
+  max-width: calc(100vw - 20px) !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: 45vh !important;
+  overflow: hidden !important;
+  border: 1px solid rgba(35, 53, 78, 0.95) !important;
+  border-radius: 18px !important;
+  background: rgba(5, 10, 18, 0.92) !important;
+  box-shadow: 0 -18px 54px rgba(0, 0, 0, 0.48) !important;
+  transform: translateY(0) !important;
+  transition: transform 220ms ease !important;
+}
+
+body.demo-mobile.demo-panel-collapsed .grid-container > .infoPanel {
+  transform: translateY(calc(100% + 14px)) !important;
+}
+
+body.demo-mobile .info-panel-container {
+  display: flex !important;
+  align-items: stretch !important;
+  gap: 10px !important;
+  max-height: 45vh !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  padding: 10px 44px 10px 10px !important;
+  scroll-snap-type: x proximity !important;
+  -webkit-overflow-scrolling: touch !important;
+}
+
+body.demo-mobile .info-panel-container > * {
+  flex: 0 0 auto !important;
+  scroll-snap-align: start !important;
+}
+
+body.demo-mobile .timer-container,
+body.demo-mobile .scoreboard-container,
+body.demo-mobile .round-nav-container,
+body.demo-mobile .controls-container,
+body.demo-mobile .player-list-container {
+  margin: 0 !important;
+  border-radius: 14px !important;
+}
+
+body.demo-mobile .timer-container {
+  width: 150px !important;
+}
+
+body.demo-mobile .round-nav-container {
+  width: min(420px, 82vw) !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  padding: 8px !important;
+  -webkit-overflow-scrolling: touch !important;
+}
+
+body.demo-mobile .controls-container {
+  width: 250px !important;
+  gap: 8px !important;
+  padding: 10px 12px !important;
+  justify-content: center !important;
+}
+
+body.demo-mobile .controls-wrapper.compact {
+  gap: 8px !important;
+}
+
+body.demo-mobile .control-button {
+  width: 44px !important;
+  height: 44px !important;
+  min-width: 44px !important;
+  font-size: 22px !important;
+}
+
+body.demo-mobile .play-button {
+  width: 54px !important;
+  height: 54px !important;
+  min-width: 54px !important;
+}
+
+body.demo-mobile .speed-chip {
+  min-width: 46px !important;
+  padding: 7px 8px !important;
+  font-size: 12px !important;
+}
+
+body.demo-mobile .roundNav {
+  min-width: 38px !important;
+  height: 38px !important;
+  font-size: 15px !important;
+}
+
+body.demo-mobile .player-list-container {
+  width: min(620px, 86vw) !important;
+  max-height: 40vh !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  -webkit-overflow-scrolling: touch !important;
+}
+
+body.demo-mobile .playerListItemContainer,
+body.demo-mobile .playerListItem {
+  min-height: 76px !important;
+}
+
+body.demo-mobile .scoreboard-container {
+  width: 230px !important;
+}
+
+body.demo-mobile .demo-panel-toggle {
+  position: fixed !important;
+  right: 18px !important;
+  bottom: calc(18px + env(safe-area-inset-bottom)) !important;
+  z-index: 1004 !important;
+  display: grid !important;
+  width: 38px !important;
+  height: 38px !important;
+  place-items: center !important;
+  border: 1px solid rgba(111, 240, 194, 0.65) !important;
+  border-radius: 999px !important;
+  background: rgba(16, 26, 42, 0.94) !important;
+  color: #6ff0c2 !important;
+  font: 900 24px/1 var(--font-exo, "Segoe UI", sans-serif) !important;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.44) !important;
+}
+
+body.demo-mobile.demo-panel-collapsed .demo-panel-toggle {
+  bottom: calc(14px + env(safe-area-inset-bottom)) !important;
+}

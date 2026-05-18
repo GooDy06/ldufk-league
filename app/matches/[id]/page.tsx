@@ -11,7 +11,7 @@ import {
   type LotPlayerStat
 } from "@/lib/lotgaming";
 import { getDemoAnalysis, type DemoAnalysis, type DemoAnalysisPlayer } from "@/lib/demo-analysis";
-import { demoViewerHref, getDemoFile } from "@/lib/demo-files";
+import { demoFileProxyHref, demoViewerHref, getDemoFile } from "@/lib/demo-files";
 import { mapImageFor } from "@/lib/map-assets";
 
 export const dynamic = "force-dynamic";
@@ -346,7 +346,7 @@ export default async function MatchDetailPage({ params, searchParams }: { params
                 2D Demo
               </Link>
               <Link
-                href={demoFile.url}
+                href={demoFileProxyHref(demoFile.url)}
                 target="_blank"
                 download
                 className="rounded-xl border border-line bg-surface2 px-4 py-2 text-sm font-extrabold uppercase tracking-[0.14em] text-slate-300 transition hover:border-accent hover:text-accent"
