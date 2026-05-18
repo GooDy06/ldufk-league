@@ -9,15 +9,35 @@ export function DemoViewerShell() {
     let cancelled = false;
     let script: HTMLScriptElement | null = null;
 
-    async function bootViewer() {
-      if ("serviceWorker" in navigator) {
-        try {
-          await navigator.serviceWorker.register("/demo-viewer/demo-cache-sw.js", { scope: "/demo-viewer/" });
-          await navigator.serviceWorker.ready;
-        } catch {
-          // The viewer still works without offline cache; it will just download normally.
+    async function cleanupLegacyDemoCache() {
+      if (!("serviceWorker" in navigator)) return false;
+
+      try {
+        const registrations = await navigator.serviceWorker.getRegistrations();
+        await Promise.all(
+          registrations
+            .filter((registration) => registration.scope.includes("/demo-viewer/"))
+            .map((registration) => registration.unregister()),
+        );
+        if ("caches" in window) {
+          await caches.delete("ldufk-demo-cache-v1");
         }
+      } catch {
+        return false;
       }
+
+      if (navigator.serviceWorker.controller && !sessionStorage.getItem("ldufk-demo-sw-cleaned")) {
+        sessionStorage.setItem("ldufk-demo-sw-cleaned", "1");
+        window.location.reload();
+        return true;
+      }
+
+      return false;
+    }
+
+    async function bootViewer() {
+      const reloading = await cleanupLegacyDemoCache();
+      if (reloading) return;
 
       if (cancelled) return;
       script = document.createElement("script");
