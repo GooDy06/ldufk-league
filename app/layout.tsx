@@ -13,7 +13,12 @@ const rajdhani = Rajdhani({
 
 export const metadata: Metadata = {
   title: "LDUFK League",
-  description: "Український портал навчальної CS2-ліги"
+  description: "Український портал навчальної CS2-ліги",
+  icons: {
+    icon: "/assets/logo.png",
+    shortcut: "/assets/logo.png",
+    apple: "/assets/logo.png"
+  }
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

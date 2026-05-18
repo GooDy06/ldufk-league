@@ -1,0 +1,148 @@
+import { existsSync, readdirSync, readFileSync } from "fs";
+import path from "path";
+import { schoolRosters } from "@/lib/school-rosters";
+
+export type PlayerComputedStats = {
+  nick: string;
+  teamNames: string[];
+  maps: number;
+  kills: number;
+  deaths: number;
+  assists: number;
+  damage: number;
+  headshots: number;
+  firstKills: number;
+  firstDeaths: number;
+  flashAssists: number;
+  rating: number;
+  kd: number;
+  adr: number;
+  hsPercent: number;
+  firepower: number;
+  entrying: number;
+  trading: number;
+  opening: number;
+  clutching: number;
+  sniping: number;
+  utility: number;
+  matchIds: number[];
+};
+
+type RawDemoPlayer = {
+  name: string;
+  teamName: string;
+  sides: Record<string, {
+    kills?: number;
+    deaths?: number;
+    assists?: number;
+    damage?: number;
+    firstKills?: number;
+    firstDeaths?: number;
+    flashAssists?: number;
+    headshots?: number;
+  }>;
+};
+
+type RawDemo = {
+  matchId: number;
+  players?: RawDemoPlayer[];
+};
+
+function emptyStats(nick: string): PlayerComputedStats {
+  return {
+    nick,
+    teamNames: [],
+    maps: 0,
+    kills: 0,
+    deaths: 0,
+    assists: 0,
+    damage: 0,
+    headshots: 0,
+    firstKills: 0,
+    firstDeaths: 0,
+    flashAssists: 0,
+    rating: 0,
+    kd: 0,
+    adr: 0,
+    hsPercent: 0,
+    firepower: 0,
+    entrying: 0,
+    trading: 0,
+    opening: 0,
+    clutching: 0,
+    sniping: 0,
+    utility: 0,
+    matchIds: []
+  };
+}
+
+function score(value: number, target: number) {
+  if (!Number.isFinite(value) || target <= 0) return 0;
+  return Math.max(0, Math.min(100, Math.round((value / target) * 100)));
+}
+
+function finalize(stats: PlayerComputedStats) {
+  const rounds = Math.max(1, stats.maps * 20);
+  stats.kd = stats.deaths > 0 ? stats.kills / stats.deaths : stats.kills;
+  stats.adr = stats.damage / rounds;
+  stats.hsPercent = stats.kills > 0 ? (stats.headshots / stats.kills) * 100 : 0;
+
+  const killPart = (stats.kills / rounds) / 0.7;
+  const damagePart = stats.adr / 85;
+  const survivalPart = ((rounds - stats.deaths) / rounds) / 0.7;
+  stats.rating = (killPart * 0.45) + (damagePart * 0.35) + (Math.max(0, survivalPart) * 0.2);
+
+  stats.firepower = score(stats.kills / rounds, 0.9);
+  stats.entrying = score(stats.firstKills / Math.max(1, stats.firstKills + stats.firstDeaths), 0.65);
+  stats.trading = score(stats.assists / rounds, 0.25);
+  stats.opening = score(stats.firstKills / rounds, 0.16);
+  stats.clutching = score(stats.kd, 1.5);
+  stats.sniping = 0;
+  stats.utility = score(stats.flashAssists / rounds, 0.08);
+  stats.teamNames = [...new Set(stats.teamNames)].filter(Boolean);
+  stats.matchIds = [...new Set(stats.matchIds)].sort((a, b) => b - a);
+
+  return stats;
+}
+
+export function getAllPlayerStats() {
+  const dir = path.join(process.cwd(), "public", "demo-data", "matches");
+  const players = new Map<string, PlayerComputedStats>();
+
+  if (!existsSync(dir)) return [];
+
+  for (const file of readdirSync(dir)) {
+    if (!file.endsWith(".json")) continue;
+    const demo = JSON.parse(readFileSync(path.join(dir, file), "utf8")) as RawDemo;
+
+    for (const player of demo.players || []) {
+      const current = players.get(player.name) || emptyStats(player.name);
+      current.maps += 1;
+      current.teamNames.push(player.teamName);
+      current.matchIds.push(demo.matchId);
+
+      for (const side of Object.values(player.sides || {})) {
+        current.kills += side.kills || 0;
+        current.deaths += side.deaths || 0;
+        current.assists += side.assists || 0;
+        current.damage += side.damage || 0;
+        current.headshots += side.headshots || 0;
+        current.firstKills += side.firstKills || 0;
+        current.firstDeaths += side.firstDeaths || 0;
+        current.flashAssists += side.flashAssists || 0;
+      }
+
+      players.set(player.name, current);
+    }
+  }
+
+  return [...players.values()].map(finalize).sort((a, b) => b.rating - a.rating || b.kills - a.kills);
+}
+
+export function getPlayerStatsByNick(nick: string) {
+  return getAllPlayerStats().find((player) => player.nick.toLowerCase() === nick.toLowerCase()) || null;
+}
+
+export function getManualTeamForNick(nick: string) {
+  return schoolRosters.find((team) => team.players.some((player) => player.toLowerCase() === nick.toLowerCase())) || null;
+}

@@ -45,7 +45,7 @@ export function RankingList({ teams }: { teams: RankingTeam[] }) {
                 </div>
                 <div className="mt-0.5 text-xs text-slate-500">{team.org}</div>
               </div>
-              <div className={`hidden text-sm font-bold md:block ${team.trend > 0 ? "text-emerald-300" : team.trend < 0 ? "text-red-300" : "text-slate-500"}`}>{trendLabel}</div>
+              <div className={`hidden text-sm font-bold md:block ${team.trend > 0 ? "text-emerald-300" : team.trend < 0 ? "text-red-300" : "text-slate-500"}`}>{team.trend === 0 ? "" : trendLabel}</div>
               <div className="text-right">
                 <div className="font-rajdhani text-xl font-bold">{team.points}</div>
                 <div className="text-[10px] uppercase tracking-widest text-slate-500">points</div>

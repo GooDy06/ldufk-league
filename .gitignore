@@ -1,5 +1,7 @@
 node_modules
 .next
+.next-build
+.cache
 .env.local
 dist
 out

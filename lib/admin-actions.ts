@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient, requireAdmin } from "@/lib/supabase/server";
 import type { AdminRole } from "@/lib/types";
+import { getPlayerStatsByNick } from "@/lib/player-stats";
 
 function text(formData: FormData, key: string) {
   return String(formData.get(key) || "").trim();
@@ -140,11 +141,13 @@ export async function savePlayer(formData: FormData) {
     redirect("/admin/players?saved=player");
   }
 
+  const nick = text(formData, "nick");
+  const computedStats = getPlayerStatsByNick(nick);
   const payload = {
     team_id: nullableText(formData, "team_id"),
-    nick: text(formData, "nick"),
+    nick,
     role: text(formData, "role"),
-    rating: Number(text(formData, "rating") || 1),
+    rating: Number((computedStats?.rating ?? Number(text(formData, "rating") || 1)).toFixed(2)),
     avatar_url: nullableText(formData, "avatar_url"),
     highlight_youtube_url: nullableText(formData, "highlight_youtube_url"),
     highlight_title: nullableText(formData, "highlight_title"),

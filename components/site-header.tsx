@@ -3,6 +3,7 @@ import Link from "next/link";
 const links = [
   ["Загальна", "/"],
   ["Рейтинг", "/ranking"],
+  ["Матчі", "/matches"],
   ["Турніри", "/tournaments"],
   ["Новини", "/news"]
 ];
