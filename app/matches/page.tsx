@@ -3,7 +3,9 @@ import {
   getOwnPlayerSummaries,
   getOwnRecentMatches,
   getOwnSeasons,
+  getMatchMapStats,
   groupMatchesIntoSeries,
+  type LotMapStat,
   type LotSeason,
   type LotMatchSeries
 } from "@/lib/lotgaming";
@@ -36,21 +38,30 @@ function tournamentName(season: LotSeason | undefined, key: string) {
   return season?.name || (key === "no-season" ? "Без турніру" : `Турнір #${key}`);
 }
 
-function SeriesRow({ series }: { series: LotMatchSeries }) {
+function SeriesRow({ series, mapStats }: { series: LotMatchSeries; mapStats?: LotMapStat[] }) {
   const href = series.matches.length > 1 ? `/matches/series/${series.key}` : `/matches/${series.matches[0].id}`;
   const statusLabel = series.status === "live" ? "Live" : series.status === "cancelled" ? "Cancelled" : "Finished";
   const seriesLabel = series.matches.length > 1 ? `BO${series.matches.length}` : "BO1";
   const winner = series.team1Wins === series.team2Wins ? null : series.team1Wins > series.team2Wins ? series.team1 : series.team2;
+  const firstMatch = series.matches[0];
+  const firstMap = mapStats?.[0];
+  const isSingleMap = series.matches.length === 1;
+  const team1Score = isSingleMap
+    ? firstMap?.team1_score ?? firstMatch.team1_mapscore ?? firstMatch.team1_score ?? series.team1Wins
+    : series.team1Wins;
+  const team2Score = isSingleMap
+    ? firstMap?.team2_score ?? firstMatch.team2_mapscore ?? firstMatch.team2_score ?? series.team2Wins
+    : series.team2Wins;
 
   return (
-    <Link href={href} className="grid gap-3 border-b border-line bg-surface px-4 py-3 transition last:border-0 hover:bg-surface2 md:grid-cols-[74px_1fr_86px_1fr_88px_88px] md:items-center">
+    <Link href={href} className="grid gap-3 border-b border-line bg-surface px-4 py-3 transition last:border-0 hover:bg-surface2 md:grid-cols-[74px_minmax(0,1fr)_120px_minmax(0,1fr)_88px_120px] md:items-center">
       <div>
         <div className="font-rajdhani text-2xl font-bold text-slate-200">{formatTime(series.startTime)}</div>
         <div className="mt-0.5 text-[10px] font-bold uppercase tracking-[0.14em] text-slate-600">{formatDate(series.startTime)}</div>
       </div>
-      <div className={`font-rajdhani text-2xl font-bold ${winner === series.team1 ? "text-white" : "text-slate-400"}`}>{series.team1}</div>
-      <div className="border border-line bg-bg px-3 py-2 text-center font-rajdhani text-2xl font-bold text-accent">{series.team1Wins}:{series.team2Wins}</div>
-      <div className={`font-rajdhani text-2xl font-bold md:text-right ${winner === series.team2 ? "text-white" : "text-slate-400"}`}>{series.team2}</div>
+      <div className={`font-rajdhani text-2xl font-bold md:text-right ${winner === series.team1 ? "text-white" : "text-slate-400"}`}>{series.team1}</div>
+      <div className="w-28 justify-self-center border border-line bg-bg px-3 py-2 text-center font-rajdhani text-2xl font-bold text-accent">{team1Score}:{team2Score}</div>
+      <div className={`font-rajdhani text-2xl font-bold ${winner === series.team2 ? "text-white" : "text-slate-400"}`}>{series.team2}</div>
       <div className="text-center text-xs font-extrabold uppercase tracking-[0.18em] text-slate-500">{seriesLabel}</div>
       <div className="flex items-center gap-2 justify-self-start text-xs font-bold uppercase tracking-[0.14em] md:justify-self-end">
         <span className={`h-2 w-2 rounded-full ${series.status === "live" ? "live-pulse bg-red-400" : series.status === "cancelled" ? "bg-slate-600" : "bg-emerald-400"}`} />
@@ -73,6 +84,9 @@ export default async function MatchesPage({ searchParams }: { searchParams: { to
   const selectedSeries = series.filter((item) => tournamentKey(item) === selectedTournament);
   const liveSeries = selectedSeries.filter((item) => item.status === "live");
   const finishedSeries = selectedSeries.filter((item) => item.status !== "live");
+  const selectedSeriesMapStats = new Map(
+    await Promise.all(selectedSeries.map(async (item) => [item.key, await getMatchMapStats(item.matches[0].id)] as const))
+  );
 
   return (
     <div className="py-8">
@@ -95,7 +109,7 @@ export default async function MatchesPage({ searchParams }: { searchParams: { to
               <div className="text-sm font-bold text-slate-500">{liveSeries.length}</div>
             </div>
             <div className="grid gap-3">
-              {liveSeries.length ? liveSeries.map((item) => <SeriesRow key={item.key} series={item} />) : <div className="rounded-xl border border-line bg-surface2 p-4 text-sm text-slate-500">Зараз немає live-матчів.</div>}
+              {liveSeries.length ? liveSeries.map((item) => <SeriesRow key={item.key} series={item} mapStats={selectedSeriesMapStats.get(item.key)} />) : <div className="rounded-xl border border-line bg-surface2 p-4 text-sm text-slate-500">Зараз немає live-матчів.</div>}
             </div>
           </div>
 
@@ -108,7 +122,7 @@ export default async function MatchesPage({ searchParams }: { searchParams: { to
               <div className="text-sm font-bold text-slate-500">{finishedSeries.length} матчів</div>
             </div>
             <div className="overflow-hidden border border-line bg-surface">
-              {finishedSeries.length ? finishedSeries.map((item) => <SeriesRow key={item.key} series={item} />) : <div className="p-4 text-sm text-slate-500">У цьому турнірі ще немає завершених матчів.</div>}
+              {finishedSeries.length ? finishedSeries.map((item) => <SeriesRow key={item.key} series={item} mapStats={selectedSeriesMapStats.get(item.key)} />) : <div className="p-4 text-sm text-slate-500">У цьому турнірі ще немає завершених матчів.</div>}
             </div>
           </div>
         </div>
