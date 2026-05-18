@@ -140,7 +140,7 @@ export default async function MatchSeriesPage({ params, searchParams }: { params
   const baseHref = `/matches/series/${params.key}`;
 
   return (
-    <div className="py-8">
+    <div className="py-5 sm:py-8">
       <Link href="/matches" className="text-sm font-bold text-accent hover:text-white">Назад до матчів</Link>
 
       <section className="mx-auto mt-4 max-w-5xl overflow-hidden rounded-2xl border border-line bg-surface">
@@ -152,22 +152,22 @@ export default async function MatchSeriesPage({ params, searchParams }: { params
             </div>
           </div>
 
-          <div className="mt-2 grid items-center gap-3 md:grid-cols-[1fr_170px_1fr]">
-            <div className={`font-rajdhani text-2xl font-bold md:text-3xl ${winner === series.team1 ? "text-white" : "text-slate-400"}`}>{series.team1}</div>
+          <div className="mt-2 grid grid-cols-[1fr_116px_1fr] items-center gap-2 sm:grid-cols-[1fr_150px_1fr] md:grid-cols-[1fr_170px_1fr]">
+            <div className={`truncate font-rajdhani text-xl font-bold sm:text-2xl md:text-3xl ${winner === series.team1 ? "text-white" : "text-slate-400"}`}>{series.team1}</div>
             <div className="text-center">
-              <div className="rounded-xl border border-line bg-bg px-3 py-1 font-rajdhani text-2xl font-bold md:text-3xl">
+              <div className="rounded-xl border border-line bg-bg px-2 py-1 font-rajdhani text-xl font-bold sm:px-3 sm:text-2xl md:text-3xl">
                 <span className={winner === series.team1 ? "text-emerald-300" : "text-red-300"}>{series.team1Wins}</span>
                 <span className="px-1 text-white">:</span>
                 <span className={winner === series.team2 ? "text-emerald-300" : "text-red-300"}>{series.team2Wins}</span>
               </div>
               <div className="mt-1 text-[10px] font-bold uppercase leading-snug tracking-[0.14em] text-slate-500">{seasonName}</div>
             </div>
-            <div className={`font-rajdhani text-2xl font-bold md:text-right md:text-3xl ${winner === series.team2 ? "text-white" : "text-slate-400"}`}>{series.team2}</div>
+            <div className={`truncate text-right font-rajdhani text-xl font-bold sm:text-2xl md:text-3xl ${winner === series.team2 ? "text-white" : "text-slate-400"}`}>{series.team2}</div>
           </div>
 
         </div>
 
-        <div className="mx-auto grid max-w-3xl gap-2 p-3 lg:grid-cols-3">
+        <div className="mx-auto grid max-w-3xl gap-2 p-3 sm:grid-cols-2 lg:grid-cols-3">
           {mapStatsByMatch.map(({ match, maps }, index) => {
             const firstMap = maps[0];
             const mapWinner = matchWinnerName(match);

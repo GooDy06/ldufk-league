@@ -306,16 +306,16 @@ export default async function MatchDetailPage({ params, searchParams }: { params
   ];
 
   return (
-    <div className="py-8">
+    <div className="py-5 sm:py-8">
       <Link href="/matches" className="text-sm font-bold text-accent hover:text-white">Назад до матчів</Link>
 
       <section
         className="mx-auto mt-4 overflow-hidden rounded-2xl border border-line bg-surface bg-cover bg-center"
         style={mapImage ? { backgroundImage: `linear-gradient(90deg, rgba(255, 154, 162, 0.14), rgba(7, 12, 22, 0.9) 34%, rgba(7, 12, 22, 0.9) 66%, rgba(111, 240, 194, 0.14)), url(${mapImage})` } : undefined}
       >
-        <div className="grid items-center gap-3 p-4 backdrop-blur-[1px] md:grid-cols-[1fr_190px_1fr]">
-          <div>
-            <div className={`font-rajdhani text-3xl font-bold md:text-4xl ${winner === match.team1_string ? "text-white" : "text-slate-400"}`}>{match.team1_string}</div>
+        <div className="grid grid-cols-[1fr_108px_1fr] items-center gap-2 p-3 backdrop-blur-[1px] sm:grid-cols-[1fr_150px_1fr] sm:p-4 md:grid-cols-[1fr_190px_1fr]">
+          <div className="min-w-0">
+            <div className={`truncate font-rajdhani text-xl font-bold sm:text-3xl md:text-4xl ${winner === match.team1_string ? "text-white" : "text-slate-400"}`}>{match.team1_string}</div>
             <div className={`mt-0.5 font-rajdhani text-3xl font-bold ${winner === match.team1_string ? "text-emerald-300" : "text-red-300"}`}>{team1Score}</div>
           </div>
           <div className="text-center">
@@ -323,8 +323,8 @@ export default async function MatchDetailPage({ params, searchParams }: { params
             <div className="mt-1 font-rajdhani text-2xl font-bold text-slate-100">{cleanMapName(firstMap?.map_name || null)}</div>
             <div className="mt-1 rounded-full border border-line bg-bg/50 px-3 py-0.5 text-[10px] font-extrabold uppercase tracking-[0.18em] text-slate-400">{status === "live" ? "Live" : status === "cancelled" ? "Cancelled" : "Match over"}</div>
           </div>
-          <div className="text-right">
-            <div className={`font-rajdhani text-3xl font-bold md:text-4xl ${winner === match.team2_string ? "text-white" : "text-slate-400"}`}>{match.team2_string}</div>
+          <div className="min-w-0 text-right">
+            <div className={`truncate font-rajdhani text-xl font-bold sm:text-3xl md:text-4xl ${winner === match.team2_string ? "text-white" : "text-slate-400"}`}>{match.team2_string}</div>
             <div className={`mt-0.5 font-rajdhani text-3xl font-bold ${winner === match.team2_string ? "text-emerald-300" : "text-red-300"}`}>{team2Score}</div>
           </div>
         </div>
@@ -367,14 +367,14 @@ export default async function MatchDetailPage({ params, searchParams }: { params
             />
           ) : null}
           <div className="relative bg-accent/15 px-4 py-2 text-center text-sm font-bold text-white backdrop-blur-[2px]">{seasonName}</div>
-          <div className="relative grid grid-cols-[1fr_100px_1fr] items-center gap-3 px-4 py-4 text-center">
+          <div className="relative grid grid-cols-[1fr_76px_1fr] items-center gap-2 px-3 py-3 text-center sm:grid-cols-[1fr_100px_1fr] sm:gap-3 sm:px-4 sm:py-4">
             <div>
-              <div className="font-rajdhani text-2xl font-bold md:text-3xl">{match.team1_string}</div>
+              <div className="truncate font-rajdhani text-xl font-bold md:text-3xl">{match.team1_string}</div>
               <div className={`mt-1 font-rajdhani text-3xl font-bold ${team1Score > team2Score ? "text-emerald-300" : "text-red-300"}`}>{team1Score}</div>
             </div>
             <div className="text-sm font-extrabold uppercase tracking-[0.18em] text-slate-500">Map<br /><span className="text-white">{cleanMapName(firstMap?.map_name || null)}</span></div>
             <div>
-              <div className="font-rajdhani text-2xl font-bold md:text-3xl">{match.team2_string}</div>
+              <div className="truncate font-rajdhani text-xl font-bold md:text-3xl">{match.team2_string}</div>
               <div className={`mt-1 font-rajdhani text-3xl font-bold ${team2Score > team1Score ? "text-emerald-300" : "text-red-300"}`}>{team2Score}</div>
             </div>
           </div>

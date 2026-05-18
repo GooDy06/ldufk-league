@@ -26,7 +26,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="uk" className={`${exo.variable} ${rajdhani.variable}`}>
       <body className="font-exo">
         <SiteHeader />
-        <main className="mx-auto min-h-screen w-full max-w-6xl px-4 pb-12">{children}</main>
+        <main className="mx-auto min-h-screen w-full max-w-6xl px-3 pb-10 sm:px-4 sm:pb-12">{children}</main>
         <footer className="border-t border-line py-5">
           <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-4 text-xs tracking-wide text-slate-500 sm:flex-row">
             <div>

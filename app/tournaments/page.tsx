@@ -40,8 +40,8 @@ export default async function TournamentsPage() {
   const globalTournaments = tournaments.filter((tournament) => tournament.division === "Global");
 
   return (
-    <div className="py-8">
-      <h1 className="mb-5 font-rajdhani text-5xl font-bold">Турніри</h1>
+    <div className="py-5 sm:py-8">
+      <h1 className="mb-4 font-rajdhani text-4xl font-bold sm:mb-5 sm:text-5xl">Турніри</h1>
       <TournamentGroup title="School League" tournaments={schoolTournaments} />
       <TournamentGroup title="University League" tournaments={universityTournaments} />
       {globalTournaments.length ? <TournamentGroup title="Global Championship" tournaments={globalTournaments} /> : null}

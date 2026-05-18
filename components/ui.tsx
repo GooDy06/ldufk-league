@@ -8,15 +8,15 @@ function formatNewsDate(value: string | null) {
 
 export function HeroTitle() {
   return (
-    <section className="py-8 text-center">
-      <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-accent/25 bg-accent/10 px-4 py-1 text-xs font-bold uppercase tracking-[0.22em] text-accent">
+    <section className="py-5 text-center sm:py-8">
+      <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-accent/25 bg-accent/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-accent sm:px-4 sm:text-xs sm:tracking-[0.22em]">
         <span className="h-1.5 w-1.5 rounded-full bg-accent" />
         Сезон 2026 · Активний
       </div>
-      <h1 className="font-rajdhani text-5xl font-bold tracking-[0.08em] md:text-6xl">
+      <h1 className="font-rajdhani text-4xl font-bold tracking-wide sm:text-5xl md:text-6xl md:tracking-[0.08em]">
         LDUFK <span className="text-accent">CS2</span> League
       </h1>
-      <p className="mx-auto mt-3 max-w-3xl text-base tracking-wide text-slate-400">
+      <p className="mx-auto mt-3 max-w-3xl text-sm tracking-wide text-slate-400 sm:text-base">
         Офіційний портал університетської та шкільної кіберспортивної ліги України
       </p>
     </section>
@@ -35,11 +35,11 @@ export function Panel({
   action?: React.ReactNode;
 }) {
   return (
-    <section className="rounded-2xl border border-line bg-surface p-4">
+    <section className="rounded-2xl border border-line bg-surface p-3 sm:p-4">
       <div className="mb-3 flex items-center justify-between gap-3">
         <div>
           {eyebrow ? <div className="text-[10px] font-extrabold uppercase tracking-[0.2em] text-slate-500">{eyebrow}</div> : null}
-          <h2 className="font-rajdhani text-xl font-bold tracking-wide">{title}</h2>
+          <h2 className="font-rajdhani text-lg font-bold tracking-wide sm:text-xl">{title}</h2>
         </div>
         {action}
       </div>
@@ -56,21 +56,21 @@ export function TeamRow({ team, index }: { team: Team; index: number }) {
   return (
     <Link
       href={`/teams/${team.slug}`}
-      className="grid grid-cols-[34px_38px_1fr_auto_auto] items-center gap-3 rounded-xl border border-line bg-surface2 p-3 transition hover:border-accent/40"
+      className="grid grid-cols-[28px_34px_minmax(0,1fr)_auto] items-center gap-2 rounded-xl border border-line bg-surface2 p-2.5 transition hover:border-accent/40 sm:grid-cols-[34px_38px_minmax(0,1fr)_auto_auto] sm:gap-3 sm:p-3"
     >
-      <div className={`font-rajdhani text-xl font-bold ${rankColor}`}>{index + 1}</div>
+      <div className={`font-rajdhani text-lg font-bold sm:text-xl ${rankColor}`}>{index + 1}</div>
       <div
-        className="grid h-10 w-10 place-items-center overflow-hidden rounded-lg border border-white/10 bg-cover bg-center text-xs font-bold"
+        className="grid h-8 w-8 place-items-center overflow-hidden rounded-lg border border-white/10 bg-cover bg-center text-[10px] font-bold sm:h-10 sm:w-10 sm:text-xs"
         style={team.logo_url ? { backgroundImage: `url(${team.logo_url})` } : { background: `${team.color}22`, color: team.color }}
       >
         {team.logo_url ? null : team.name.split(/\s+/).map((w) => w[0]).join("").slice(0, 3)}
       </div>
-      <div>
-        <div className="font-bold">{team.name}</div>
-        <div className="text-xs text-slate-500">{team.org}</div>
+      <div className="min-w-0">
+        <div className="truncate text-sm font-bold sm:text-base">{team.name}</div>
+        <div className="truncate text-[11px] text-slate-500 sm:text-xs">{team.org}</div>
       </div>
       <div className={`hidden text-xs font-bold sm:block ${trendColor}`}>{team.trend === 0 ? "0" : trendLabel}</div>
-      <div className="font-rajdhani text-lg font-bold">{team.points}</div>
+      <div className="font-rajdhani text-base font-bold sm:text-lg">{team.points}</div>
     </Link>
   );
 }
