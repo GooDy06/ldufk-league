@@ -42,6 +42,10 @@ export type Player = Publishable & {
   role: string;
   rating: number;
   avatar_url: string | null;
+  instagram_url: string | null;
+  twitch_url: string | null;
+  x_url: string | null;
+  faceit_url: string | null;
   highlight_youtube_url: string | null;
   highlight_title: string | null;
   highlight_tournament: string | null;

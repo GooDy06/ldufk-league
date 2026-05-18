@@ -51,6 +51,15 @@ function PlayerForm({ player, teams, role }: { player?: Player; teams: Team[]; r
         <Field label="Published"><input name="published" type="checkbox" defaultChecked={player?.published} className="h-5 w-5" /></Field>
       </div>
       <div className="rounded-xl border border-line bg-surface2 p-3">
+        <div className="mb-3 text-[10px] font-extrabold uppercase tracking-[0.2em] text-accent">Social links</div>
+        <div className="grid gap-3 md:grid-cols-4">
+          <Field label="Instagram"><input className={inputClass} name="instagram_url" placeholder="https://instagram.com/..." defaultValue={player?.instagram_url || ""} /></Field>
+          <Field label="Twitch"><input className={inputClass} name="twitch_url" placeholder="https://twitch.tv/..." defaultValue={player?.twitch_url || ""} /></Field>
+          <Field label="X"><input className={inputClass} name="x_url" placeholder="https://x.com/..." defaultValue={player?.x_url || ""} /></Field>
+          <Field label="FACEIT"><input className={inputClass} name="faceit_url" placeholder="https://faceit.com/..." defaultValue={player?.faceit_url || ""} /></Field>
+        </div>
+      </div>
+      <div className="rounded-xl border border-line bg-surface2 p-3">
         <div className="mb-3 text-[10px] font-extrabold uppercase tracking-[0.2em] text-accent">Top 1 highlight</div>
         <div className="grid gap-3 md:grid-cols-3">
           <Field label="YouTube highlight URL"><input className={inputClass} name="highlight_youtube_url" placeholder="https://youtube.com/watch?v=..." defaultValue={player?.highlight_youtube_url || ""} /></Field>
