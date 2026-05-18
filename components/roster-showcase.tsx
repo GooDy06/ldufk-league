@@ -1,5 +1,6 @@
 import type { Player } from "@/lib/types";
 import Link from "next/link";
+import Image from "next/image";
 import { slugifyPlayerNick } from "@/lib/school-rosters";
 
 export const DEFAULT_PLAYER_AVATAR = "https://i.ibb.co/Ps7G5vnD/players.png";
@@ -12,20 +13,22 @@ export function RosterShowcase({ players }: { players: Player[] }) {
   }
 
   return (
-    <div className="grid grid-cols-5 gap-2">
+    <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
       {roster.map((player) => (
         <Link key={player.id} href={`/players/${slugifyPlayerNick(player.nick)}`} className="group overflow-hidden rounded-lg border border-line bg-surface text-center transition hover:border-accent/35">
-          <div className="aspect-[16/9] border-b border-line bg-gradient-to-b from-[#263545] to-[#111b29]">
-            <img
+          <div className="relative aspect-[16/9] border-b border-line bg-gradient-to-b from-[#263545] to-[#111b29] sm:aspect-[16/10]">
+            <Image
               src={player.avatar_url || DEFAULT_PLAYER_AVATAR}
               alt={player.nick}
-              className="h-full w-full object-contain object-bottom transition group-hover:brightness-110"
+              fill
+              sizes="(max-width: 640px) 42vw, (max-width: 1024px) 28vw, 180px"
+              className="object-contain object-bottom transition group-hover:brightness-110"
             />
           </div>
-          <div className="px-2 py-1.5">
-            <div className="font-rajdhani text-base font-bold leading-none">{player.nick}</div>
+          <div className="px-2 py-1.5 sm:py-2">
+            <div className="truncate font-rajdhani text-sm font-bold leading-none sm:text-base">{player.nick}</div>
             <div className="mt-0.5 text-[9px] font-semibold uppercase tracking-wider text-slate-500">{player.role}</div>
-            <div className="font-rajdhani text-sm font-semibold text-slate-400">Rating 3.0 - {Number(player.rating || 0).toFixed(2)}</div>
+            <div className="font-rajdhani text-xs font-semibold text-slate-400 sm:text-sm">Rating 3.0 - {Number(player.rating || 0).toFixed(2)}</div>
           </div>
         </Link>
       ))}

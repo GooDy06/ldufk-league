@@ -44,9 +44,7 @@ export default async function RankingPage({ searchParams }: { searchParams: { di
         <a className={`rounded-lg border px-4 py-2 text-sm font-bold ${division === "School" ? "border-school bg-school/10 text-school" : "border-line text-slate-400"}`} href="/ranking?division=School">School</a>
       </div>
       <Panel title="Рейтинг команд" eyebrow="Top 4 отримують LAN Invite">
-        <div className="-mx-4 overflow-x-auto px-4 pb-2 sm:mx-0 sm:px-0">
-          <RankingList teams={teams} />
-        </div>
+        <RankingList teams={teams} />
       </Panel>
     </div>
   );
