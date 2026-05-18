@@ -126,6 +126,19 @@ async function main() {
         const { error } = await supabase.from("players").insert(payload);
         if (error) throw error;
       }
+
+      const { data: nickRows, error: nickRowsError } = await supabase.from("players").select("id, team_id, published").eq("nick", nick);
+      if (nickRowsError) throw nickRowsError;
+      const keeper = (nickRows || []).find((player) => player.id === existing?.id) || (nickRows || []).find((player) => player.team_id === teamIds.get(team.slug)) || nickRows?.[0];
+      const duplicateIds = (nickRows || []).filter((player) => player.id !== keeper?.id).map((player) => player.id);
+      if (keeper?.id) {
+        const { error } = await supabase.from("players").update({ ...payload, published: true }).eq("id", keeper.id);
+        if (error) throw error;
+      }
+      if (duplicateIds.length) {
+        const { error } = await supabase.from("players").update({ published: false }).in("id", duplicateIds);
+        if (error) throw error;
+      }
     }
   }
 

@@ -10,14 +10,28 @@ export default async function RankingPage({ searchParams }: { searchParams: { di
   const supabase = createClient();
   const { data } = await supabase
     .from("teams")
-    .select("*, players(*)")
+    .select("*")
     .eq("published", true)
-    .eq("players.published", true)
     .eq("division", division)
     .order("points", { ascending: false })
     .limit(20);
 
-  const teams = (data || []) as (Team & { players?: Player[] })[];
+  const baseTeams = (data || []) as Team[];
+  const teamIds = baseTeams.map((team) => team.id);
+  const { data: playerRows } = teamIds.length
+    ? await supabase
+        .from("players")
+        .select("*")
+        .eq("published", true)
+        .in("team_id", teamIds)
+        .order("rating", { ascending: false })
+    : { data: [] };
+  const playersByTeam = new Map<string, Player[]>();
+  for (const player of (playerRows || []) as Player[]) {
+    if (!player.team_id) continue;
+    playersByTeam.set(player.team_id, [...(playersByTeam.get(player.team_id) || []), player]);
+  }
+  const teams = baseTeams.map((team) => ({ ...team, players: playersByTeam.get(team.id) || [] }));
 
   return (
     <div className="py-8">
