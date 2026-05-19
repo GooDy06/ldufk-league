@@ -38,7 +38,7 @@ function heroMetric(label: string, value: string | number, rawScore: number, acc
     <div>
       <div className={`font-rajdhani text-xl font-bold leading-none sm:text-2xl ${accent}`}>{value}</div>
       <div className="mt-0.5 text-[8px] font-bold uppercase tracking-[0.12em] text-sky-200/70">{label}</div>
-      <div className="mt-0.5 h-0.5 overflow-hidden rounded-full bg-slate-500/35">
+      <div className="mt-0.5 h-[5px] overflow-hidden rounded-full bg-slate-500/35">
         <div className={`h-full rounded-full ${state.bar} ${state.glow}`} style={{ width: `${Math.max(3, Math.min(100, rawScore))}%` }} />
       </div>
       <div className={`mt-0.5 text-right text-[8px] font-extrabold uppercase tracking-[0.16em] ${state.color}`}>{state.label}</div>
@@ -46,20 +46,37 @@ function heroMetric(label: string, value: string | number, rawScore: number, acc
   );
 }
 
+function ratingProgress(rating: number) {
+  return Math.max(0, Math.min(100, ((rating - 0.6) / 0.8) * 100));
+}
+
+function ratingColor(rating: number) {
+  if (rating > 1.1) return "#21c637";
+  if (rating >= 0.9) return "#facc15";
+  return "#fca5a5";
+}
+
+function ratingGrade(rating: number) {
+  if (rating >= 1.25) return { label: "GREAT", color: "text-emerald-300" };
+  if (rating > 1.1) return { label: "GOOD", color: "text-emerald-300" };
+  if (rating >= 0.9) return { label: "OKAY", color: "text-amber-300" };
+  return { label: "POOR", color: "text-red-300" };
+}
+
 function socialIcons(player: Player | null) {
   const links = [
-    { key: "x", label: "X", href: player?.x_url, node: <span className="font-rajdhani text-lg font-bold">X</span>, className: "bg-black/85 text-slate-200 hover:text-white" },
-    { key: "twitch", label: "Twitch", href: player?.twitch_url, node: <img src="/assets/twitch.png" alt="" className="h-4 w-4 object-contain" />, className: "bg-[#6441a5] hover:bg-[#7653bd]" },
-    { key: "instagram", label: "Instagram", href: player?.instagram_url, node: <img src="/assets/instagram.png" alt="" className="h-4 w-4 object-contain" />, className: "bg-[#d62976] hover:bg-[#e13f89]" },
-    { key: "faceit", label: "FACEIT", href: player?.faceit_url, node: <span className="block h-0 w-0 border-y-[7px] border-l-[13px] border-y-transparent border-l-orange-500" />, className: "bg-black/85 hover:bg-black" },
+    { key: "x", label: "X", href: player?.x_url, node: <span className="font-rajdhani text-[10px] font-bold leading-none">X</span>, className: "bg-black/85 text-slate-200 hover:text-white" },
+    { key: "twitch", label: "Twitch", href: player?.twitch_url, node: <img src="/assets/twitch.png" alt="" className="h-2.5 w-2.5 object-contain" />, className: "bg-[#6441a5] hover:bg-[#7653bd]" },
+    { key: "instagram", label: "Instagram", href: player?.instagram_url, node: <img src="/assets/instagram.png" alt="" className="h-2.5 w-2.5 object-contain" />, className: "bg-[#d62976] hover:bg-[#e13f89]" },
+    { key: "faceit", label: "FACEIT", href: player?.faceit_url, node: <span className="block h-0 w-0 border-y-[4px] border-l-[7px] border-y-transparent border-l-orange-500" />, className: "bg-black/85 hover:bg-black" },
   ];
   const visible = links.filter((link) => link.href);
   if (!visible.length) return null;
 
   return (
-    <div className="absolute right-3 top-3 z-10 flex gap-2">
+    <div className="absolute right-2 top-2 z-10 flex flex-row-reverse gap-1">
       {visible.map((link) => (
-        <a key={link.key} href={link.href || "#"} target="_blank" rel="noreferrer" aria-label={link.label} className={`grid h-9 w-9 place-items-center rounded-md border border-white/10 shadow-lg transition ${link.className}`}>
+        <a key={link.key} href={link.href || "#"} target="_blank" rel="noreferrer" aria-label={link.label} className={`grid h-5 w-5 place-items-center rounded border border-white/10 shadow-lg transition ${link.className}`}>
           {link.node}
         </a>
       ))}
@@ -67,39 +84,60 @@ function socialIcons(player: Player | null) {
   );
 }
 
-function analyticHero(stats: PlayerComputedStats | null, rating: number, player: Player | null, manualTeam: ReturnType<typeof getManualTeamForNick> | null, displayNick: string, teamName: string) {
+type ResolvedTeam = Pick<NonNullable<Player["team"]>, "name" | "slug" | "division" | "color" | "logo_url"> | null;
+
+function analyticHero(stats: PlayerComputedStats | null, rating: number, player: Player | null, resolvedTeam: ResolvedTeam, manualTeam: ReturnType<typeof getManualTeamForNick> | null, displayNick: string, teamName: string) {
   const positiveSwing = (stats?.roundSwing || 0) >= 0;
-  const teamColor = player?.team?.color || manualTeam?.color || "#18d7ff";
+  const teamColor = resolvedTeam?.color || manualTeam?.color || "#18d7ff";
   const teamInitial = teamName.trim().charAt(0).toUpperCase();
+  const teamLogo = resolvedTeam?.logo_url || manualTeam?.logo_url;
+  const teamSlug = resolvedTeam?.slug || manualTeam?.slug;
+  const arcProgress = ratingProgress(rating);
+  const arcColor = ratingColor(rating);
+  const ratingState = ratingGrade(rating);
+  const teamWatermark = teamLogo ? (
+    <span className="absolute left-1/2 top-6 z-[1] grid h-44 w-44 -translate-x-1/2 place-items-center opacity-40 sm:h-52 sm:w-52">
+      <img src={teamLogo} alt={teamName} className="h-full w-full object-contain drop-shadow-[0_18px_30px_rgba(0,0,0,0.8)]" />
+    </span>
+  ) : null;
   return (
     <div className="overflow-hidden rounded-sm border border-line bg-[#26313d]">
       <div className="grid min-h-[164px] lg:grid-cols-[270px_1fr]">
         <div className="relative min-h-[196px] overflow-hidden border-r border-line bg-gradient-to-br from-slate-700/50 to-bg lg:min-h-[164px]">
           <div className="absolute inset-y-0 left-0 w-16 border-r border-white/10 bg-white/5" />
           <div className="absolute inset-0 opacity-20" style={{ background: `linear-gradient(135deg, transparent 36%, ${teamColor} 37%, transparent 66%)` }} />
-          <div className="absolute left-5 top-4 z-10 grid h-10 w-10 place-items-center rounded-md border border-white/10 bg-bg/65 font-rajdhani text-lg font-bold text-accent shadow-lg">{teamInitial}</div>
-          {socialIcons(player)}
-          <img src={player?.avatar_url || DEFAULT_PLAYER_AVATAR} alt={displayNick} className="absolute inset-x-1 bottom-[23px] mx-auto h-[115%] w-[112%] object-contain object-bottom" />
-          <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#111a24] via-[#111a24]/25 to-transparent px-4 pb-1.5 pt-16">
+          {teamSlug && teamWatermark ? <Link href={`/teams/${teamSlug}`} aria-label={teamName}>{teamWatermark}</Link> : teamWatermark}
+          <img src={player?.avatar_url || DEFAULT_PLAYER_AVATAR} alt={displayNick} className="absolute inset-x-1 bottom-0 z-[2] mx-auto h-[98%] w-[96%] object-contain object-bottom" />
+          <div className="absolute inset-x-0 bottom-0 z-[3] bg-gradient-to-t from-[#111a24] via-[#111a24]/25 to-transparent px-4 pb-1.5 pt-16">
             <h1 className="break-words font-rajdhani text-[1.6rem] font-bold leading-none text-white sm:text-[2.1rem]">{displayNick}</h1>
             <div className="mt-0.5 text-[11px] font-semibold text-slate-400">{teamName}</div>
           </div>
         </div>
 
-        <div className="relative overflow-hidden p-2 sm:p-2.5">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_42%_18%,rgba(255,255,255,0.08),transparent_28%),linear-gradient(90deg,rgba(255,154,162,0.06),transparent_46%,rgba(111,240,194,0.06))]" />
+        <div
+          className="relative overflow-hidden p-2 sm:p-2.5"
+        >
+          <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(245,158,11,0.06),transparent_42%,rgba(56,189,248,0.07))]" />
+          <img src="https://www.hltv.org/img/static/stats/t-bg.png" alt="" className="pointer-events-none absolute -left-2 top-3 h-[74%] w-auto max-w-none object-contain opacity-[0.16]" />
+          <img src="https://www.hltv.org/img/static/stats/ct-bg.png" alt="" className="pointer-events-none absolute -right-2 top-3 h-[74%] w-auto max-w-none object-contain opacity-[0.16]" />
+          <div className="absolute inset-0 bg-[#17212b]/62" />
+          {socialIcons(player)}
           <div className="relative">
-            <div className="grid items-center gap-2 lg:grid-cols-[1fr_96px_1fr]">
+            <div className="grid items-center gap-1 bg-slate-800/18 py-1 lg:grid-cols-[1fr_124px_1fr]">
               <div className="text-center">
                 <div className="font-rajdhani text-2xl font-bold text-amber-400">{stats?.tRating.toFixed(2) || "0.00"}</div>
                 <div className="text-[10px] font-bold uppercase tracking-[0.14em] text-amber-300/80">T rating</div>
               </div>
 
-              <div className="mx-auto grid h-24 w-24 place-items-center rounded-full border-[6px] border-slate-600/80 bg-[#202a35]/80 shadow-inner" style={{ borderTopColor: rating >= 1 ? "#44c23a" : "#fca5a5", borderLeftColor: rating >= 1.12 ? "#44c23a" : "#64748b" }}>
-                <div className="text-center">
-                  <div className={`text-[8px] font-extrabold uppercase tracking-[0.14em] ${rating >= 1 ? "text-green-400" : "text-red-300"}`}>{rating >= 1.15 ? "Great" : rating >= 1 ? "Good" : "Poor"}</div>
-                  <div className="font-rajdhani text-3xl font-bold leading-none text-white">{rating.toFixed(2)}</div>
-                  <div className="text-[8px] font-bold uppercase tracking-[0.12em] text-sky-200/70">Rating 3.0</div>
+              <div className="relative mx-auto h-24 w-36">
+                <svg viewBox="0 0 144 94" className="absolute inset-x-0 top-0 h-24 w-36 overflow-visible" aria-hidden="true">
+                  <path d="M 20 74 A 52 52 0 0 1 124 74" fill="none" stroke="rgba(100,116,139,0.78)" strokeWidth="8" strokeLinecap="butt" pathLength={100} />
+                  <path d="M 20 74 A 52 52 0 0 1 124 74" fill="none" stroke={arcColor} strokeWidth="8" strokeLinecap="butt" pathLength={100} strokeDasharray={`${arcProgress} 100`} />
+                </svg>
+                <div className="absolute inset-x-0 top-7 text-center">
+                  <div className={`text-[10px] font-extrabold uppercase tracking-[0.14em] ${ratingState.color}`}>{ratingState.label}</div>
+                  <div className="font-rajdhani text-4xl font-bold leading-none text-white">{rating.toFixed(2)}</div>
+                  <div className="text-[11px] font-bold uppercase tracking-[0.12em] text-sky-200/70">Rating 3.0</div>
                 </div>
               </div>
 
@@ -180,7 +218,7 @@ export default async function PlayerPage({ params, searchParams }: { params: { n
   const supabase = createClient();
   const { data } = await supabase
     .from("players")
-    .select("*, team:teams(name, slug, division, color)")
+    .select("*, team:teams(name, slug, division, color, logo_url)")
     .ilike("nick", nick)
     .eq("published", true)
     .maybeSingle();
@@ -188,7 +226,27 @@ export default async function PlayerPage({ params, searchParams }: { params: { n
   const player = data as Player | null;
   const stats = getPlayerStatsByNick(player?.nick || nick);
   const manualTeam = getManualTeamForNick(player?.nick || nick);
-  const teamName = player?.team?.name || manualTeam?.name || stats?.teamNames[0] || "No team";
+  const statsTeamName = stats?.teamNames[0] || null;
+
+  let resolvedTeam = player?.team || null;
+  if (!resolvedTeam?.logo_url && manualTeam?.slug) {
+    const { data: teamBySlug } = await supabase
+      .from("teams")
+      .select("name, slug, division, color, logo_url")
+      .eq("slug", manualTeam.slug)
+      .maybeSingle();
+    resolvedTeam = (teamBySlug as ResolvedTeam) || resolvedTeam;
+  }
+  if (!resolvedTeam?.logo_url && (manualTeam?.name || statsTeamName)) {
+    const { data: teamByName } = await supabase
+      .from("teams")
+      .select("name, slug, division, color, logo_url")
+      .eq("name", manualTeam?.name || statsTeamName)
+      .maybeSingle();
+    resolvedTeam = (teamByName as ResolvedTeam) || resolvedTeam;
+  }
+
+  const teamName = resolvedTeam?.name || manualTeam?.name || statsTeamName || "No team";
 
   if (!player && !stats) notFound();
 
@@ -206,7 +264,7 @@ export default async function PlayerPage({ params, searchParams }: { params: { n
   return (
     <div className="py-5 sm:py-8">
       <section>
-        {analyticHero(stats, rating, player, manualTeam, displayNick, teamName)}
+        {analyticHero(stats, rating, player, resolvedTeam, manualTeam, displayNick, teamName)}
       </section>
 
       <section className="mt-4 grid gap-4 xl:grid-cols-[1.05fr_0.95fr]">
@@ -223,12 +281,13 @@ export default async function PlayerPage({ params, searchParams }: { params: { n
                   {selectedSide === "both" ? "All sides" : selectedSide === "ct" ? "Counter-Terrorist side" : "Terrorist side"} · {selectedSideValue.rounds} rounds
                 </div>
               </div>
-              <div className="grid w-full grid-cols-3 overflow-hidden rounded-md border border-slate-500/40 bg-bg/60 p-0.5 lg:w-[330px]">
+              <div className="grid h-10 w-full grid-cols-3 overflow-hidden rounded-md border border-slate-500/40 bg-bg/60 p-0.5 lg:w-[330px]">
                 {sideTabs.map(([key, label]) => (
                   <Link
                     key={key}
                     href={key === "both" ? basePlayerHref : `${basePlayerHref}?side=${key}`}
-                    className={`h-9 min-w-0 rounded px-2 text-center text-sm font-bold leading-9 transition ${selectedSide === key ? "bg-slate-500/70 text-white" : "text-slate-400 hover:text-accent"}`}
+                    scroll={false}
+                    className={`flex h-9 min-w-0 items-center justify-center rounded px-2 text-center text-sm font-bold leading-none transition ${selectedSide === key ? "bg-slate-500/70 text-white" : "text-slate-400 hover:text-accent"}`}
                   >
                     {label}
                   </Link>

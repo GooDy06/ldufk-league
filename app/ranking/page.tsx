@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import type { Player, Team } from "@/lib/types";
 import { Panel } from "@/components/ui";
 import { RankingList } from "@/components/ranking-list";
+import { getAllPlayerStats } from "@/lib/player-stats";
 
 export const dynamic = "force-dynamic";
 
@@ -26,10 +27,13 @@ export default async function RankingPage({ searchParams }: { searchParams: { di
         .in("team_id", teamIds)
         .order("rating", { ascending: false })
     : { data: [] };
+  const computedRatings = new Map(getAllPlayerStats().map((player) => [player.nick.toLowerCase(), player.rating]));
   const playersByTeam = new Map<string, Player[]>();
   for (const player of (playerRows || []) as Player[]) {
     if (!player.team_id) continue;
-    playersByTeam.set(player.team_id, [...(playersByTeam.get(player.team_id) || []), player]);
+    const computedRating = computedRatings.get(player.nick.toLowerCase());
+    const playerWithComputedRating = computedRating ? { ...player, rating: Number(computedRating.toFixed(2)) } : player;
+    playersByTeam.set(player.team_id, [...(playersByTeam.get(player.team_id) || []), playerWithComputedRating]);
   }
   const teams = baseTeams.map((team) => ({ ...team, players: playersByTeam.get(team.id) || [] }));
 

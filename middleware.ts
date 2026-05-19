@@ -2,8 +2,39 @@ import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import type { CookieOptions } from "@supabase/ssr";
 
+function hostname(request: NextRequest) {
+  return (request.headers.get("host") || "").split(":")[0].toLowerCase();
+}
+
+function routedPath(request: NextRequest) {
+  const host = hostname(request);
+  const path = request.nextUrl.pathname;
+
+  if (host === "admin.ldufk.com") {
+    return path.startsWith("/admin") ? path : `/admin${path === "/" ? "" : path}`;
+  }
+
+  if (host === "veto.ldufk.com") {
+    return path.startsWith("/veto") ? path : `/veto${path === "/" ? "" : path}`;
+  }
+
+  return path;
+}
+
+function routedResponse(request: NextRequest, path: string) {
+  if (path === request.nextUrl.pathname) {
+    return NextResponse.next({ request });
+  }
+
+  const url = request.nextUrl.clone();
+  url.pathname = path;
+  return NextResponse.rewrite(url);
+}
+
 export async function middleware(request: NextRequest) {
-  let response = NextResponse.next({ request });
+  const path = routedPath(request);
+  const makeResponse = () => routedResponse(request, path);
+  let response = makeResponse();
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -15,12 +46,12 @@ export async function middleware(request: NextRequest) {
         },
         set(name: string, value: string, options: CookieOptions) {
           request.cookies.set({ name, value, ...options });
-          response = NextResponse.next({ request });
+          response = makeResponse();
           response.cookies.set({ name, value, ...options });
         },
         remove(name: string, options: CookieOptions) {
           request.cookies.set({ name, value: "", ...options });
-          response = NextResponse.next({ request });
+          response = makeResponse();
           response.cookies.set({ name, value: "", ...options });
         }
       }
@@ -28,18 +59,18 @@ export async function middleware(request: NextRequest) {
   );
 
   const { data } = await supabase.auth.getUser();
-  const isAdminRoute = request.nextUrl.pathname.startsWith("/admin");
-  const isAdminHome = request.nextUrl.pathname === "/admin";
+  const isAdminRoute = path.startsWith("/admin");
+  const isAdminHome = path === "/admin";
   const email = data.user?.email?.trim().toLowerCase();
   const allowedEmail = process.env.ADMIN_EMAIL?.trim().toLowerCase();
 
   if (isAdminRoute && !isAdminHome && (!email || email !== allowedEmail)) {
-    return NextResponse.redirect(new URL("/admin", request.url));
+    return NextResponse.redirect(new URL(hostname(request) === "admin.ldufk.com" ? "/" : "/admin", request.url));
   }
 
   return response;
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/auth/callback"]
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|assets|demo-viewer/assets).*)"]
 };

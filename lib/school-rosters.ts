@@ -3,6 +3,7 @@ export type ManualSchoolTeam = {
   slug: string;
   org: string;
   color: string;
+  logo_url?: string | null;
   players: string[];
 };
 

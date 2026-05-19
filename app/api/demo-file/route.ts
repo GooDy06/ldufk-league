@@ -16,48 +16,22 @@ function allowedDemoUrl(value: string | null) {
   }
 }
 
-function demoFilename(url: URL) {
-  return decodeURIComponent(url.pathname.split("/").pop() || "match.dem").replace(/[^a-zA-Z0-9._-]/g, "_");
-}
-
-function responseHeaders(upstream: Response, demoUrl: URL) {
-  const headers = new Headers();
-  ["accept-ranges", "content-length", "content-range", "etag", "last-modified"].forEach((name) => {
-    const value = upstream.headers.get(name);
-    if (value) headers.set(name, value);
-  });
-  headers.set("content-type", upstream.headers.get("content-type") || "application/octet-stream");
-  headers.set("content-disposition", `attachment; filename="${demoFilename(demoUrl)}"`);
-  headers.set("cache-control", "public, max-age=86400");
-  return headers;
-}
-
 export async function GET(request: NextRequest) {
   const demoUrl = allowedDemoUrl(request.nextUrl.searchParams.get("url"));
   if (!demoUrl) return new Response("Invalid demo URL", { status: 400 });
 
-  const range = request.headers.get("range");
-  const upstream = await fetch(demoUrl, {
-    headers: range ? { range } : undefined,
-    cache: "no-store",
-  });
-
-  return new Response(upstream.body, {
-    status: upstream.status,
-    statusText: upstream.statusText,
-    headers: responseHeaders(upstream, demoUrl),
-  });
+  return Response.redirect(demoUrl, 302);
 }
 
 export async function HEAD(request: NextRequest) {
   const demoUrl = allowedDemoUrl(request.nextUrl.searchParams.get("url"));
   if (!demoUrl) return new Response(null, { status: 400 });
 
-  const upstream = await fetch(demoUrl, { method: "HEAD", cache: "no-store" });
-
   return new Response(null, {
-    status: upstream.status,
-    statusText: upstream.statusText,
-    headers: responseHeaders(upstream, demoUrl),
+    status: 302,
+    headers: {
+      location: demoUrl.toString(),
+      "cache-control": "no-store",
+    },
   });
 }

@@ -25,9 +25,13 @@ export function getDemoFile(matchId: string | number) {
 }
 
 export function demoViewerHref(url: string) {
-  return `/demo-viewer/player?demourl=${encodeURIComponent(demoFileProxyHref(url))}`;
+  return `/demo-viewer/player?demourl=${encodeURIComponent(demoFileHref(url))}`;
+}
+
+export function demoFileHref(url: string) {
+  return url;
 }
 
 export function demoFileProxyHref(url: string) {
-  return `/api/demo-file?url=${encodeURIComponent(url)}`;
+  return demoFileHref(url);
 }

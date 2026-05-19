@@ -52,7 +52,7 @@ export type Player = Publishable & {
   highlight_map: string | null;
   highlight_date: string | null;
   highlight_description: string | null;
-  team?: Pick<Team, "name" | "slug" | "division" | "color"> | null;
+  team?: Pick<Team, "name" | "slug" | "division" | "color" | "logo_url"> | null;
 };
 
 export type NewsItem = Publishable & {

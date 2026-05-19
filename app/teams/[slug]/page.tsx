@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import type { Player, Team } from "@/lib/types";
 import { Panel } from "@/components/ui";
 import { RosterShowcase } from "@/components/roster-showcase";
+import { getAllPlayerStats } from "@/lib/player-stats";
 
 export const dynamic = "force-dynamic";
 
@@ -12,6 +13,11 @@ export default async function TeamPage({ params }: { params: { slug: string } })
   if (!team) notFound();
 
   const { data: players } = await supabase.from("players").select("*").eq("team_id", team.id).eq("published", true).order("rating", { ascending: false });
+  const computedRatings = new Map(getAllPlayerStats().map((player) => [player.nick.toLowerCase(), player.rating]));
+  const roster = ((players || []) as Player[]).map((player) => {
+    const computedRating = computedRatings.get(player.nick.toLowerCase());
+    return computedRating ? { ...player, rating: Number(computedRating.toFixed(2)) } : player;
+  });
 
   const typedTeam = team as Team;
 
@@ -27,7 +33,7 @@ export default async function TeamPage({ params }: { params: { slug: string } })
         </div>
       </div>
       <Panel title="Склад команди" eyebrow="Players">
-        <RosterShowcase players={(players || []) as Player[]} />
+        <RosterShowcase players={roster} />
       </Panel>
     </div>
   );

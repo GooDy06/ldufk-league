@@ -108,7 +108,9 @@ function PlayerStatsTable({ title, players, winner }: { title: string; players: 
         return (
           <div key={player.steamId} className="grid grid-cols-[1fr_64px_64px_70px] items-center border-b border-line/70 px-3 py-2 text-sm last:border-0 md:grid-cols-[1fr_76px_76px_80px]">
             <div className="min-w-0">
-              <div className="truncate font-bold text-slate-200">{player.name}</div>
+              <Link href={`/players/${encodeURIComponent(player.name)}`} className="truncate font-bold text-slate-200 transition hover:text-accent">
+                {player.name}
+              </Link>
             </div>
             <div className="text-right font-rajdhani text-lg font-bold text-slate-300">{player.kills}-{player.deaths}</div>
             <div className="text-right font-rajdhani text-lg font-bold text-slate-300">{adr(player)}</div>

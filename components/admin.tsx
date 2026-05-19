@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { AdminRole } from "@/lib/types";
 
 export function AdminNav({ role }: { role?: AdminRole | null }) {
-  const links = [["Dashboard", "/admin"]];
+  const links = [["Dashboard", "/admin"], ["Veto", "/veto"]];
 
   if (role === "main_admin" || role === "admin") {
     links.push(["Homepage", "/admin/homepage"], ["Teams", "/admin/teams"], ["News", "/admin/news"], ["Tournaments", "/admin/tournaments"], ["Players", "/admin/players"]);

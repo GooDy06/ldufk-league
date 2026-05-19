@@ -174,7 +174,11 @@ function PlayerTable({
             const flashAssists = demo.flashAssists || (selectedSide === "all" ? player.flashbang_assists || 0 : 0);
             return (
               <tr key={`${player.steam_id}-${player.map_id}`} className="border-b border-line/70 last:border-0">
-                <td className="px-3 py-2 font-bold text-slate-200">{player.name}</td>
+                <td className="px-3 py-2 font-bold text-slate-200">
+                  <Link href={`/players/${encodeURIComponent(player.name)}`} className="transition hover:text-accent">
+                    {player.name}
+                  </Link>
+                </td>
                 {showOpening ? <td className="px-2 py-2 text-right font-rajdhani text-lg font-bold text-slate-300">{firstKills}-{firstDeaths}</td> : null}
                 {showLotOnlyColumns ? <td className="px-2 py-2 text-right font-rajdhani text-lg font-bold text-slate-300">{multiKills(player)}</td> : null}
                 {showLotOnlyColumns ? <td className="px-2 py-2 text-right font-rajdhani text-lg font-bold text-slate-300">{clutches(player)}</td> : null}
