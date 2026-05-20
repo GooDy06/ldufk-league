@@ -99,7 +99,8 @@ export function remainingMaps(mapPool: string[], steps: VetoStep[]) {
   return mapPool.filter((map) => !steps.some((step) => step.map.toLowerCase() === map.toLowerCase()));
 }
 
-export function publicObsUrl(sessionId: string) {
+export function publicObsUrl(sessionId: string, layout?: "cards" | "compact") {
   const base = process.env.NEXT_PUBLIC_VETO_ORIGIN || "https://veto.ldufk.com";
-  return `${base}/obs/${sessionId}`;
+  const url = `${base}/obs/${sessionId}`;
+  return layout === "compact" ? `${url}?layout=compact` : url;
 }

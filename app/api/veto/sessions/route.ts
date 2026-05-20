@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { ACTIVE_MAPS, normalizeMaps, type VetoFormat, type VetoTeamKey } from "@/lib/veto/types";
 import { getVetoServiceClient, rowToVetoState } from "@/lib/veto/server";
+import { requireAdmin } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 
@@ -13,6 +14,11 @@ type CreatePayload = {
 };
 
 export async function POST(request: Request) {
+  const { user } = await requireAdmin();
+  if (!user) {
+    return NextResponse.json({ ok: false, error: "Unauthorized." }, { status: 401 });
+  }
+
   const payload = (await request.json().catch(() => ({}))) as CreatePayload;
   const mapPool = normalizeMaps(payload.mapPool?.length ? payload.mapPool : ACTIVE_MAPS);
 

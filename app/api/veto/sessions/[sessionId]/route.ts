@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { normalizeMaps, type VetoFormat, type VetoStep, type VetoTeamKey } from "@/lib/veto/types";
 import { getVetoServiceClient, rowToVetoState } from "@/lib/veto/server";
+import { requireAdmin } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 
@@ -34,6 +35,11 @@ export async function GET(_request: Request, { params }: { params: { sessionId: 
 }
 
 export async function PATCH(request: Request, { params }: { params: { sessionId: string } }) {
+  const { user } = await requireAdmin();
+  if (!user) {
+    return NextResponse.json({ ok: false, error: "Unauthorized." }, { status: 401 });
+  }
+
   const payload = (await request.json().catch(() => ({}))) as UpdatePayload;
   const update: Record<string, unknown> = {
     updated_at: new Date().toISOString()

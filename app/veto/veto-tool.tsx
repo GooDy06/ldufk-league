@@ -41,6 +41,7 @@ export function VetoTool() {
   };
   const actionText = flipState.active ? "??? starts" : isDone ? "Veto complete" : `${teamName(next.team)} ${next.action}s`;
   const obsLink = sessionId ? publicObsUrl(sessionId) : "";
+  const compactObsLink = sessionId ? publicObsUrl(sessionId, "compact") : "";
 
   useEffect(() => {
     if (hasCreatedRef.current || createInFlightRef.current) return;
@@ -181,20 +182,28 @@ export function VetoTool() {
           </div>
 
           <div className="rounded-lg border border-accent/25 bg-accent/10 p-2">
-            <div className="text-[10px] font-extrabold uppercase tracking-[0.18em] text-accent">OBS live overlay</div>
-            <input readOnly value={obsLink || "Creating OBS link..."} className="mt-2 w-full rounded-md border border-line bg-bg/60 px-2 py-1.5 font-mono text-[10px] text-slate-300 outline-none" />
-            <div className="mt-2 grid grid-cols-[1fr_auto] items-center gap-2">
-              <div className={`text-[10px] font-bold uppercase tracking-[0.12em] ${saveStatus === "error" ? "text-rose-300" : "text-slate-500"}`}>
-                {saveStatus === "saving" ? "saving" : saveStatus === "error" ? "sync error" : "live sync"}
+            <div className="text-[10px] font-extrabold uppercase tracking-[0.18em] text-accent">OBS live overlays</div>
+            {[
+              ["Full cards", obsLink],
+              ["Compact lower", compactObsLink]
+            ].map(([label, link]) => (
+              <div key={label} className="mt-2 grid grid-cols-[1fr_auto] gap-2">
+                <label className="grid gap-1">
+                  <span className="text-[10px] font-bold uppercase tracking-[0.12em] text-slate-500">{label}</span>
+                  <input readOnly value={link || "Creating OBS link..."} className="w-full rounded-md border border-line bg-bg/60 px-2 py-1.5 font-mono text-[10px] text-slate-300 outline-none" />
+                </label>
+                <button
+                  type="button"
+                  disabled={!link}
+                  onClick={() => void navigator.clipboard.writeText(link)}
+                  className="mt-5 self-start rounded-md border border-accent/35 bg-accent/15 px-2 py-1 text-[10px] font-extrabold uppercase tracking-[0.12em] text-accent transition hover:bg-accent hover:text-bg disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  Copy
+                </button>
               </div>
-              <button
-                type="button"
-                disabled={!obsLink}
-                onClick={() => void navigator.clipboard.writeText(obsLink)}
-                className="rounded-md border border-accent/35 bg-accent/15 px-2 py-1 text-[10px] font-extrabold uppercase tracking-[0.12em] text-accent transition hover:bg-accent hover:text-bg disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                Copy
-              </button>
+            ))}
+            <div className={`mt-2 text-[10px] font-bold uppercase tracking-[0.12em] ${saveStatus === "error" ? "text-rose-300" : "text-slate-500"}`}>
+              {saveStatus === "saving" ? "saving" : saveStatus === "error" ? "sync error" : "live sync"}
             </div>
           </div>
         </div>

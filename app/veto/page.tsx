@@ -1,8 +1,18 @@
 import { VetoTool } from "./veto-tool";
+import { redirect } from "next/navigation";
+import { headers } from "next/headers";
+import { requireAdmin } from "@/lib/supabase/server";
 
-export const dynamic = "force-static";
+export const dynamic = "force-dynamic";
 
-export default function VetoPage() {
+export default async function VetoPage() {
+  const { user } = await requireAdmin();
+
+  if (!user) {
+    const host = headers().get("x-ldufk-hostname") || headers().get("host") || "";
+    redirect(host.toLowerCase().includes("veto.ldufk.com") ? "https://admin.ldufk.com" : "/admin");
+  }
+
   return (
     <div className="py-4 sm:py-6">
       <div className="mb-4">
