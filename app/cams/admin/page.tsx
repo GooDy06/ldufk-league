@@ -146,7 +146,7 @@ export default async function CamsAdminPage({ searchParams }: { searchParams: Ad
                     <tbody>
                       {roomPlayers.map((player) => {
                         const joinLink = `${baseUrl}/join/${player.join_token}`;
-                        const obsLink = `${baseUrl}/view/${player.steamid64}?mode=cover&rounded=true&muted=true`;
+                        const obsLink = `${baseUrl}/view/${player.steamid64}?mode=cover&rounded=true&muted=false&name=true`;
                         const isOnline = isFreshOnline(player.is_online, player.last_seen);
                         return (
                           <tr key={player.id} className="border-b border-white/5 last:border-0">

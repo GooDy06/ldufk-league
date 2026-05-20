@@ -140,6 +140,14 @@ https://cams.ldufk.com/view/7656119XXXXXXXXXX?mode=cover&rounded=true&muted=true
 
 Цей OBS link генерується автоматично для кожного player в `/admin`.
 
+Для OBS зі звуком мікрофона і nickname overlay:
+
+```text
+https://cams.ldufk.com/view/7656119XXXXXXXXXX?mode=cover&rounded=true&muted=false&name=true
+```
+
+Гравець має увімкнути `Enable microphone for OBS` на join page. HUD links лишай з `muted=true`.
+
 Auto-switch iframe:
 
 ```text
@@ -165,3 +173,88 @@ https://cams.ldufk.com/room/ROOM_UUID?mode=cover&rounded=true&names=true
 7. HUD передає SteamID у `<ActivePlayerCamera steamid={observedSteamId} />`.
 8. Component підключається до signaling server як viewer і показує правильний WebRTC stream.
 9. Якщо player offline, HUD показує avatar або initials placeholder і не ламається.
+
+## Emergency / Rollback
+
+Якщо треба швидко вимкнути LDUFK Cams і повернути HUD до старих LHM webcams:
+
+1. У HUD settings увімкнути `Disable LDUFK cams service`, якщо цей flag доступний.
+2. Або перед build/start HUD поставити:
+
+```env
+REACT_APP_USE_LDUFK_CAMS=false
+```
+
+3. У Vercel можна тимчасово зламати тільки нову camera integration без впливу на сайт:
+
+```env
+NEXT_PUBLIC_CAMS_SIGNALING_URL=
+```
+
+Після зміни env потрібен redeploy. Старий LHM HUD має продовжити працювати, якщо HUD fallback зроблений правильно.
+
+Щоб прибрати окрему камеру:
+
+- `Remove camera` в `/admin` тільки відключає live stream/player session, але player лишається у списку.
+- `Delete player` повністю видаляє player row, join link і OBS link для нього.
+
+Щоб тимчасово не використовувати cams у трансляції:
+
+- Видалити або сховати OBS Browser Sources із `https://cams.ldufk.com/view/...`.
+- У HUD вимкнути `USE_LDUFK_CAMS`.
+- Render signaling server можна не чіпати, він не передає відео без активних viewers.
+
+Корисні production URLs:
+
+```text
+Admin:
+https://cams.ldufk.com/admin
+
+Player join:
+https://cams.ldufk.com/join/[token]
+
+Single OBS camera:
+https://cams.ldufk.com/view/[steamid]?mode=cover&rounded=true&muted=true
+
+Auto-switch HUD iframe:
+https://cams.ldufk.com/hud/active?steamid=[steamid]&mode=cover&rounded=true&muted=true
+
+Room grid:
+https://cams.ldufk.com/room/[roomId]?mode=cover&rounded=true&names=true
+
+Signaling health:
+https://ldufk-cams-signal.onrender.com/health
+```
+
+Env checklist:
+
+Vercel:
+
+```env
+NEXT_PUBLIC_CAMS_ORIGIN=https://cams.ldufk.com
+NEXT_PUBLIC_CAMS_SIGNALING_URL=https://ldufk-cams-signal.onrender.com
+CAMS_ADMIN_PASSWORD=...
+CAMS_ADMIN_SESSION_SECRET=...
+CAMS_SIGNALING_ADMIN_SECRET=...
+NEXT_PUBLIC_SUPABASE_URL=...
+NEXT_PUBLIC_SUPABASE_ANON_KEY=...
+SUPABASE_SERVICE_ROLE_KEY=...
+NEXT_PUBLIC_CAMS_STUN_URLS=stun:stun.l.google.com:19302,stun:global.stun.twilio.com:3478
+```
+
+Render:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=...
+SUPABASE_SERVICE_ROLE_KEY=...
+CAMS_ALLOWED_ORIGINS=https://cams.ldufk.com,https://ldufk.com
+CAMS_SIGNALING_ADMIN_SECRET=...
+```
+
+Якщо camera page працює, але HUD не показує камеру:
+
+1. Перевірити `https://cams.ldufk.com/hud/active?steamid=STEAMID64&mode=cover&rounded=true&muted=true`.
+2. Якщо прямий URL показує камеру, проблема у HUD mapping/fallback.
+3. У HUD console перевірити `Observed SteamID: ...`.
+4. Якщо SteamID `null` або не той, треба поправити `getObservedSteamId(gameState)`.
+5. Якщо SteamID правильний, але LDUFK stream offline, HUD має показати старий LHM webcam або avatar.

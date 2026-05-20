@@ -45,6 +45,7 @@ export function PlayerCameraClient({ token, player }: PlayerCameraClientProps) {
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [devices, setDevices] = useState<MediaDeviceInfo[]>([]);
   const [selectedDeviceId, setSelectedDeviceId] = useState("");
+  const [audioEnabled, setAudioEnabled] = useState(false);
   const [status, setStatus] = useState<CameraStatus>("disconnected");
   const [error, setError] = useState<string | null>(null);
 
@@ -120,7 +121,7 @@ export function PlayerCameraClient({ token, player }: PlayerCameraClientProps) {
       const peer = new RTCPeerConnection({ iceServers });
       peersRef.current.set(viewerId, peer);
 
-      mediaStream.getVideoTracks().forEach((track) => peer.addTrack(track, mediaStream));
+      mediaStream.getTracks().forEach((track) => peer.addTrack(track, mediaStream));
 
       peer.onicecandidate = (event) => {
         if (event.candidate) {
@@ -180,7 +181,7 @@ export function PlayerCameraClient({ token, player }: PlayerCameraClientProps) {
     });
   }
 
-  async function enableCamera(deviceId = selectedDeviceId) {
+  async function enableCamera(deviceId = selectedDeviceId, includeAudio = audioEnabled) {
     setError(null);
     setStatus("connecting");
 
@@ -198,7 +199,13 @@ export function PlayerCameraClient({ token, player }: PlayerCameraClientProps) {
               height: { ideal: 720 },
               frameRate: { ideal: 30, max: 60 }
             },
-        audio: false
+        audio: includeAudio
+          ? {
+              echoCancellation: true,
+              noiseSuppression: true,
+              autoGainControl: true
+            }
+          : false
       });
 
       stopStream(streamRef.current);
@@ -253,7 +260,7 @@ export function PlayerCameraClient({ token, player }: PlayerCameraClientProps) {
             value={selectedDeviceId}
             onChange={(event) => {
               setSelectedDeviceId(event.target.value);
-              if (stream) void enableCamera(event.target.value);
+              if (stream) void enableCamera(event.target.value, audioEnabled);
             }}
             className="rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-white outline-none focus:border-cyan-300"
           >
@@ -264,6 +271,19 @@ export function PlayerCameraClient({ token, player }: PlayerCameraClientProps) {
               </option>
             ))}
           </select>
+        </label>
+
+        <label className="mt-4 flex items-center justify-between gap-3 rounded-lg border border-white/10 bg-black/20 p-3 text-sm font-semibold text-slate-300">
+          <span>Enable microphone for OBS</span>
+          <input
+            type="checkbox"
+            checked={audioEnabled}
+            onChange={(event) => {
+              setAudioEnabled(event.target.checked);
+              if (stream) void enableCamera(selectedDeviceId, event.target.checked);
+            }}
+            className="h-5 w-5 accent-cyan-300"
+          />
         </label>
 
         <button

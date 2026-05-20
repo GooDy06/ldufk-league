@@ -6,6 +6,7 @@ type ViewerSearchParams = {
   mode?: "cover" | "contain";
   rounded?: string;
   muted?: string;
+  name?: string;
 };
 
 function bool(value: string | undefined, fallback = false) {
@@ -17,10 +18,11 @@ export default function CameraViewPage({ params, searchParams }: { params: { ste
   const mode = searchParams.mode === "contain" ? "contain" : "cover";
   const rounded = bool(searchParams.rounded);
   const muted = bool(searchParams.muted, true);
+  const showName = bool(searchParams.name);
 
   return (
     <div className="fixed inset-0 overflow-hidden bg-transparent">
-      <CameraViewer steamid={params.steamid} mode={mode} rounded={rounded} muted={muted} clean showFallback={false} />
+      <CameraViewer steamid={params.steamid} mode={mode} rounded={rounded} muted={muted} clean showFallback={false} showNameOverlay={showName} />
     </div>
   );
 }

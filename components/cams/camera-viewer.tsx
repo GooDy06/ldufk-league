@@ -14,6 +14,7 @@ type CameraViewerProps = {
   showFallback?: boolean;
   fallbackPlayer?: Partial<PublicCameraPlayer> | null;
   clean?: boolean;
+  showNameOverlay?: boolean;
   className?: string;
   onStatusChange?: (status: CameraStatus) => void;
   onPlayerChange?: (player: PublicCameraPlayer | null) => void;
@@ -40,6 +41,7 @@ export function CameraViewer({
   showFallback = false,
   fallbackPlayer,
   clean = false,
+  showNameOverlay = false,
   className = "",
   onStatusChange,
   onPlayerChange
@@ -210,6 +212,13 @@ export function CameraViewer({
         muted={muted}
         className={`absolute inset-0 h-full w-full bg-transparent transition-opacity duration-200 ${mode === "contain" ? "object-contain" : "object-cover"} ${hasVideo ? "opacity-100" : "opacity-0"}`}
       />
+      {showNameOverlay && activePlayer?.nickname ? (
+        <div className="pointer-events-none absolute bottom-3 left-3 right-3 text-center">
+          <div className="inline-block max-w-full truncate px-3 py-1 font-rajdhani text-2xl font-bold leading-none text-white [text-shadow:0_3px_12px_rgba(0,0,0,0.95),0_1px_3px_rgba(0,0,0,1)]">
+            {activePlayer.nickname}
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
