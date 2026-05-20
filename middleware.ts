@@ -16,6 +16,7 @@ function routedPath(request: NextRequest) {
   }
 
   if (host === "admin.ldufk.com") {
+    if (path.startsWith("/api/")) return path;
     return path.startsWith("/admin") ? path : `/admin${path === "/" ? "" : path}`;
   }
 

@@ -10,7 +10,7 @@ export default async function VetoPage() {
 
   if (!user) {
     const host = headers().get("x-ldufk-hostname") || headers().get("host") || "";
-    redirect(host.toLowerCase().includes("veto.ldufk.com") ? "https://admin.ldufk.com" : "/admin");
+    redirect(host.toLowerCase().includes("veto.ldufk.com") ? "https://admin.ldufk.com/admin/veto" : "/admin/veto");
   }
 
   return (

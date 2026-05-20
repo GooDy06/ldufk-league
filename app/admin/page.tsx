@@ -45,7 +45,7 @@ export default async function AdminPage({ searchParams }: { searchParams: { erro
           {role === "main_admin" || role === "admin" || role === "reporter" ? <Link href="/admin/news" className="rounded-xl border border-line bg-surface2 p-4 font-bold hover:text-accent">News</Link> : null}
           {role === "main_admin" || role === "admin" ? <Link href="/admin/tournaments" className="rounded-xl border border-line bg-surface2 p-4 font-bold hover:text-accent">Tournaments</Link> : null}
           {role === "main_admin" || role === "admin" || role === "moderator" ? <Link href="/admin/players" className="rounded-xl border border-line bg-surface2 p-4 font-bold hover:text-accent">Players</Link> : null}
-          <Link href="/veto" className="rounded-xl border border-accent/30 bg-accent/10 p-4 font-bold text-accent hover:text-white">Veto</Link>
+          <Link href="/admin/veto" className="rounded-xl border border-accent/30 bg-accent/10 p-4 font-bold text-accent hover:text-white">Veto</Link>
           {role === "main_admin" ? <Link href="/admin/admins" className="rounded-xl border border-line bg-surface2 p-4 font-bold hover:text-accent">Admins</Link> : null}
         </div>
         <form action={signOut} className="mt-5">
