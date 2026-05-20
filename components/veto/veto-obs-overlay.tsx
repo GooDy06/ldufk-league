@@ -39,7 +39,8 @@ function actionTheme(action: VetoCardItem["action"]) {
       label: "bg-red-700/86 text-white",
       compact: "border-red-500/80 bg-red-800/82",
       glow: "shadow-red-500/30",
-      footer: "from-red-600/92 via-red-700/80 to-red-950/88"
+      footer: "from-red-600/92 via-red-700/80 to-red-950/88",
+      innerGlow: "shadow-[inset_0_0_38px_rgba(239,68,68,0.38),inset_0_-95px_95px_rgba(127,29,29,0.42),0_0_28px_rgba(239,68,68,0.18)]"
     };
   }
 
@@ -50,7 +51,8 @@ function actionTheme(action: VetoCardItem["action"]) {
       label: "bg-indigo-700/88 text-white",
       compact: "border-indigo-400/80 bg-indigo-800/74",
       glow: "shadow-indigo-400/30",
-      footer: "from-indigo-500/86 via-indigo-700/72 to-indigo-950/84"
+      footer: "from-indigo-500/86 via-indigo-700/72 to-indigo-950/84",
+      innerGlow: "shadow-[inset_0_0_38px_rgba(99,102,241,0.34),inset_0_-95px_95px_rgba(49,46,129,0.34),0_0_28px_rgba(99,102,241,0.16)]"
     };
   }
 
@@ -61,7 +63,8 @@ function actionTheme(action: VetoCardItem["action"]) {
       label: "bg-yellow-400/88 text-slate-950",
       compact: "border-yellow-300/85 bg-yellow-500/82",
       glow: "shadow-yellow-300/30",
-      footer: "from-yellow-300/92 via-yellow-500/76 to-yellow-800/80"
+      footer: "from-yellow-300/92 via-yellow-500/76 to-yellow-800/80",
+      innerGlow: "shadow-[inset_0_0_42px_rgba(250,204,21,0.42),inset_0_-95px_95px_rgba(161,98,7,0.36),0_0_30px_rgba(250,204,21,0.18)]"
     };
   }
 
@@ -114,7 +117,7 @@ function PortraitCard({ item, state, index }: { item: VetoCardItem; state: VetoS
 
   return (
     <div
-      className={`relative h-full min-h-[520px] min-w-0 overflow-hidden rounded border ${theme.border} shadow-[0_28px_60px_rgba(0,0,0,0.42)] ${theme.glow} animate-[vetoCardIn_0.5s_ease-out_both]`}
+      className={`relative h-full min-h-[520px] min-w-0 overflow-hidden rounded border ${theme.border} shadow-[0_28px_60px_rgba(0,0,0,0.42)] ${theme.glow} ${theme.innerGlow} animate-[vetoCardIn_0.5s_ease-out_both]`}
       style={{ animationDelay: `${index * 85}ms` }}
     >
       {image ? <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${image})`, opacity: 0.86 }} /> : null}
@@ -139,7 +142,7 @@ function CompactCard({ item, state, index }: { item: VetoCardItem; state: VetoSe
 
   return (
     <div
-      className={`relative h-[96px] w-[154px] overflow-hidden rounded border ${theme.compact} shadow-[0_14px_35px_rgba(0,0,0,0.36)] ${theme.glow} animate-[vetoPopIn_0.38s_ease-out_both]`}
+      className={`relative h-[118px] min-w-0 overflow-hidden rounded border ${theme.compact} shadow-[0_14px_35px_rgba(0,0,0,0.36)] ${theme.glow} ${theme.innerGlow} animate-[vetoPopIn_0.38s_ease-out_both]`}
       style={{ animationDelay: `${index * 55}ms` }}
     >
       {image ? <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${image})`, opacity: item.action === "pick" ? 0.88 : 0.68 }} /> : null}
@@ -147,24 +150,34 @@ function CompactCard({ item, state, index }: { item: VetoCardItem; state: VetoSe
       <div className={`absolute inset-x-0 top-0 h-8 bg-gradient-to-r ${theme.footer}`} />
       <div className="relative z-10 flex h-full flex-col justify-between">
         <div className="grid grid-cols-[1fr_auto] items-center gap-1 px-2 py-1.5">
-          <span className="min-w-0 truncate font-rajdhani text-[15px] font-bold uppercase leading-none text-white [text-shadow:0_2px_8px_rgba(0,0,0,1)]">
+          <span className="min-w-0 truncate font-rajdhani text-[17px] font-bold uppercase leading-none text-white [text-shadow:0_2px_8px_rgba(0,0,0,1)]">
             {teamText}
           </span>
-          <span className={`rounded px-1.5 py-0.5 font-rajdhani text-[13px] font-bold uppercase leading-none ${theme.label}`}>{label}</span>
+          <span className={`rounded px-2 py-1 font-rajdhani text-[15px] font-bold uppercase leading-none ${theme.label}`}>{label}</span>
         </div>
         <div className="bg-black/42 px-2 py-2 text-center">
-          <div className="truncate font-rajdhani text-[20px] font-bold uppercase leading-none text-white [text-shadow:0_3px_12px_rgba(0,0,0,1)]">{item.map}</div>
+          <div className="truncate font-rajdhani text-[27px] font-bold uppercase leading-none text-white [text-shadow:0_3px_12px_rgba(0,0,0,1)]">{item.map}</div>
         </div>
       </div>
     </div>
   );
 }
 
-function TeamTurnRow({ label, name, active }: { label: string; name: string; active: boolean }) {
+function TeamTurnRow({ label, name, active, neutral = false }: { label: string; name: string; active: boolean; neutral?: boolean }) {
   return (
-    <div className={`rounded border px-3 py-1.5 text-center transition ${active ? "border-cyan-300/70 bg-cyan-300/14 text-white shadow-[0_0_22px_rgba(103,232,249,0.22)]" : "border-white/10 bg-white/[0.04] text-white/38"}`}>
-      <div className={`text-[9px] font-extrabold uppercase tracking-[0.18em] ${active ? "text-cyan-100" : "text-white/30"}`}>{label}</div>
-      <div className="truncate font-rajdhani text-[26px] font-bold uppercase leading-none">{name}</div>
+    <div className="rounded px-3 py-1.5 text-center transition">
+      <div className={`text-[9px] font-extrabold uppercase tracking-[0.18em] ${active ? "text-cyan-100" : neutral ? "text-white/50" : "text-white/26"}`}>{label}</div>
+      <div
+        className={`truncate font-rajdhani text-[28px] font-black uppercase leading-none transition ${
+          active
+            ? "text-cyan-50 [text-shadow:0_0_16px_rgba(103,232,249,0.92),0_3px_12px_rgba(0,0,0,1)]"
+            : neutral
+              ? "text-white [text-shadow:0_3px_12px_rgba(0,0,0,1)]"
+              : "text-white/34 [text-shadow:0_3px_10px_rgba(0,0,0,0.8)]"
+        }`}
+      >
+        {name}
+      </div>
     </div>
   );
 }
@@ -222,12 +235,12 @@ function CardsLayout({ state, items, stale }: { state: VetoSessionState; items: 
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_12%_12%,rgba(56,189,248,0.16),transparent_34%),radial-gradient(circle_at_88%_90%,rgba(239,68,68,0.18),transparent_34%)]" />
           <div className="relative z-10 flex h-full flex-col">
             <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-6">
-              <div className="truncate text-left font-rajdhani text-5xl font-bold uppercase text-white/88">{state.team1}</div>
+              <div className="truncate text-left font-rajdhani text-[62px] font-black uppercase leading-none text-white/92 [text-shadow:0_5px_24px_rgba(0,0,0,0.9)]">{state.team1}</div>
               <div className="text-center">
                 <div className="font-rajdhani text-4xl font-bold uppercase text-white [text-shadow:0_4px_22px_rgba(0,0,0,0.9)]">MAP VETO</div>
                 <div className="mt-1 text-xs font-extrabold uppercase text-cyan-100/70">{formatLabel(state.format)}</div>
               </div>
-              <div className="truncate text-right font-rajdhani text-5xl font-bold uppercase text-white/88">{state.team2}</div>
+              <div className="truncate text-right font-rajdhani text-[62px] font-black uppercase leading-none text-white/92 [text-shadow:0_5px_24px_rgba(0,0,0,0.9)]">{state.team2}</div>
             </div>
 
             <div className="mt-12 grid min-h-0 flex-1 grid-cols-7 gap-3 overflow-hidden">
@@ -253,20 +266,21 @@ function CompactLayout({ state, items, stale }: { state: VetoSessionState; items
   const isTeam1Active = nextStep?.team === "team1";
   const isTeam2Active = nextStep?.team === "team2";
   const currentAction = state.status === "complete" ? "COMPLETE" : nextStep ? nextStep.action.toUpperCase() : "WAIT";
+  const neutralTeams = state.status === "complete" || nextStep?.team === "system";
 
   return (
     <div className="h-screen w-screen overflow-hidden bg-transparent text-white">
       <OverlayStyles />
-      <div className="absolute bottom-14 left-1/2 flex -translate-x-1/2 items-end gap-2 rounded bg-black/18 px-3 py-2 backdrop-blur-[2px]">
-        <div className="mr-2 hidden w-[240px] rounded border border-white/18 bg-black/64 px-3 py-3 shadow-[0_12px_34px_rgba(0,0,0,0.42)] lg:block">
+      <div className="absolute bottom-12 left-[4vw] grid w-[92vw] max-w-[1760px] grid-cols-[280px_repeat(7,minmax(0,1fr))] items-end gap-3 rounded bg-black/18 px-4 py-3 backdrop-blur-[2px]">
+        <div className="min-h-[118px] rounded border border-white/18 bg-black/64 px-3 py-3 shadow-[0_12px_34px_rgba(0,0,0,0.42)]">
           <div className="grid grid-cols-[1fr_auto] items-center gap-2">
             <div className="text-[10px] font-extrabold uppercase tracking-[0.18em] text-cyan-100/70">Map veto</div>
             <div className="rounded bg-white/10 px-2 py-0.5 font-rajdhani text-[15px] font-bold uppercase text-white">{currentAction}</div>
           </div>
           <div className="mt-2 grid gap-1.5">
-            <TeamTurnRow label={isTeam1Active ? "Now" : "Waiting"} name={state.team1} active={isTeam1Active} />
+            <TeamTurnRow label={isTeam1Active ? "Now" : neutralTeams ? "Ready" : "Waiting"} name={state.team1} active={isTeam1Active} neutral={neutralTeams} />
             <div className="text-center font-rajdhani text-lg font-bold uppercase leading-none text-white/42">vs</div>
-            <TeamTurnRow label={isTeam2Active ? "Now" : "Waiting"} name={state.team2} active={isTeam2Active} />
+            <TeamTurnRow label={isTeam2Active ? "Now" : neutralTeams ? "Ready" : "Waiting"} name={state.team2} active={isTeam2Active} neutral={neutralTeams} />
           </div>
         </div>
         {items.map((item, index) => <CompactCard key={`${item.map}-${item.action}-${item.order}`} item={item} state={state} index={index} />)}
