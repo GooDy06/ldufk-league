@@ -72,6 +72,7 @@ function isAllowedOrigin(origin?: string) {
 }
 
 const app = express();
+app.use(express.json());
 app.use(
   cors({
     origin(origin, callback) {
@@ -80,8 +81,48 @@ app.use(
   })
 );
 
-app.get("/health", (_request, response) => {
-  response.json({ ok: true, service: "ldufk-cams-signaling" });
+function publicErrorMessage(error: unknown) {
+  if (!error || typeof error !== "object") return "Unknown signaling error.";
+  const message = "message" in error ? String((error as { message?: unknown }).message || "") : "";
+  const code = "code" in error ? String((error as { code?: unknown }).code || "") : "";
+  return [code, message].filter(Boolean).join(": ") || "Unknown signaling error.";
+}
+
+app.get("/health", async (_request, response) => {
+  const { error } = await supabase.from("camera_players").select("id").limit(1);
+
+  response.status(error ? 503 : 200).json({
+    ok: !error,
+    service: "ldufk-cams-signaling",
+    supabase: {
+      configured: Boolean(supabaseUrl && supabaseKey),
+      ok: !error,
+      error: error ? publicErrorMessage(error) : null
+    },
+    allowedOrigins
+  });
+});
+
+app.post("/admin/remove-camera", async (request, response) => {
+  const secret = process.env.CAMS_SIGNALING_ADMIN_SECRET;
+  const providedSecret = String(request.header("x-cams-admin-secret") || "");
+
+  if (!secret || providedSecret !== secret) {
+    response.status(401).json({ ok: false, error: "Unauthorized" });
+    return;
+  }
+
+  const playerId = String(request.body?.playerId || "");
+  const publisherSocketId = publishers.get(playerId);
+
+  if (publisherSocketId) {
+    io.to(publisherSocketId).emit("publisher:kick");
+    io.sockets.sockets.get(publisherSocketId)?.disconnect(true);
+    publishers.delete(playerId);
+  }
+
+  io.to(cameraViewersRoom(playerId)).emit("camera:offline", { reason: "admin-removed" });
+  response.json({ ok: true, kicked: Boolean(publisherSocketId) });
 });
 
 const server = http.createServer(app);
@@ -138,7 +179,7 @@ async function findPlayerBySteamId(steamid64: string) {
 
 async function markPlayerOnline(playerId: string, peerId: string) {
   const now = new Date().toISOString();
-  await supabase
+  const { error: playerError } = await supabase
     .from("camera_players")
     .update({
       is_online: true,
@@ -146,7 +187,9 @@ async function markPlayerOnline(playerId: string, peerId: string) {
     })
     .eq("id", playerId);
 
-  const { data } = await supabase
+  if (playerError) throw playerError;
+
+  const { data, error: sessionError } = await supabase
     .from("camera_sessions")
     .insert({
       player_id: playerId,
@@ -157,12 +200,13 @@ async function markPlayerOnline(playerId: string, peerId: string) {
     .select("id")
     .maybeSingle();
 
+  if (sessionError) throw sessionError;
   return data?.id as string | undefined;
 }
 
 async function markPlayerOffline(playerId: string, sessionId?: string) {
   const now = new Date().toISOString();
-  await supabase
+  const { error: playerError } = await supabase
     .from("camera_players")
     .update({
       is_online: false,
@@ -170,20 +214,24 @@ async function markPlayerOffline(playerId: string, sessionId?: string) {
     })
     .eq("id", playerId);
 
+  if (playerError) throw playerError;
+
   if (sessionId) {
-    await supabase
+    const { error: sessionError } = await supabase
       .from("camera_sessions")
       .update({
         status: "ended",
         updated_at: now
       })
       .eq("id", sessionId);
+
+    if (sessionError) throw sessionError;
   }
 }
 
 async function touchPlayer(playerId: string, sessionId?: string) {
   const now = new Date().toISOString();
-  await supabase
+  const { error: playerError } = await supabase
     .from("camera_players")
     .update({
       is_online: true,
@@ -191,14 +239,18 @@ async function touchPlayer(playerId: string, sessionId?: string) {
     })
     .eq("id", playerId);
 
+  if (playerError) throw playerError;
+
   if (sessionId) {
-    await supabase
+    const { error: sessionError } = await supabase
       .from("camera_sessions")
       .update({
         status: "active",
         updated_at: now
       })
       .eq("id", sessionId);
+
+    if (sessionError) throw sessionError;
   }
 }
 
@@ -277,7 +329,7 @@ io.on("connection", (socket) => {
       inviteWaitingViewers(player.id, socket.id);
     } catch (error) {
       console.error("publisher:join failed", error);
-      socket.emit("publisher:error", { error: "Could not start camera session." });
+      socket.emit("publisher:error", { error: `Could not start camera session: ${publicErrorMessage(error)}` });
     }
   });
 

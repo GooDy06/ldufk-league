@@ -35,6 +35,27 @@ function failIfError(error: { message: string } | null, entity: string) {
   }
 }
 
+async function notifySignalingCameraRemoved(playerId: string) {
+  const signalingUrl = process.env.NEXT_PUBLIC_CAMS_SIGNALING_URL?.replace(/\/$/, "");
+  const secret = process.env.CAMS_SIGNALING_ADMIN_SECRET;
+
+  if (!signalingUrl || !secret) return;
+
+  try {
+    await fetch(`${signalingUrl}/admin/remove-camera`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        "x-cams-admin-secret": secret
+      },
+      body: JSON.stringify({ playerId }),
+      cache: "no-store"
+    });
+  } catch (error) {
+    console.error("Could not notify signaling server about removed camera:", error);
+  }
+}
+
 export async function loginCamsAdmin(formData: FormData) {
   const expectedPassword = process.env.CAMS_ADMIN_PASSWORD;
   const password = text(formData, "password");
@@ -116,6 +137,7 @@ export async function regenerateCameraToken(formData: FormData) {
     .in("status", ["online", "active", "connecting"]);
 
   failIfError(sessionError, "session");
+  await notifySignalingCameraRemoved(playerId);
   revalidatePath("/cams/admin");
   redirect(adminRedirectPath("?saved=token"));
 }
@@ -145,6 +167,7 @@ export async function removeCamera(formData: FormData) {
     .in("status", ["online", "active", "connecting"]);
 
   failIfError(sessionError, "session");
+  await notifySignalingCameraRemoved(playerId);
   revalidatePath("/cams/admin");
   redirect(adminRedirectPath("?saved=offline"));
 }

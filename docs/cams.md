@@ -34,6 +34,7 @@ SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 
 CAMS_ADMIN_PASSWORD=strong-admin-password
 CAMS_ADMIN_SESSION_SECRET=random-long-secret
+CAMS_SIGNALING_ADMIN_SECRET=random-shared-signaling-secret
 NEXT_PUBLIC_CAMS_ORIGIN=https://cams.ldufk.com
 NEXT_PUBLIC_CAMS_SIGNALING_URL=https://your-cams-signaling.onrender.com
 
@@ -52,6 +53,7 @@ PORT=4000
 NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
 SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 CAMS_ALLOWED_ORIGINS=http://localhost:3000,https://cams.ldufk.com,https://ldufk.com
+CAMS_SIGNALING_ADMIN_SECRET=random-shared-signaling-secret
 ```
 
 ## Локальний запуск
