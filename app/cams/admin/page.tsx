@@ -1,5 +1,6 @@
 import { headers } from "next/headers";
 import { CopyLinkButton } from "@/components/cams/copy-link-button";
+import { CustomDelayLinks } from "@/components/cams/custom-delay-links";
 import { addCameraPlayer, createCameraRoom, deleteCameraPlayer, deleteCameraRoom, loginCamsAdmin, logoutCamsAdmin, regenerateCameraToken, removeCamera, updateCameraPlayer } from "@/lib/cams/actions";
 import { isCamsAdminAuthed } from "@/lib/cams/auth";
 import { getCamsBaseUrl, isFreshOnline } from "@/lib/cams/server-utils";
@@ -117,9 +118,13 @@ export default async function CamsAdminPage({ searchParams }: { searchParams: Ad
                   <div>
                     <div className="text-[10px] font-bold uppercase tracking-[0.24em] text-cyan-200/70">{room.tournament_name || "Camera room"}</div>
                     <h2 className="font-rajdhani text-3xl font-bold">{room.name}</h2>
-                    <div className="mt-3 flex max-w-2xl items-center gap-2">
-                      <input readOnly value={roomObsLink} className="w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2 font-mono text-xs text-slate-300 outline-none" />
-                      <CopyLinkButton value={roomObsLink} />
+                    <div className="mt-3 grid max-w-2xl gap-2">
+                      <div className="flex items-center gap-2">
+                        <span className="w-20 text-[10px] font-bold uppercase tracking-[0.16em] text-slate-500">Room live</span>
+                        <input readOnly value={roomObsLink} className="w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2 font-mono text-xs text-slate-300 outline-none" />
+                        <CopyLinkButton value={roomObsLink} />
+                      </div>
+                      <CustomDelayLinks baseLink={roomObsLink} labels={["Room D1", "Room D2"]} />
                     </div>
                     <form action={deleteCameraRoom} className="mt-2">
                       <input type="hidden" name="room_id" value={room.id} />
@@ -180,10 +185,11 @@ export default async function CamsAdminPage({ searchParams }: { searchParams: Ad
                                   <CopyLinkButton value={joinLink} />
                                 </div>
                                 <div className="flex items-center gap-2">
-                                  <span className="w-10 text-[10px] font-bold uppercase tracking-[0.16em] text-slate-500">OBS</span>
+                                  <span className="w-12 text-[10px] font-bold uppercase tracking-[0.16em] text-slate-500">OBS</span>
                                   <input readOnly value={obsLink} className="w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2 font-mono text-xs text-cyan-100 outline-none" />
                                   <CopyLinkButton value={obsLink} />
                                 </div>
+                                <CustomDelayLinks baseLink={obsLink} />
                               </div>
                             </td>
                             <td className="py-3 pl-3">

@@ -148,6 +148,20 @@ https://cams.ldufk.com/view/7656119XXXXXXXXXX?mode=cover&rounded=true&muted=fals
 
 Гравець має увімкнути `Enable microphone for OBS` на join page. HUD links лишай з `muted=true`.
 
+Delayed camera viewer для replay/FACEIT delay:
+
+```text
+https://cams.ldufk.com/view/7656119XXXXXXXXXX?mode=cover&rounded=true&muted=false&name=true&delay=120
+```
+
+Auto-switch HUD iframe із delay:
+
+```text
+https://cams.ldufk.com/hud/active?steamid=7656119XXXXXXXXXX&mode=cover&rounded=true&muted=true&delay=120
+```
+
+`delay` задається у секундах, підтримується від `0` до `900`. Гравець відкриває тільки один join link; delay виконується на viewer/OBS/HUD сторінці через локальний buffer. Для replay HUD інтеграції: якщо `cameraDelay=0`, LDUFK iframe не треба рендерити, щоб replay HUD лишився з avatar/LHM fallback як раніше. Практично для OBS краще тримати `30-120`, бо довгий delay споживає RAM на viewer machine.
+
 Auto-switch iframe:
 
 ```text
@@ -158,6 +172,12 @@ https://cams.ldufk.com/hud/active?steamid=7656119XXXXXXXXXX&mode=cover&rounded=t
 
 ```text
 https://cams.ldufk.com/room/ROOM_UUID?mode=cover&rounded=true&names=true
+```
+
+Room grid із delay:
+
+```text
+https://cams.ldufk.com/room/ROOM_UUID?mode=cover&rounded=true&names=true&delay=120
 ```
 
 У власному React HUD краще використовувати `<ActivePlayerCamera />`, бо він перемикає stream без reload всієї HUD сторінки.

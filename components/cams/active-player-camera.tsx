@@ -10,6 +10,7 @@ type ActivePlayerCameraProps = {
   mode?: "cover" | "contain";
   rounded?: boolean;
   muted?: boolean;
+  delaySeconds?: number;
   className?: string;
   fallbackPlayer?: Partial<PublicCameraPlayer> | null;
   onStatusChange?: (status: CameraStatus) => void;
@@ -20,6 +21,7 @@ export function ActivePlayerCamera({
   mode = "cover",
   rounded = true,
   muted = true,
+  delaySeconds = 0,
   className = "",
   fallbackPlayer,
   onStatusChange
@@ -75,6 +77,7 @@ export function ActivePlayerCamera({
           mode={mode}
           rounded={rounded}
           muted={muted}
+          delaySeconds={delaySeconds}
           showFallback
           fallbackPlayer={player}
           onStatusChange={onStatusChange}

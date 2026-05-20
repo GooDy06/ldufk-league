@@ -9,6 +9,7 @@ type HudSearchParams = {
   muted?: string;
   nickname?: string;
   avatar?: string;
+  delay?: string;
 };
 
 function bool(value: string | undefined, fallback = false) {
@@ -16,10 +17,17 @@ function bool(value: string | undefined, fallback = false) {
   return value === "true" || value === "1" || value === "yes";
 }
 
+function delaySeconds(value: string | undefined) {
+  const delay = Number(value || 0);
+  if (!Number.isFinite(delay)) return 0;
+  return Math.max(0, Math.min(900, Math.floor(delay)));
+}
+
 export default function ActiveHudCameraPage({ searchParams }: { searchParams: HudSearchParams }) {
   const mode = searchParams.mode === "contain" ? "contain" : "cover";
   const rounded = bool(searchParams.rounded, true);
   const muted = bool(searchParams.muted, true);
+  const delay = delaySeconds(searchParams.delay);
 
   return (
     <div className="fixed inset-0 overflow-hidden bg-transparent">
@@ -28,6 +36,7 @@ export default function ActiveHudCameraPage({ searchParams }: { searchParams: Hu
         mode={mode}
         rounded={rounded}
         muted={muted}
+        delaySeconds={delay}
         className="h-full w-full"
         fallbackPlayer={{
           nickname: searchParams.nickname || "Player",

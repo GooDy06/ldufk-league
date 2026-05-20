@@ -11,6 +11,7 @@ type CameraViewerProps = {
   mode?: "cover" | "contain";
   rounded?: boolean;
   muted?: boolean;
+  delaySeconds?: number;
   showFallback?: boolean;
   fallbackPlayer?: Partial<PublicCameraPlayer> | null;
   clean?: boolean;
@@ -33,11 +34,29 @@ function stopStream(stream: MediaStream | null) {
   stream?.getTracks().forEach((track) => track.stop());
 }
 
+function clampDelaySeconds(value: number | undefined) {
+  if (!Number.isFinite(value || 0)) return 0;
+  return Math.max(0, Math.min(900, Math.floor(value || 0)));
+}
+
+function supportedRecordingMimeType() {
+  if (typeof MediaRecorder === "undefined") return "";
+
+  const candidates = [
+    "video/webm;codecs=vp9,opus",
+    "video/webm;codecs=vp8,opus",
+    "video/webm"
+  ];
+
+  return candidates.find((type) => MediaRecorder.isTypeSupported(type)) || "";
+}
+
 export function CameraViewer({
   steamid,
   mode = "cover",
   rounded = false,
   muted = true,
+  delaySeconds = 0,
   showFallback = false,
   fallbackPlayer,
   clean = false,
@@ -47,10 +66,12 @@ export function CameraViewer({
   onPlayerChange
 }: CameraViewerProps) {
   const normalizedSteamId = useMemo(() => normalizeSteamId64Client(steamid), [steamid]);
+  const safeDelaySeconds = useMemo(() => clampDelaySeconds(delaySeconds), [delaySeconds]);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const peerRef = useRef<RTCPeerConnection | null>(null);
   const socketRef = useRef<Socket | null>(null);
   const [remoteStream, setRemoteStream] = useState<MediaStream | null>(null);
+  const [delayedVideoReady, setDelayedVideoReady] = useState(false);
   const [status, setStatus] = useState<CameraStatus>(normalizedSteamId ? "connecting" : "idle");
   const [player, setPlayer] = useState<PublicCameraPlayer | null>(null);
 
@@ -63,13 +84,136 @@ export function CameraViewer({
   }, [onPlayerChange, player]);
 
   useEffect(() => {
-    if (videoRef.current) {
-      videoRef.current.srcObject = remoteStream;
-      if (remoteStream) {
-        void videoRef.current.play().catch(() => undefined);
+    const video = videoRef.current;
+    if (!video || safeDelaySeconds > 0) return;
+
+    video.src = "";
+    video.srcObject = remoteStream;
+
+    if (remoteStream) {
+      void video.play().catch(() => undefined);
+    }
+  }, [remoteStream, safeDelaySeconds]);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    setDelayedVideoReady(false);
+
+    if (!video || !remoteStream || safeDelaySeconds <= 0) {
+      return () => undefined;
+    }
+
+    const videoElement = video;
+    const streamToRecord = remoteStream;
+    const mimeType = supportedRecordingMimeType();
+    if (!mimeType) {
+      setStatus("error");
+      return () => undefined;
+    }
+
+    let cancelled = false;
+    let recorder: MediaRecorder | null = null;
+    let recorderStopTimer: number | null = null;
+    let playbackStartTimer: number | null = null;
+    let playbackRetryTimer: number | null = null;
+    let currentUrl: string | null = null;
+    const segmentQueue: Blob[] = [];
+    const segmentMs = 2000;
+
+    function clearTimers() {
+      if (recorderStopTimer) window.clearTimeout(recorderStopTimer);
+      if (playbackStartTimer) window.clearTimeout(playbackStartTimer);
+      if (playbackRetryTimer) window.clearTimeout(playbackRetryTimer);
+      recorderStopTimer = null;
+      playbackStartTimer = null;
+      playbackRetryTimer = null;
+    }
+
+    function revokeCurrentUrl() {
+      if (currentUrl) {
+        URL.revokeObjectURL(currentUrl);
+        currentUrl = null;
       }
     }
-  }, [remoteStream]);
+
+    function recordSegment() {
+      if (cancelled || !streamToRecord.active) return;
+
+      const chunks: Blob[] = [];
+      recorder = new MediaRecorder(streamToRecord, { mimeType });
+
+      recorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          chunks.push(event.data);
+        }
+      };
+
+      recorder.onstop = () => {
+        recorder = null;
+
+        if (!cancelled && chunks.length) {
+          segmentQueue.push(new Blob(chunks, { type: mimeType }));
+          while (segmentQueue.length > Math.max(4, Math.ceil(safeDelaySeconds / 2) + 10)) {
+            segmentQueue.shift();
+          }
+        }
+
+        if (!cancelled) {
+          recordSegment();
+        }
+      };
+
+      recorder.start();
+      recorderStopTimer = window.setTimeout(() => {
+        if (recorder && recorder.state !== "inactive") {
+          recorder.stop();
+        }
+      }, segmentMs);
+    }
+
+    function playNextSegment() {
+      if (cancelled) return;
+
+      const segment = segmentQueue.shift();
+      if (!segment) {
+        playbackRetryTimer = window.setTimeout(playNextSegment, 250);
+        return;
+      }
+
+      revokeCurrentUrl();
+      currentUrl = URL.createObjectURL(segment);
+      videoElement.srcObject = null;
+      videoElement.src = currentUrl;
+      videoElement.muted = muted;
+      videoElement.onended = playNextSegment;
+      videoElement.onplaying = () => setDelayedVideoReady(true);
+      void videoElement.play().catch(() => {
+        playbackRetryTimer = window.setTimeout(playNextSegment, 500);
+      });
+    }
+
+    videoElement.pause();
+    videoElement.srcObject = null;
+    videoElement.removeAttribute("src");
+    videoElement.load();
+
+    recordSegment();
+    playbackStartTimer = window.setTimeout(playNextSegment, safeDelaySeconds * 1000);
+
+    return () => {
+      cancelled = true;
+      clearTimers();
+      videoElement.onended = null;
+      videoElement.onplaying = null;
+
+      if (recorder && recorder.state !== "inactive") {
+        recorder.stop();
+      }
+
+      revokeCurrentUrl();
+      segmentQueue.length = 0;
+    };
+  }, [muted, remoteStream, safeDelaySeconds]);
 
   useEffect(() => {
     let cancelled = false;
@@ -193,7 +337,7 @@ export function CameraViewer({
   }, [normalizedSteamId]);
 
   const activePlayer = player || fallbackPlayer || null;
-  const hasVideo = Boolean(remoteStream);
+  const hasVideo = safeDelaySeconds > 0 ? delayedVideoReady : Boolean(remoteStream);
 
   return (
     <div className={`relative h-full w-full overflow-hidden ${rounded ? "rounded-lg" : ""} ${className}`}>

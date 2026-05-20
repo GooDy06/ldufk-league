@@ -8,6 +8,7 @@ type RoomCameraGridProps = {
   mode?: "cover" | "contain";
   rounded?: boolean;
   showNames?: boolean;
+  delaySeconds?: number;
 };
 
 function gridClass(count: number) {
@@ -18,7 +19,7 @@ function gridClass(count: number) {
   return "grid-cols-5";
 }
 
-export function RoomCameraGrid({ players, mode = "cover", rounded = true, showNames = true }: RoomCameraGridProps) {
+export function RoomCameraGrid({ players, mode = "cover", rounded = true, showNames = true, delaySeconds = 0 }: RoomCameraGridProps) {
   return (
     <div className={`grid h-screen w-screen gap-2 bg-transparent p-2 ${gridClass(players.length)}`}>
       {players.map((player) => (
@@ -28,6 +29,7 @@ export function RoomCameraGrid({ players, mode = "cover", rounded = true, showNa
             mode={mode}
             rounded={rounded}
             muted
+            delaySeconds={delaySeconds}
             showFallback
             fallbackPlayer={player}
             clean={!showNames}

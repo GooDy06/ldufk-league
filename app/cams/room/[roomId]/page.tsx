@@ -10,11 +10,18 @@ type RoomSearchParams = {
   mode?: "cover" | "contain";
   rounded?: string;
   names?: string;
+  delay?: string;
 };
 
 function bool(value: string | undefined, fallback = false) {
   if (value === undefined) return fallback;
   return value === "true" || value === "1" || value === "yes";
+}
+
+function delaySeconds(value: string | undefined) {
+  const delay = Number(value || 0);
+  if (!Number.isFinite(delay)) return 0;
+  return Math.max(0, Math.min(900, Math.floor(delay)));
 }
 
 async function getRoomPlayers(roomId: string) {
@@ -44,6 +51,7 @@ export default async function CameraRoomPage({ params, searchParams }: { params:
   const mode = searchParams.mode === "contain" ? "contain" : "cover";
   const rounded = bool(searchParams.rounded, true);
   const showNames = bool(searchParams.names, true);
+  const delay = delaySeconds(searchParams.delay);
 
-  return <RoomCameraGrid players={players} mode={mode} rounded={rounded} showNames={showNames} />;
+  return <RoomCameraGrid players={players} mode={mode} rounded={rounded} showNames={showNames} delaySeconds={delay} />;
 }
