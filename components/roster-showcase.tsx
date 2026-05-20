@@ -15,7 +15,7 @@ export function RosterShowcase({ players }: { players: Player[] }) {
   return (
     <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
       {roster.map((player) => (
-        <Link key={player.id} href={`/players/${slugifyPlayerNick(player.nick)}`} className="group overflow-hidden rounded-lg border border-line bg-surface text-center transition hover:border-accent/35">
+        <Link key={player.id} href={`/players/${slugifyPlayerNick(player.nick)}`} className="interactive-card group overflow-hidden rounded-lg border border-line bg-surface text-center">
           <div className="relative aspect-[16/9] border-b border-line bg-gradient-to-b from-[#263545] to-[#111b29] sm:aspect-[16/10]">
             <Image
               src={player.avatar_url || DEFAULT_PLAYER_AVATAR}

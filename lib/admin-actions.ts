@@ -265,6 +265,7 @@ export async function saveHomepageChampion(formData: FormData) {
   const payload = {
     slot,
     team_name: text(formData, "team_name"),
+    institution_name: nullableText(formData, "institution_name"),
     tournament_name: text(formData, "tournament_name"),
     date_label: text(formData, "date_label"),
     division_label: text(formData, "division_label"),
@@ -272,7 +273,12 @@ export async function saveHomepageChampion(formData: FormData) {
     details_url: nullableText(formData, "details_url")
   };
 
-  const { error } = await supabase.from("homepage_champions").upsert(payload, { onConflict: "slot" });
+  let { error } = await supabase.from("homepage_champions").upsert(payload, { onConflict: "slot" });
+  if (error?.message.includes("institution_name")) {
+    const { institution_name: _institutionName, ...fallbackPayload } = payload;
+    const retry = await supabase.from("homepage_champions").upsert(fallbackPayload, { onConflict: "slot" });
+    error = retry.error;
+  }
   failIfError(error, "homepage champion");
   revalidatePath("/");
   revalidatePath("/admin/homepage");

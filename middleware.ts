@@ -10,6 +10,11 @@ function routedPath(request: NextRequest) {
   const host = hostname(request);
   const path = request.nextUrl.pathname;
 
+  if (host === "cams.ldufk.com") {
+    if (path.startsWith("/api/") || path.startsWith("/cams")) return path;
+    return `/cams${path === "/" ? "" : path}`;
+  }
+
   if (host === "admin.ldufk.com") {
     return path.startsWith("/admin") ? path : `/admin${path === "/" ? "" : path}`;
   }
@@ -22,13 +27,17 @@ function routedPath(request: NextRequest) {
 }
 
 function routedResponse(request: NextRequest, path: string) {
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set("x-ldufk-routed-path", path);
+  requestHeaders.set("x-ldufk-hostname", hostname(request));
+
   if (path === request.nextUrl.pathname) {
-    return NextResponse.next({ request });
+    return NextResponse.next({ request: { headers: requestHeaders } });
   }
 
   const url = request.nextUrl.clone();
   url.pathname = path;
-  return NextResponse.rewrite(url);
+  return NextResponse.rewrite(url, { request: { headers: requestHeaders } });
 }
 
 export async function middleware(request: NextRequest) {

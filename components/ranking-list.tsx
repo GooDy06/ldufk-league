@@ -28,7 +28,7 @@ export function RankingList({ teams }: { teams: RankingTeam[] }) {
         const trendLabel = team.trend > 0 ? `+${team.trend}` : String(team.trend);
 
         return (
-          <article key={team.id} className={`overflow-hidden rounded-2xl border bg-surface2 transition ${isOpen ? "border-accent/45 shadow-[0_0_30px_rgba(0,213,255,0.08)]" : "border-line hover:border-accent/25"}`}>
+          <article key={team.id} className={`interactive-card overflow-hidden rounded-2xl border bg-surface2 ${isOpen ? "border-accent/45 shadow-[0_0_30px_rgba(0,213,255,0.08)]" : "border-line"}`}>
             <button type="button" onClick={() => toggleTeam(team.id)} className="grid w-full grid-cols-[42px_40px_minmax(0,1fr)_auto] items-center gap-2 p-3 text-left sm:grid-cols-[52px_46px_minmax(0,1fr)_auto_auto] sm:gap-3">
               <div className={`font-rajdhani text-xl font-bold sm:text-2xl ${rankColor(index)}`}>#{index + 1}</div>
               <div

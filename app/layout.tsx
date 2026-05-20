@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import { Exo_2, Rajdhani } from "next/font/google";
 import "./globals.css";
 import { SiteHeader } from "@/components/site-header";
@@ -22,6 +23,21 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  const requestHeaders = headers();
+  const routedPath = requestHeaders.get("x-ldufk-routed-path") || "";
+  const host = requestHeaders.get("x-ldufk-hostname") || requestHeaders.get("host") || "";
+  const isCamsRoute = routedPath.startsWith("/cams") || host.toLowerCase() === "cams.ldufk.com";
+
+  if (isCamsRoute) {
+    return (
+      <html lang="uk" className={`${exo.variable} ${rajdhani.variable}`}>
+        <body className="font-exo">
+          <main className="min-h-screen w-full">{children}</main>
+        </body>
+      </html>
+    );
+  }
+
   return (
     <html lang="uk" className={`${exo.variable} ${rajdhani.variable}`}>
       <body className="font-exo">

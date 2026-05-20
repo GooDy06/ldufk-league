@@ -38,6 +38,9 @@ function ChampionForm({ slot, champion }: { slot: Division; champion?: HomepageC
         <Field label="Winner team name">
           <input className={inputClass} name="team_name" defaultValue={champion?.team_name || ""} required />
         </Field>
+        <Field label="Education institution">
+          <input className={inputClass} name="institution_name" placeholder="Ліцей / університет / школа" defaultValue={champion?.institution_name || ""} />
+        </Field>
         <Field label="Tournament name">
           <input className={inputClass} name="tournament_name" defaultValue={champion?.tournament_name || ""} required />
         </Field>

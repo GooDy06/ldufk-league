@@ -70,7 +70,7 @@ export default async function HomePage() {
         <Panel
           eyebrow="University Ranking"
           title="Топ університетів"
-          action={<Link className="rounded-lg border border-line px-3 py-2 text-sm font-bold text-slate-300 hover:text-accent" href="/ranking?division=University">Весь топ</Link>}
+          action={<Link className="focus-ring rounded-lg border border-line px-3 py-2 text-sm font-bold text-slate-300 transition hover:border-accent/40 hover:bg-accent/10 hover:text-accent" href="/ranking?division=University">Весь топ</Link>}
         >
           <div className="grid gap-2">{universityTeams.map((team, index) => <TeamRow key={team.id} team={team} index={index} />)}</div>
         </Panel>
@@ -78,7 +78,7 @@ export default async function HomePage() {
         <Panel
           eyebrow="School Ranking"
           title="Топ шкіл"
-          action={<Link className="rounded-lg border border-line px-3 py-2 text-sm font-bold text-slate-300 hover:text-school" href="/ranking?division=School">Весь топ</Link>}
+          action={<Link className="focus-ring rounded-lg border border-line px-3 py-2 text-sm font-bold text-slate-300 transition hover:border-school/40 hover:bg-school/10 hover:text-school" href="/ranking?division=School">Весь топ</Link>}
         >
           <div className="grid gap-2">{schoolTeams.map((team, index) => <TeamRow key={team.id} team={team} index={index} />)}</div>
         </Panel>
@@ -91,7 +91,7 @@ export default async function HomePage() {
               index === 0 ? (
                 <TopPlayerHighlight key={player.id} player={player} />
               ) : (
-                <div key={player.id} className="grid grid-cols-[34px_34px_1fr_auto] items-center gap-3 rounded-xl border border-line bg-surface2 p-3">
+                <Link href={`/players/${encodeURIComponent(player.nick)}`} key={player.id} className="interactive-card grid grid-cols-[34px_34px_1fr_auto] items-center gap-3 rounded-xl border border-line bg-surface2 p-3">
                   <div className={`font-rajdhani text-xl font-bold ${index === 1 ? "text-slate-300" : index === 2 ? "text-amber-700" : "text-slate-500"}`}>{index + 1}</div>
                   <div
                     className="h-9 w-9 overflow-hidden rounded-full bg-gradient-to-br from-accent to-violet-600 bg-cover bg-center"
@@ -105,13 +105,13 @@ export default async function HomePage() {
                     <span className="block text-[9px] uppercase tracking-widest text-slate-600">Rating 3.0</span>
                     {player.rating}
                   </div>
-                </div>
+                </Link>
               )
             ))}
           </div>
         </Panel>
 
-        <Panel eyebrow="Новини ліги" title="Останні анонси" action={<Link href="/news" className="rounded-lg border border-line px-3 py-2 text-sm font-bold text-slate-300 hover:text-accent">Всі новини</Link>}>
+        <Panel eyebrow="Новини ліги" title="Останні анонси" action={<Link href="/news" className="focus-ring rounded-lg border border-line px-3 py-2 text-sm font-bold text-slate-300 transition hover:border-accent/40 hover:bg-accent/10 hover:text-accent">Всі новини</Link>}>
           <div className="grid gap-3 md:grid-cols-2">{news.map((item) => <NewsCard key={item.id} item={item} />)}</div>
         </Panel>
       </section>

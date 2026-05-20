@@ -12,6 +12,7 @@ export type HomepageChampion = {
   id: string;
   slot: Division;
   team_name: string;
+  institution_name: string | null;
   tournament_name: string;
   date_label: string;
   division_label: string;
