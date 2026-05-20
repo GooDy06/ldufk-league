@@ -1,6 +1,6 @@
 import { headers } from "next/headers";
 import { CopyLinkButton } from "@/components/cams/copy-link-button";
-import { addCameraPlayer, createCameraRoom, loginCamsAdmin, logoutCamsAdmin, regenerateCameraToken, removeCamera } from "@/lib/cams/actions";
+import { addCameraPlayer, createCameraRoom, deleteCameraPlayer, loginCamsAdmin, logoutCamsAdmin, regenerateCameraToken, removeCamera } from "@/lib/cams/actions";
 import { isCamsAdminAuthed } from "@/lib/cams/auth";
 import { getCamsBaseUrl, isFreshOnline } from "@/lib/cams/server-utils";
 import { getCamsServiceClient } from "@/lib/cams/supabase";
@@ -110,12 +110,17 @@ export default async function CamsAdminPage({ searchParams }: { searchParams: Ad
         <div className="grid gap-5">
           {rooms.map((room) => {
             const roomPlayers = playersByRoom.get(room.id) || [];
+            const roomObsLink = `${baseUrl}/room/${room.id}?mode=cover&rounded=true&names=true`;
             return (
               <section key={room.id} className="rounded-lg border border-white/10 bg-white/[0.04] p-4 backdrop-blur">
                 <div className="flex flex-col justify-between gap-3 md:flex-row md:items-start">
                   <div>
                     <div className="text-[10px] font-bold uppercase tracking-[0.24em] text-cyan-200/70">{room.tournament_name || "Camera room"}</div>
                     <h2 className="font-rajdhani text-3xl font-bold">{room.name}</h2>
+                    <div className="mt-3 flex max-w-2xl items-center gap-2">
+                      <input readOnly value={roomObsLink} className="w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2 font-mono text-xs text-slate-300 outline-none" />
+                      <CopyLinkButton value={roomObsLink} />
+                    </div>
                   </div>
                   <form action={addCameraPlayer} className="grid gap-2 md:grid-cols-[160px_140px_190px_180px_auto]">
                     <input type="hidden" name="room_id" value={room.id} />
@@ -141,6 +146,7 @@ export default async function CamsAdminPage({ searchParams }: { searchParams: Ad
                     <tbody>
                       {roomPlayers.map((player) => {
                         const joinLink = `${baseUrl}/join/${player.join_token}`;
+                        const obsLink = `${baseUrl}/view/${player.steamid64}?mode=cover&rounded=true&muted=true`;
                         const isOnline = isFreshOnline(player.is_online, player.last_seen);
                         return (
                           <tr key={player.id} className="border-b border-white/5 last:border-0">
@@ -157,9 +163,17 @@ export default async function CamsAdminPage({ searchParams }: { searchParams: Ad
                               <div className="mt-1 text-xs text-slate-500">{formatLastSeen(player.last_seen)}</div>
                             </td>
                             <td className="px-3 py-3">
-                              <div className="flex items-center gap-2">
-                                <input readOnly value={joinLink} className="w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2 font-mono text-xs text-slate-300 outline-none" />
-                                <CopyLinkButton value={joinLink} />
+                              <div className="grid gap-2">
+                                <div className="flex items-center gap-2">
+                                  <span className="w-10 text-[10px] font-bold uppercase tracking-[0.16em] text-slate-500">Join</span>
+                                  <input readOnly value={joinLink} className="w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2 font-mono text-xs text-slate-300 outline-none" />
+                                  <CopyLinkButton value={joinLink} />
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <span className="w-10 text-[10px] font-bold uppercase tracking-[0.16em] text-slate-500">OBS</span>
+                                  <input readOnly value={obsLink} className="w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2 font-mono text-xs text-cyan-100 outline-none" />
+                                  <CopyLinkButton value={obsLink} />
+                                </div>
                               </div>
                             </td>
                             <td className="py-3 pl-3">
@@ -171,6 +185,10 @@ export default async function CamsAdminPage({ searchParams }: { searchParams: Ad
                                 <form action={removeCamera}>
                                   <input type="hidden" name="player_id" value={player.id} />
                                   <button className="rounded-lg border border-red-300/20 bg-red-500/10 px-3 py-2 text-xs font-bold uppercase tracking-wide text-red-100 transition hover:border-red-300/50">Remove camera</button>
+                                </form>
+                                <form action={deleteCameraPlayer}>
+                                  <input type="hidden" name="player_id" value={player.id} />
+                                  <button className="rounded-lg border border-red-400/40 bg-red-600/20 px-3 py-2 text-xs font-bold uppercase tracking-wide text-red-50 transition hover:border-red-300/70">Delete player</button>
                                 </form>
                               </div>
                             </td>

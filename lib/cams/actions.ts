@@ -171,3 +171,18 @@ export async function removeCamera(formData: FormData) {
   revalidatePath("/cams/admin");
   redirect(adminRedirectPath("?saved=offline"));
 }
+
+export async function deleteCameraPlayer(formData: FormData) {
+  assertCamsAdmin();
+
+  const playerId = text(formData, "player_id");
+  const supabase = getCamsServiceClient();
+
+  await notifySignalingCameraRemoved(playerId);
+
+  const { error } = await supabase.from("camera_players").delete().eq("id", playerId);
+
+  failIfError(error, "player");
+  revalidatePath("/cams/admin");
+  redirect(adminRedirectPath("?saved=deleted"));
+}

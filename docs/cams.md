@@ -7,6 +7,7 @@
 - `cams.ldufk.com/admin` -> `/cams/admin`: створення camera rooms, гравців, токенів і join links.
 - `cams.ldufk.com/join/[token]` -> `/cams/join/[token]`: приватна сторінка гравця для camera permission і preview.
 - `cams.ldufk.com/view/[steamid]` -> `/cams/view/[steamid]`: чиста OBS/HUD webcam view без UI.
+- `cams.ldufk.com/room/[roomId]` -> `/cams/room/[roomId]`: одна OBS Browser Source сторінка з усіма камерами room у grid.
 - `cams.ldufk.com/hud/active?steamid=...` -> `/cams/hud/active`: iframe endpoint із fallback.
 - `components/cams/active-player-camera.tsx`: React компонент `<ActivePlayerCamera steamid={observedSteamId} />`.
 - `signaling-server/`: Socket.IO signaling, який перевіряє join token через Supabase і пересилає тільки SDP/ICE.
@@ -137,10 +138,18 @@ export function HudOverlay({ gameState }: { gameState: unknown }) {
 https://cams.ldufk.com/view/7656119XXXXXXXXXX?mode=cover&rounded=true&muted=true
 ```
 
+Цей OBS link генерується автоматично для кожного player в `/admin`.
+
 Auto-switch iframe:
 
 ```text
 https://cams.ldufk.com/hud/active?steamid=7656119XXXXXXXXXX&mode=cover&rounded=true&muted=true
+```
+
+Усі камери room однією OBS Browser Source:
+
+```text
+https://cams.ldufk.com/room/ROOM_UUID?mode=cover&rounded=true&names=true
 ```
 
 У власному React HUD краще використовувати `<ActivePlayerCamera />`, бо він перемикає stream без reload всієї HUD сторінки.
