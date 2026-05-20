@@ -148,13 +148,28 @@ export function CameraViewer({
     }
 
     function appendNextBlob() {
-      if (cancelled || !sourceBuffer || sourceBuffer.updating || !pendingAppendQueue.length) return;
+      if (
+        cancelled ||
+        !mediaSource ||
+        mediaSource.readyState !== "open" ||
+        !sourceBuffer ||
+        sourceBuffer.updating ||
+        !pendingAppendQueue.length
+      ) {
+        return;
+      }
 
       const nextBlob = pendingAppendQueue.shift();
       if (!nextBlob) return;
 
       nextBlob.arrayBuffer().then((buffer) => {
-        if (cancelled || !sourceBuffer || sourceBuffer.updating) {
+        if (
+          cancelled ||
+          !mediaSource ||
+          mediaSource.readyState !== "open" ||
+          !sourceBuffer ||
+          sourceBuffer.updating
+        ) {
           pendingAppendQueue.unshift(new Blob([buffer], { type: mimeType }));
           return;
         }
@@ -200,19 +215,6 @@ export function CameraViewer({
         sourceBuffer.mode = "sequence";
         sourceBuffer.addEventListener("updateend", () => {
           appendNextBlob();
-
-          try {
-            const buffer = sourceBuffer;
-            if (buffer && videoElement.currentTime > 20 && buffer.buffered.length) {
-              const start = buffer.buffered.start(0);
-              const removeBefore = videoElement.currentTime - 15;
-              if (removeBefore > start && !buffer.updating) {
-                buffer.remove(start, removeBefore);
-              }
-            }
-          } catch {
-            // Some OBS/Chromium builds are picky about buffer range removal.
-          }
         });
       }, { once: true });
     }
