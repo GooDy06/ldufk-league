@@ -37,16 +37,20 @@ function actionTheme(action: VetoCardItem["action"]) {
       border: "border-red-500/80",
       wash: "from-black/88 via-black/45 to-red-950/72",
       label: "bg-red-700/86 text-white",
-      compact: "border-red-500/65 bg-red-700/78"
+      compact: "border-red-500/80 bg-red-800/82",
+      glow: "shadow-red-500/30",
+      footer: "from-red-600/92 via-red-700/80 to-red-950/88"
     };
   }
 
   if (action === "pick") {
     return {
       border: "border-indigo-400/80",
-      wash: "from-black/58 via-indigo-950/22 to-indigo-950/62",
+      wash: "from-black/36 via-indigo-950/12 to-indigo-950/38",
       label: "bg-indigo-700/88 text-white",
-      compact: "border-indigo-400/65 bg-indigo-700/78"
+      compact: "border-indigo-400/80 bg-indigo-800/74",
+      glow: "shadow-indigo-400/30",
+      footer: "from-indigo-500/86 via-indigo-700/72 to-indigo-950/84"
     };
   }
 
@@ -55,7 +59,9 @@ function actionTheme(action: VetoCardItem["action"]) {
       border: "border-yellow-300/85",
       wash: "from-black/36 via-yellow-950/16 to-yellow-500/52",
       label: "bg-yellow-400/88 text-slate-950",
-      compact: "border-yellow-300/75 bg-yellow-500/82"
+      compact: "border-yellow-300/85 bg-yellow-500/82",
+      glow: "shadow-yellow-300/30",
+      footer: "from-yellow-300/92 via-yellow-500/76 to-yellow-800/80"
     };
   }
 
@@ -108,7 +114,7 @@ function PortraitCard({ item, state, index }: { item: VetoCardItem; state: VetoS
 
   return (
     <div
-      className={`relative h-full min-h-[520px] min-w-0 overflow-hidden rounded border ${theme.border} shadow-[0_28px_60px_rgba(0,0,0,0.42)] animate-[vetoCardIn_0.5s_ease-out_both]`}
+      className={`relative h-full min-h-[520px] min-w-0 overflow-hidden rounded border ${theme.border} shadow-[0_28px_60px_rgba(0,0,0,0.42)] ${theme.glow} animate-[vetoCardIn_0.5s_ease-out_both]`}
       style={{ animationDelay: `${index * 85}ms` }}
     >
       {image ? <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${image})`, opacity: 0.86 }} /> : null}
@@ -117,9 +123,9 @@ function PortraitCard({ item, state, index }: { item: VetoCardItem; state: VetoS
       <div className="relative z-10 flex h-full flex-col items-center justify-center gap-4 px-3">
         <TeamBadge state={state} team={item.team} />
       </div>
-      <div className="absolute inset-x-0 bottom-5 z-10 text-center">
-        <div className="font-rajdhani text-xl font-bold uppercase text-white [text-shadow:0_3px_14px_rgba(0,0,0,0.95)]">{label}</div>
-        <div className="mx-auto mt-2 max-w-[92%] truncate font-rajdhani text-2xl font-bold uppercase text-white/92 [text-shadow:0_3px_16px_rgba(0,0,0,1)]">{item.map}</div>
+      <div className={`absolute inset-x-0 bottom-0 z-10 bg-gradient-to-t ${theme.footer} px-3 pb-6 pt-16 text-center`}>
+        <div className="mx-auto inline-block rounded border border-white/20 bg-black/35 px-3 py-1 font-rajdhani text-xl font-bold uppercase text-white [text-shadow:0_3px_14px_rgba(0,0,0,0.95)]">{label}</div>
+        <div className="mx-auto mt-3 max-w-[92%] truncate font-rajdhani text-3xl font-bold uppercase text-white [text-shadow:0_3px_16px_rgba(0,0,0,1)]">{item.map}</div>
       </div>
     </div>
   );
@@ -129,23 +135,36 @@ function CompactCard({ item, state, index }: { item: VetoCardItem; state: VetoSe
   const image = mapImageFor(mapSlug(item.map));
   const theme = actionTheme(item.action);
   const label = actionLabel(item.action).toUpperCase();
+  const teamText = item.team === "system" ? "" : teamNameFor(state, item.team);
 
   return (
     <div
-      className={`relative h-[84px] w-[126px] overflow-hidden rounded border ${theme.compact} shadow-[0_14px_35px_rgba(0,0,0,0.36)] animate-[vetoPopIn_0.38s_ease-out_both]`}
+      className={`relative h-[96px] w-[154px] overflow-hidden rounded border ${theme.compact} shadow-[0_14px_35px_rgba(0,0,0,0.36)] ${theme.glow} animate-[vetoPopIn_0.38s_ease-out_both]`}
       style={{ animationDelay: `${index * 55}ms` }}
     >
-      {image ? <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${image})`, opacity: 0.78 }} /> : null}
-      <div className="absolute inset-0 bg-gradient-to-b from-black/18 via-black/22 to-black/82" />
-      <div className="relative z-10 flex h-full flex-col justify-between p-2">
-        <div className="flex items-center justify-between gap-1">
-          <span className="max-w-[68px] truncate rounded bg-black/45 px-1.5 py-0.5 font-rajdhani text-[13px] font-bold uppercase leading-none text-white">
-            {teamNameFor(state, item.team)}
+      {image ? <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${image})`, opacity: item.action === "pick" ? 0.88 : 0.68 }} /> : null}
+      <div className="absolute inset-0 bg-gradient-to-b from-black/12 via-black/18 to-black/82" />
+      <div className={`absolute inset-x-0 top-0 h-8 bg-gradient-to-r ${theme.footer}`} />
+      <div className="relative z-10 flex h-full flex-col justify-between">
+        <div className="grid grid-cols-[1fr_auto] items-center gap-1 px-2 py-1.5">
+          <span className="min-w-0 truncate font-rajdhani text-[15px] font-bold uppercase leading-none text-white [text-shadow:0_2px_8px_rgba(0,0,0,1)]">
+            {teamText}
           </span>
           <span className={`rounded px-1.5 py-0.5 font-rajdhani text-[13px] font-bold uppercase leading-none ${theme.label}`}>{label}</span>
         </div>
-        <div className="truncate text-center font-rajdhani text-[18px] font-bold uppercase leading-none text-white [text-shadow:0_3px_12px_rgba(0,0,0,1)]">{item.map}</div>
+        <div className="bg-black/42 px-2 py-2 text-center">
+          <div className="truncate font-rajdhani text-[20px] font-bold uppercase leading-none text-white [text-shadow:0_3px_12px_rgba(0,0,0,1)]">{item.map}</div>
+        </div>
       </div>
+    </div>
+  );
+}
+
+function TeamTurnRow({ label, name, active }: { label: string; name: string; active: boolean }) {
+  return (
+    <div className={`rounded border px-3 py-1.5 text-center transition ${active ? "border-cyan-300/70 bg-cyan-300/14 text-white shadow-[0_0_22px_rgba(103,232,249,0.22)]" : "border-white/10 bg-white/[0.04] text-white/38"}`}>
+      <div className={`text-[9px] font-extrabold uppercase tracking-[0.18em] ${active ? "text-cyan-100" : "text-white/30"}`}>{label}</div>
+      <div className="truncate font-rajdhani text-[26px] font-bold uppercase leading-none">{name}</div>
     </div>
   );
 }
@@ -193,6 +212,7 @@ function OverlayStyles() {
 
 function CardsLayout({ state, items, stale }: { state: VetoSessionState; items: VetoCardItem[]; stale: boolean }) {
   const nextStep = planFor(state.format, state.firstTeam, state.mapPool.length)[state.steps.length] || null;
+  const currentAction = state.status === "complete" ? "Veto complete" : nextStep ? `${teamNameFor(state, nextStep.team)} ${nextStep.action}s next` : "Waiting";
 
   return (
     <div className="h-screen w-screen overflow-hidden bg-transparent text-white">
@@ -218,7 +238,7 @@ function CardsLayout({ state, items, stale }: { state: VetoSessionState; items: 
 
             <div className="mt-8 flex items-center justify-center gap-3 text-xs font-extrabold uppercase text-white/58">
               <span className="h-2 w-2 rounded-full bg-emerald-300" style={{ animation: "livePulse 1.6s ease-in-out infinite" }} />
-              <span>{state.status === "complete" ? "Veto complete" : nextStep ? `${teamNameFor(state, nextStep.team)} ${nextStep.action}s next` : "Waiting"}</span>
+              <span>{currentAction}</span>
               {stale ? <span className="text-rose-300">Sync reconnecting</span> : null}
             </div>
           </div>
@@ -229,14 +249,25 @@ function CardsLayout({ state, items, stale }: { state: VetoSessionState; items: 
 }
 
 function CompactLayout({ state, items, stale }: { state: VetoSessionState; items: VetoCardItem[]; stale: boolean }) {
+  const nextStep = planFor(state.format, state.firstTeam, state.mapPool.length)[state.steps.length] || null;
+  const isTeam1Active = nextStep?.team === "team1";
+  const isTeam2Active = nextStep?.team === "team2";
+  const currentAction = state.status === "complete" ? "COMPLETE" : nextStep ? nextStep.action.toUpperCase() : "WAIT";
+
   return (
     <div className="h-screen w-screen overflow-hidden bg-transparent text-white">
       <OverlayStyles />
       <div className="absolute bottom-14 left-1/2 flex -translate-x-1/2 items-end gap-2 rounded bg-black/18 px-3 py-2 backdrop-blur-[2px]">
-        <div className="mr-2 hidden min-w-[165px] rounded border border-white/12 bg-black/55 px-3 py-2 lg:block">
-          <div className="text-[9px] font-extrabold uppercase text-cyan-100/62">Map veto</div>
-          <div className="truncate font-rajdhani text-2xl font-bold uppercase leading-none">{state.team1}</div>
-          <div className="font-rajdhani text-lg font-bold uppercase leading-none text-white/45">vs {state.team2}</div>
+        <div className="mr-2 hidden w-[240px] rounded border border-white/18 bg-black/64 px-3 py-3 shadow-[0_12px_34px_rgba(0,0,0,0.42)] lg:block">
+          <div className="grid grid-cols-[1fr_auto] items-center gap-2">
+            <div className="text-[10px] font-extrabold uppercase tracking-[0.18em] text-cyan-100/70">Map veto</div>
+            <div className="rounded bg-white/10 px-2 py-0.5 font-rajdhani text-[15px] font-bold uppercase text-white">{currentAction}</div>
+          </div>
+          <div className="mt-2 grid gap-1.5">
+            <TeamTurnRow label={isTeam1Active ? "Now" : "Waiting"} name={state.team1} active={isTeam1Active} />
+            <div className="text-center font-rajdhani text-lg font-bold uppercase leading-none text-white/42">vs</div>
+            <TeamTurnRow label={isTeam2Active ? "Now" : "Waiting"} name={state.team2} active={isTeam2Active} />
+          </div>
         </div>
         {items.map((item, index) => <CompactCard key={`${item.map}-${item.action}-${item.order}`} item={item} state={state} index={index} />)}
         {stale ? <div className="ml-2 rounded border border-rose-400/35 bg-rose-500/18 px-2 py-1 text-[10px] font-bold uppercase text-rose-100">reconnect</div> : null}
