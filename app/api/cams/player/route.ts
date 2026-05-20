@@ -5,12 +5,25 @@ import type { CameraPlayerWithRoom } from "@/lib/cams/types";
 
 export const dynamic = "force-dynamic";
 
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "GET, OPTIONS",
+  "Access-Control-Allow-Headers": "content-type"
+};
+
+export async function OPTIONS() {
+  return new Response(null, {
+    status: 204,
+    headers: corsHeaders
+  });
+}
+
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const steamid = normalizeSteamId64(searchParams.get("steamid"));
 
   if (!steamid) {
-    return NextResponse.json({ error: "Invalid SteamID64" }, { status: 400 });
+    return NextResponse.json({ error: "Invalid SteamID64" }, { status: 400, headers: corsHeaders });
   }
 
   try {
@@ -26,12 +39,12 @@ export async function GET(request: Request) {
 
     if (error) {
       console.error("Camera player lookup error:", error.message);
-      return NextResponse.json({ error: "Camera lookup failed" }, { status: 500 });
+      return NextResponse.json({ error: "Camera lookup failed" }, { status: 500, headers: corsHeaders });
     }
 
-    return NextResponse.json({ player: publicCameraPlayer(data as CameraPlayerWithRoom | null) });
+    return NextResponse.json({ player: publicCameraPlayer(data as CameraPlayerWithRoom | null) }, { headers: corsHeaders });
   } catch (error) {
     console.error(error);
-    return NextResponse.json({ error: "Camera service is not configured" }, { status: 503 });
+    return NextResponse.json({ error: "Camera service is not configured" }, { status: 503, headers: corsHeaders });
   }
 }
