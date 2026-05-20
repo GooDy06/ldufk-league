@@ -43,12 +43,16 @@ function supportedRecordingMimeType() {
   if (typeof MediaRecorder === "undefined") return "";
 
   const candidates = [
-    "video/webm;codecs=vp9,opus",
     "video/webm;codecs=vp8,opus",
+    "video/webm;codecs=vp9,opus",
     "video/webm"
   ];
 
-  return candidates.find((type) => MediaRecorder.isTypeSupported(type)) || "";
+  return candidates.find((type) => {
+    const recorderSupported = MediaRecorder.isTypeSupported(type);
+    const mediaSourceSupported = typeof MediaSource === "undefined" || MediaSource.isTypeSupported(type);
+    return recorderSupported && mediaSourceSupported;
+  }) || "";
 }
 
 export function CameraViewer({
@@ -68,6 +72,7 @@ export function CameraViewer({
   const normalizedSteamId = useMemo(() => normalizeSteamId64Client(steamid), [steamid]);
   const safeDelaySeconds = useMemo(() => clampDelaySeconds(delaySeconds), [delaySeconds]);
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const liveDelayVideoRef = useRef<HTMLVideoElement | null>(null);
   const peerRef = useRef<RTCPeerConnection | null>(null);
   const socketRef = useRef<Socket | null>(null);
   const [remoteStream, setRemoteStream] = useState<MediaStream | null>(null);
@@ -84,7 +89,7 @@ export function CameraViewer({
   }, [onPlayerChange, player]);
 
   useEffect(() => {
-    const video = videoRef.current;
+    const video = safeDelaySeconds > 0 ? liveDelayVideoRef.current : videoRef.current;
     if (!video || safeDelaySeconds > 0) return;
 
     video.src = "";
@@ -97,6 +102,7 @@ export function CameraViewer({
 
   useEffect(() => {
     const video = videoRef.current;
+    const liveVideo = liveDelayVideoRef.current;
     setDelayedVideoReady(false);
 
     if (!video || !remoteStream || safeDelaySeconds <= 0) {
@@ -104,6 +110,7 @@ export function CameraViewer({
     }
 
     const videoElement = video;
+    const liveVideoElement = liveVideo;
     const streamToRecord = remoteStream;
     const mimeType = supportedRecordingMimeType();
     if (!mimeType) {
@@ -113,20 +120,24 @@ export function CameraViewer({
 
     let cancelled = false;
     let recorder: MediaRecorder | null = null;
-    let recorderStopTimer: number | null = null;
-    let playbackStartTimer: number | null = null;
-    let playbackRetryTimer: number | null = null;
+    let appendTimer: number | null = null;
     let currentUrl: string | null = null;
-    const segmentQueue: Blob[] = [];
-    const segmentMs = 2000;
+    let mediaSource: MediaSource | null = null;
+    let sourceBuffer: SourceBuffer | null = null;
+    const recordedQueue: Array<{ blob: Blob; recordedAt: number }> = [];
+    const pendingAppendQueue: Blob[] = [];
+    const segmentMs = 1000;
+    const delayMs = safeDelaySeconds * 1000;
+
+    if (liveVideoElement) {
+      liveVideoElement.srcObject = streamToRecord;
+      liveVideoElement.muted = true;
+      void liveVideoElement.play().catch(() => undefined);
+    }
 
     function clearTimers() {
-      if (recorderStopTimer) window.clearTimeout(recorderStopTimer);
-      if (playbackStartTimer) window.clearTimeout(playbackStartTimer);
-      if (playbackRetryTimer) window.clearTimeout(playbackRetryTimer);
-      recorderStopTimer = null;
-      playbackStartTimer = null;
-      playbackRetryTimer = null;
+      if (appendTimer) window.clearInterval(appendTimer);
+      appendTimer = null;
     }
 
     function revokeCurrentUrl() {
@@ -136,60 +147,94 @@ export function CameraViewer({
       }
     }
 
-    function recordSegment() {
-      if (cancelled || !streamToRecord.active) return;
+    function appendNextBlob() {
+      if (cancelled || !sourceBuffer || sourceBuffer.updating || !pendingAppendQueue.length) return;
 
-      const chunks: Blob[] = [];
-      recorder = new MediaRecorder(streamToRecord, { mimeType });
+      const nextBlob = pendingAppendQueue.shift();
+      if (!nextBlob) return;
 
-      recorder.ondataavailable = (event) => {
-        if (event.data.size > 0) {
-          chunks.push(event.data);
-        }
-      };
-
-      recorder.onstop = () => {
-        recorder = null;
-
-        if (!cancelled && chunks.length) {
-          segmentQueue.push(new Blob(chunks, { type: mimeType }));
-          while (segmentQueue.length > Math.max(4, Math.ceil(safeDelaySeconds / 2) + 10)) {
-            segmentQueue.shift();
-          }
+      nextBlob.arrayBuffer().then((buffer) => {
+        if (cancelled || !sourceBuffer || sourceBuffer.updating) {
+          pendingAppendQueue.unshift(new Blob([buffer], { type: mimeType }));
+          return;
         }
 
-        if (!cancelled) {
-          recordSegment();
+        try {
+          sourceBuffer.appendBuffer(buffer);
+          setDelayedVideoReady(true);
+          void videoElement.play().catch(() => undefined);
+        } catch (error) {
+          console.error("[cams] delayed append failed", error);
         }
-      };
-
-      recorder.start();
-      recorderStopTimer = window.setTimeout(() => {
-        if (recorder && recorder.state !== "inactive") {
-          recorder.stop();
-        }
-      }, segmentMs);
+      }).catch((error) => {
+        console.error("[cams] delayed blob read failed", error);
+      });
     }
 
-    function playNextSegment() {
+    function moveReadySegments() {
       if (cancelled) return;
 
-      const segment = segmentQueue.shift();
-      if (!segment) {
-        playbackRetryTimer = window.setTimeout(playNextSegment, 250);
-        return;
+      const readyAt = Date.now() - delayMs;
+
+      while (recordedQueue.length && recordedQueue[0].recordedAt <= readyAt) {
+        const item = recordedQueue.shift();
+        if (item) pendingAppendQueue.push(item.blob);
       }
 
-      revokeCurrentUrl();
-      currentUrl = URL.createObjectURL(segment);
+      appendNextBlob();
+    }
+
+    function setupMediaSource() {
+      mediaSource = new MediaSource();
+      currentUrl = URL.createObjectURL(mediaSource);
       videoElement.srcObject = null;
       videoElement.src = currentUrl;
       videoElement.muted = muted;
-      videoElement.onended = playNextSegment;
       videoElement.onplaying = () => setDelayedVideoReady(true);
-      void videoElement.play().catch(() => {
-        playbackRetryTimer = window.setTimeout(playNextSegment, 500);
-      });
+      videoElement.onloadeddata = () => setDelayedVideoReady(true);
+
+      mediaSource.addEventListener("sourceopen", () => {
+        if (!mediaSource || cancelled) return;
+
+        sourceBuffer = mediaSource.addSourceBuffer(mimeType);
+        sourceBuffer.mode = "sequence";
+        sourceBuffer.addEventListener("updateend", () => {
+          appendNextBlob();
+
+          try {
+            const buffer = sourceBuffer;
+            if (buffer && videoElement.currentTime > 20 && buffer.buffered.length) {
+              const start = buffer.buffered.start(0);
+              const removeBefore = videoElement.currentTime - 15;
+              if (removeBefore > start && !buffer.updating) {
+                buffer.remove(start, removeBefore);
+              }
+            }
+          } catch {
+            // Some OBS/Chromium builds are picky about buffer range removal.
+          }
+        });
+      }, { once: true });
+    }
+
+    function startRecorder() {
+      if (cancelled || !streamToRecord.active) return;
+
+      recorder = new MediaRecorder(streamToRecord, { mimeType });
+      recorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          recordedQueue.push({
+            blob: event.data,
+            recordedAt: Date.now()
+          });
+        }
+      };
+      recorder.onerror = (event) => {
+        console.error("[cams] delayed recorder error", event);
+        setStatus("error");
+      };
+      recorder.start(segmentMs);
+      appendTimer = window.setInterval(moveReadySegments, 250);
     }
 
     videoElement.pause();
@@ -197,21 +242,36 @@ export function CameraViewer({
     videoElement.removeAttribute("src");
     videoElement.load();
 
-    recordSegment();
-    playbackStartTimer = window.setTimeout(playNextSegment, safeDelaySeconds * 1000);
+    setupMediaSource();
+    startRecorder();
 
     return () => {
       cancelled = true;
       clearTimers();
       videoElement.onended = null;
       videoElement.onplaying = null;
+      videoElement.onloadeddata = null;
+      videoElement.onerror = null;
+      if (liveVideoElement) {
+        liveVideoElement.pause();
+        liveVideoElement.srcObject = null;
+      }
 
       if (recorder && recorder.state !== "inactive") {
         recorder.stop();
       }
 
       revokeCurrentUrl();
-      segmentQueue.length = 0;
+      recordedQueue.length = 0;
+      pendingAppendQueue.length = 0;
+
+      if (mediaSource?.readyState === "open") {
+        try {
+          mediaSource.endOfStream();
+        } catch {
+          // Ignore cleanup races.
+        }
+      }
     };
   }, [muted, remoteStream, safeDelaySeconds]);
 
@@ -354,8 +414,19 @@ export function CameraViewer({
         playsInline
         autoPlay
         muted={muted}
+        controls={false}
         className={`absolute inset-0 h-full w-full bg-transparent transition-opacity duration-200 ${mode === "contain" ? "object-contain" : "object-cover"} ${hasVideo ? "opacity-100" : "opacity-0"}`}
       />
+      {safeDelaySeconds > 0 ? (
+        <video
+          ref={liveDelayVideoRef}
+          playsInline
+          autoPlay
+          muted
+          controls={false}
+          className="pointer-events-none absolute h-px w-px opacity-0"
+        />
+      ) : null}
       {showNameOverlay && activePlayer?.nickname ? (
         <div className="pointer-events-none absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/45 to-transparent px-2 pb-1 pt-8 text-center">
           <div className="inline-block max-w-full truncate px-3 py-0.5 font-rajdhani text-2xl font-bold leading-none text-white [text-shadow:0_4px_14px_rgba(0,0,0,1),0_1px_4px_rgba(0,0,0,1)]">
