@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { createClient, requireAdmin } from "@/lib/supabase/server";
 import type { AdminRole } from "@/lib/types";
@@ -67,9 +68,13 @@ export async function signIn(formData: FormData) {
   redirect("/admin");
 }
 
-export async function signOut() {
+export async function signOut(formData?: FormData) {
   const supabase = createClient();
+  const redirectTo = String(formData?.get("redirect_to") || "").trim();
   await supabase.auth.signOut();
+  if (redirectTo) redirect(redirectTo);
+  const host = headers().get("x-ldufk-hostname") || headers().get("host") || "";
+  if (host.toLowerCase().includes("veto.ldufk.com")) redirect("https://admin.ldufk.com");
   redirect("/admin");
 }
 

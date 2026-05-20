@@ -11,7 +11,6 @@ import {
   teamNameFor,
   type VetoAction,
   type VetoSessionState,
-  type VetoStep,
   type VetoTeamKey
 } from "@/lib/veto/types";
 
@@ -27,7 +26,7 @@ type ApiResponse = {
 
 type VetoCardItem = {
   map: string;
-  action: VetoAction | "pending";
+  action: VetoAction;
   team: VetoTeamKey;
   order: number;
 };
@@ -60,74 +59,55 @@ function actionTheme(action: VetoCardItem["action"]) {
     };
   }
 
-  return {
-    border: "border-white/12",
-    wash: "from-black/86 via-black/62 to-black/78",
-    label: "bg-white/10 text-white/55",
-    compact: "border-white/12 bg-black/52"
-  };
+  return actionTheme("pick");
 }
 
 function displayItems(state: VetoSessionState): VetoCardItem[] {
   const remaining = remainingMaps(state.mapPool, state.steps);
   const deciderMap = state.status === "complete" ? remaining[0] : null;
 
-  return state.mapPool.map((map, index) => {
-    const step = state.steps.find((item) => item.map.toLowerCase() === map.toLowerCase());
+  const items = state.steps.map((step, index) => ({
+    map: step.map,
+    action: step.action,
+    team: step.team,
+    order: index + 1
+  }));
 
-    if (step) {
-      return {
-        map,
-        action: step.action,
-        team: step.team,
-        order: state.steps.findIndex((item) => item.map.toLowerCase() === map.toLowerCase()) + 1
-      };
-    }
-
-    if (deciderMap && deciderMap.toLowerCase() === map.toLowerCase()) {
-      return {
-        map,
-        action: "decider",
-        team: "system",
-        order: state.steps.length + 1
-      };
-    }
-
-    return {
-      map,
-      action: "pending",
+  if (deciderMap) {
+    items.push({
+      map: deciderMap,
+      action: "decider",
       team: "system",
-      order: index + 1
-    };
-  });
+      order: state.steps.length + 1
+    });
+  }
+
+  return items;
 }
 
-function ActionMark({ action }: { action: VetoCardItem["action"] }) {
-  const symbol = action === "ban" ? "X" : action === "pick" ? "◆" : action === "decider" ? "D" : "·";
-  const color = action === "ban" ? "text-cyan-300" : action === "pick" ? "text-violet-300" : action === "decider" ? "text-yellow-100" : "text-white/30";
-
+function TeamBadge({ state, team }: { state: VetoSessionState; team: VetoTeamKey }) {
   return (
-    <div className={`grid h-11 w-11 place-items-center rounded-full border border-white/20 bg-black/35 font-rajdhani text-2xl font-bold ${color} shadow-[0_10px_25px_rgba(0,0,0,0.45)]`}>
-      {symbol}
+    <div className="max-w-[92%] truncate rounded border border-white/20 bg-black/54 px-3 py-1 text-center font-rajdhani text-xl font-bold uppercase text-white shadow-[0_10px_25px_rgba(0,0,0,0.45)] [text-shadow:0_2px_10px_rgba(0,0,0,0.9)]">
+      {teamNameFor(state, team)}
     </div>
   );
 }
 
-function PortraitCard({ item, index }: { item: VetoCardItem; index: number }) {
+function PortraitCard({ item, state, index }: { item: VetoCardItem; state: VetoSessionState; index: number }) {
   const image = mapImageFor(mapSlug(item.map));
   const theme = actionTheme(item.action);
-  const label = item.action === "pending" ? "WAIT" : actionLabel(item.action).toUpperCase();
+  const label = actionLabel(item.action).toUpperCase();
 
   return (
     <div
       className={`relative h-[445px] min-w-0 overflow-hidden rounded border ${theme.border} shadow-[0_28px_60px_rgba(0,0,0,0.42)] animate-[vetoCardIn_0.5s_ease-out_both]`}
       style={{ animationDelay: `${index * 85}ms` }}
     >
-      {image ? <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${image})` }} /> : null}
-      <div className={`absolute inset-0 bg-gradient-to-b ${theme.wash}`} />
-      <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/90 via-red-950/38 to-transparent" />
+      {image ? <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${image})`, opacity: 0.86 }} /> : null}
+      <div className={`absolute inset-0 bg-gradient-to-b ${theme.wash} opacity-80`} />
+      <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/88 via-black/34 to-transparent" />
       <div className="relative z-10 flex h-full flex-col items-center justify-center gap-4 px-3">
-        {item.action !== "pending" ? <ActionMark action={item.action} /> : null}
+        <TeamBadge state={state} team={item.team} />
       </div>
       <div className="absolute inset-x-0 bottom-5 z-10 text-center">
         <div className="font-rajdhani text-xl font-bold uppercase text-white [text-shadow:0_3px_14px_rgba(0,0,0,0.95)]">{label}</div>
@@ -137,21 +117,23 @@ function PortraitCard({ item, index }: { item: VetoCardItem; index: number }) {
   );
 }
 
-function CompactCard({ item, index }: { item: VetoCardItem; index: number }) {
+function CompactCard({ item, state, index }: { item: VetoCardItem; state: VetoSessionState; index: number }) {
   const image = mapImageFor(mapSlug(item.map));
   const theme = actionTheme(item.action);
-  const label = item.action === "pending" ? "WAIT" : actionLabel(item.action).toUpperCase();
+  const label = actionLabel(item.action).toUpperCase();
 
   return (
     <div
       className={`relative h-[84px] w-[126px] overflow-hidden rounded border ${theme.compact} shadow-[0_14px_35px_rgba(0,0,0,0.36)] animate-[vetoPopIn_0.38s_ease-out_both]`}
       style={{ animationDelay: `${index * 55}ms` }}
     >
-      {image ? <div className="absolute inset-0 bg-cover bg-center opacity-64" style={{ backgroundImage: `url(${image})` }} /> : null}
-      <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/28 to-black/82" />
+      {image ? <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${image})`, opacity: 0.78 }} /> : null}
+      <div className="absolute inset-0 bg-gradient-to-b from-black/18 via-black/22 to-black/82" />
       <div className="relative z-10 flex h-full flex-col justify-between p-2">
-        <div className="flex items-center justify-between">
-          <ActionMark action={item.action} />
+        <div className="flex items-center justify-between gap-1">
+          <span className="max-w-[68px] truncate rounded bg-black/45 px-1.5 py-0.5 font-rajdhani text-[13px] font-bold uppercase leading-none text-white">
+            {teamNameFor(state, item.team)}
+          </span>
           <span className={`rounded px-1.5 py-0.5 font-rajdhani text-[13px] font-bold uppercase leading-none ${theme.label}`}>{label}</span>
         </div>
         <div className="truncate text-center font-rajdhani text-[18px] font-bold uppercase leading-none text-white [text-shadow:0_3px_12px_rgba(0,0,0,1)]">{item.map}</div>
@@ -208,7 +190,7 @@ function CardsLayout({ state, items, stale }: { state: VetoSessionState; items: 
     <div className="h-screen w-screen overflow-hidden bg-transparent p-10 text-white">
       <OverlayStyles />
       <div className="mx-auto flex h-full max-w-[1620px] items-center justify-center">
-        <section className="relative w-full overflow-hidden rounded-lg border border-white/8 bg-slate-950/78 px-8 py-10 shadow-[0_32px_90px_rgba(0,0,0,0.55)] backdrop-blur-md">
+        <section className="relative min-h-[650px] w-full overflow-hidden rounded-lg border border-white/8 bg-slate-950/72 px-8 py-10 shadow-[0_32px_90px_rgba(0,0,0,0.55)] backdrop-blur-md">
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_12%_12%,rgba(56,189,248,0.16),transparent_34%),radial-gradient(circle_at_88%_90%,rgba(239,68,68,0.18),transparent_34%)]" />
           <div className="relative z-10">
             <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-6">
@@ -220,8 +202,8 @@ function CardsLayout({ state, items, stale }: { state: VetoSessionState; items: 
               <div className="truncate text-right font-rajdhani text-4xl font-bold uppercase text-white/88">{state.team2}</div>
             </div>
 
-            <div className="mt-10 grid grid-cols-7 gap-3">
-              {items.map((item, index) => <PortraitCard key={`${item.map}-${item.action}-${item.order}`} item={item} index={index} />)}
+            <div className="mt-10 flex min-h-[445px] justify-start gap-3 overflow-hidden">
+              {items.map((item, index) => <PortraitCard key={`${item.map}-${item.action}-${item.order}`} item={item} state={state} index={index} />)}
             </div>
 
             <div className="mt-7 flex items-center justify-center gap-3 text-[11px] font-extrabold uppercase text-white/58">
@@ -246,7 +228,7 @@ function CompactLayout({ state, items, stale }: { state: VetoSessionState; items
           <div className="truncate font-rajdhani text-2xl font-bold uppercase leading-none">{state.team1}</div>
           <div className="font-rajdhani text-lg font-bold uppercase leading-none text-white/45">vs {state.team2}</div>
         </div>
-        {items.map((item, index) => <CompactCard key={`${item.map}-${item.action}-${item.order}`} item={item} index={index} />)}
+        {items.map((item, index) => <CompactCard key={`${item.map}-${item.action}-${item.order}`} item={item} state={state} index={index} />)}
         {stale ? <div className="ml-2 rounded border border-rose-400/35 bg-rose-500/18 px-2 py-1 text-[10px] font-bold uppercase text-rose-100">reconnect</div> : null}
       </div>
     </div>

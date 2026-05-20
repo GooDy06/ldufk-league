@@ -1,15 +1,19 @@
 import { cookies } from "next/headers";
+import { headers } from "next/headers";
 import { createServerClient } from "@supabase/ssr";
 import type { CookieOptions } from "@supabase/ssr";
 import type { AdminRole } from "@/lib/types";
+import { sharedAuthCookieOptions } from "@/lib/supabase/cookie-options";
 
 export function createClient() {
   const cookieStore = cookies();
+  const host = headers().get("x-ldufk-hostname") || headers().get("host");
 
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
+      cookieOptions: sharedAuthCookieOptions(host),
       cookies: {
         get(name: string) {
           return cookieStore.get(name)?.value;

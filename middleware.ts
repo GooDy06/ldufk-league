@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import type { CookieOptions } from "@supabase/ssr";
+import { sharedAuthCookieOptions } from "@/lib/supabase/cookie-options";
 
 function hostname(request: NextRequest) {
   return (request.headers.get("host") || "").split(":")[0].toLowerCase();
@@ -51,6 +52,7 @@ export async function middleware(request: NextRequest) {
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
+      cookieOptions: sharedAuthCookieOptions(hostname(request)),
       cookies: {
         get(name: string) {
           return request.cookies.get(name)?.value;
