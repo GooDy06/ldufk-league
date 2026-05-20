@@ -49,9 +49,7 @@ function supportedRecordingMimeType() {
   ];
 
   return candidates.find((type) => {
-    const recorderSupported = MediaRecorder.isTypeSupported(type);
-    const mediaSourceSupported = typeof MediaSource === "undefined" || MediaSource.isTypeSupported(type);
-    return recorderSupported && mediaSourceSupported;
+    return MediaRecorder.isTypeSupported(type);
   }) || "";
 }
 
@@ -120,12 +118,12 @@ export function CameraViewer({
 
     let cancelled = false;
     let recorder: MediaRecorder | null = null;
-    let appendTimer: number | null = null;
+    let moveTimer: number | null = null;
     let currentUrl: string | null = null;
-    let mediaSource: MediaSource | null = null;
-    let sourceBuffer: SourceBuffer | null = null;
-    const recordedQueue: Array<{ blob: Blob; recordedAt: number }> = [];
-    const pendingAppendQueue: Blob[] = [];
+    let segmentTimer: number | null = null;
+    let isPlayingSegment = false;
+    const recordedQueue: Array<{ blob: Blob; readyAt: number }> = [];
+    const playableQueue: Blob[] = [];
     const segmentMs = 1000;
     const delayMs = safeDelaySeconds * 1000;
 
@@ -136,8 +134,10 @@ export function CameraViewer({
     }
 
     function clearTimers() {
-      if (appendTimer) window.clearInterval(appendTimer);
-      appendTimer = null;
+      if (moveTimer) window.clearInterval(moveTimer);
+      if (segmentTimer) window.clearTimeout(segmentTimer);
+      moveTimer = null;
+      segmentTimer = null;
     }
 
     function revokeCurrentUrl() {
@@ -147,96 +147,77 @@ export function CameraViewer({
       }
     }
 
-    function appendNextBlob() {
-      if (
-        cancelled ||
-        !mediaSource ||
-        mediaSource.readyState !== "open" ||
-        !sourceBuffer ||
-        sourceBuffer.updating ||
-        !pendingAppendQueue.length
-      ) {
-        return;
-      }
+    function playNextSegment() {
+      if (cancelled || isPlayingSegment || !playableQueue.length) return;
 
-      const nextBlob = pendingAppendQueue.shift();
+      const nextBlob = playableQueue.shift();
       if (!nextBlob) return;
 
-      nextBlob.arrayBuffer().then((buffer) => {
-        if (
-          cancelled ||
-          !mediaSource ||
-          mediaSource.readyState !== "open" ||
-          !sourceBuffer ||
-          sourceBuffer.updating
-        ) {
-          pendingAppendQueue.unshift(new Blob([buffer], { type: mimeType }));
-          return;
-        }
-
-        try {
-          sourceBuffer.appendBuffer(buffer);
-          setDelayedVideoReady(true);
-          void videoElement.play().catch(() => undefined);
-        } catch (error) {
-          console.error("[cams] delayed append failed", error);
-        }
-      }).catch((error) => {
-        console.error("[cams] delayed blob read failed", error);
+      isPlayingSegment = true;
+      revokeCurrentUrl();
+      currentUrl = URL.createObjectURL(nextBlob);
+      videoElement.srcObject = null;
+      videoElement.src = currentUrl;
+      videoElement.muted = muted;
+      videoElement.onplaying = () => setDelayedVideoReady(true);
+      videoElement.onloadeddata = () => setDelayedVideoReady(true);
+      videoElement.onended = () => {
+        isPlayingSegment = false;
+        playNextSegment();
+      };
+      videoElement.onerror = () => {
+        isPlayingSegment = false;
+        playNextSegment();
+      };
+      void videoElement.play().catch(() => {
+        isPlayingSegment = false;
       });
     }
 
     function moveReadySegments() {
       if (cancelled) return;
 
-      const readyAt = Date.now() - delayMs;
+      const now = Date.now();
 
-      while (recordedQueue.length && recordedQueue[0].recordedAt <= readyAt) {
+      while (recordedQueue.length && recordedQueue[0].readyAt <= now) {
         const item = recordedQueue.shift();
-        if (item) pendingAppendQueue.push(item.blob);
+        if (item) playableQueue.push(item.blob);
       }
 
-      appendNextBlob();
-    }
-
-    function setupMediaSource() {
-      mediaSource = new MediaSource();
-      currentUrl = URL.createObjectURL(mediaSource);
-      videoElement.srcObject = null;
-      videoElement.src = currentUrl;
-      videoElement.muted = muted;
-      videoElement.onplaying = () => setDelayedVideoReady(true);
-      videoElement.onloadeddata = () => setDelayedVideoReady(true);
-
-      mediaSource.addEventListener("sourceopen", () => {
-        if (!mediaSource || cancelled) return;
-
-        sourceBuffer = mediaSource.addSourceBuffer(mimeType);
-        sourceBuffer.mode = "sequence";
-        sourceBuffer.addEventListener("updateend", () => {
-          appendNextBlob();
-        });
-      }, { once: true });
+      playNextSegment();
     }
 
     function startRecorder() {
       if (cancelled || !streamToRecord.active) return;
 
+      const chunks: Blob[] = [];
+      const segmentStartedAt = Date.now();
       recorder = new MediaRecorder(streamToRecord, { mimeType });
       recorder.ondataavailable = (event) => {
         if (event.data.size > 0) {
-          recordedQueue.push({
-            blob: event.data,
-            recordedAt: Date.now()
-          });
+          chunks.push(event.data);
         }
       };
       recorder.onerror = (event) => {
         console.error("[cams] delayed recorder error", event);
         setStatus("error");
       };
-      recorder.start(segmentMs);
-      appendTimer = window.setInterval(moveReadySegments, 250);
+      recorder.onstop = () => {
+        if (chunks.length) {
+          recordedQueue.push({
+            blob: new Blob(chunks, { type: mimeType }),
+            readyAt: segmentStartedAt + delayMs
+          });
+        }
+
+        startRecorder();
+      };
+      recorder.start();
+      segmentTimer = window.setTimeout(() => {
+        if (recorder && recorder.state !== "inactive") {
+          recorder.stop();
+        }
+      }, segmentMs);
     }
 
     videoElement.pause();
@@ -244,8 +225,8 @@ export function CameraViewer({
     videoElement.removeAttribute("src");
     videoElement.load();
 
-    setupMediaSource();
     startRecorder();
+    moveTimer = window.setInterval(moveReadySegments, 250);
 
     return () => {
       cancelled = true;
@@ -265,15 +246,7 @@ export function CameraViewer({
 
       revokeCurrentUrl();
       recordedQueue.length = 0;
-      pendingAppendQueue.length = 0;
-
-      if (mediaSource?.readyState === "open") {
-        try {
-          mediaSource.endOfStream();
-        } catch {
-          // Ignore cleanup races.
-        }
-      }
+      playableQueue.length = 0;
     };
   }, [muted, remoteStream, safeDelaySeconds]);
 

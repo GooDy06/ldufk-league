@@ -88,11 +88,11 @@ export function ChampionCard({ tournament }: { tournament: Tournament | Homepage
   return (
     <article className="interactive-card soft-enter overflow-hidden rounded-2xl border border-line bg-surface">
       <div
-        className="relative min-h-[300px] overflow-hidden bg-cover bg-center p-3 sm:min-h-[330px] sm:p-4"
+        className="relative min-h-[255px] overflow-hidden bg-cover bg-center p-3 sm:min-h-[280px] sm:p-4"
         style={{ backgroundImage: `url(${imageUrl || "/assets/winners-hero.png"})` }}
       >
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(4,8,14,0.08),rgba(4,8,14,0.42)_48%,rgba(4,8,14,0.9)),radial-gradient(circle_at_76%_14%,rgba(0,213,255,0.16),transparent_36%)]" />
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-bg/95 to-transparent" />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-bg/95 to-transparent" />
 
         <div className="relative z-10 flex items-start justify-between gap-2">
           <div className="glass-chip max-w-[56%] truncate whitespace-nowrap rounded-full px-2.5 py-1 text-[8px] font-extrabold uppercase tracking-[0.11em] text-slate-100 sm:max-w-[58%] sm:px-3 sm:text-[9px]">
@@ -103,22 +103,22 @@ export function ChampionCard({ tournament }: { tournament: Tournament | Homepage
           </div>
         </div>
 
-        <div className="absolute inset-x-3 bottom-3 z-10 sm:inset-x-4 sm:bottom-4">
+        <div className="absolute inset-x-3 bottom-2 z-10 sm:inset-x-4 sm:bottom-[10px]">
           <div className="ml-auto max-w-[92%] text-right sm:max-w-[72%]">
-            <h3 className="font-rajdhani text-2xl font-bold leading-[0.95] tracking-wide sm:text-3xl md:text-4xl">{teamName}</h3>
-            {supportingName ? <p className="mt-1 text-xs font-bold leading-tight text-slate-200 sm:text-sm md:text-base">{supportingName}</p> : null}
+            <h3 className="font-rajdhani text-xl font-bold leading-[0.95] tracking-wide sm:text-2xl md:text-3xl">{teamName}</h3>
+            {supportingName ? <p className="mt-0.5 text-[11px] font-bold leading-tight text-slate-200 sm:text-xs md:text-sm">{supportingName}</p> : null}
           </div>
 
-          <div className="mt-3 grid gap-1.5 sm:grid-cols-[1fr_1fr_auto] sm:items-stretch">
-            <div className="glass-card rounded-lg px-3 py-2">
-              <span className="block text-[8px] font-extrabold uppercase tracking-[0.16em] text-slate-400">Дата</span>
-              <strong className="mt-0.5 block font-rajdhani text-base font-bold leading-none text-slate-100 sm:text-lg">{tournament.date_label}</strong>
+          <div className="mt-2 grid gap-1.5 sm:grid-cols-[1fr_1fr_auto] sm:items-stretch">
+            <div className="glass-card rounded-md px-2.5 py-1.5 sm:px-3">
+              <span className="block text-[7px] font-extrabold uppercase tracking-[0.15em] text-slate-400 sm:text-[8px]">Дата</span>
+              <strong className="mt-0.5 block font-rajdhani text-sm font-bold leading-none text-slate-100 sm:text-base">{tournament.date_label}</strong>
             </div>
-            <div className="glass-card rounded-lg px-3 py-2">
-              <span className="block text-[8px] font-extrabold uppercase tracking-[0.16em] text-slate-400">Дивізіон</span>
-              <strong className="mt-0.5 block font-rajdhani text-base font-bold leading-none text-slate-100 sm:text-lg">{divisionLabel}</strong>
+            <div className="glass-card rounded-md px-2.5 py-1.5 sm:px-3">
+              <span className="block text-[7px] font-extrabold uppercase tracking-[0.15em] text-slate-400 sm:text-[8px]">Дивізіон</span>
+              <strong className="mt-0.5 block font-rajdhani text-sm font-bold leading-none text-slate-100 sm:text-base">{divisionLabel}</strong>
             </div>
-            <Link href={detailsUrl} className="focus-ring grid min-h-[42px] place-items-center rounded-lg bg-accent px-4 text-center font-rajdhani text-base font-extrabold text-bg transition hover:-translate-y-0.5 hover:bg-cyan-300 hover:shadow-[0_0_26px_rgba(0,213,255,0.22)] sm:min-h-[48px] sm:text-lg">
+            <Link href={detailsUrl} className="focus-ring grid min-h-[30px] place-items-center rounded-md bg-accent px-3 text-center font-rajdhani text-sm font-extrabold text-bg transition hover:-translate-y-0.5 hover:bg-cyan-300 hover:shadow-[0_0_26px_rgba(0,213,255,0.22)] sm:min-h-[34px] sm:text-base">
               Детальніше
             </Link>
           </div>
