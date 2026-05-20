@@ -86,6 +86,14 @@ function displayItems(state: VetoSessionState): VetoCardItem[] {
 }
 
 function TeamBadge({ state, team }: { state: VetoSessionState; team: VetoTeamKey }) {
+  if (team === "system") {
+    return (
+      <div className="max-w-[92%] truncate rounded border border-yellow-200/30 bg-yellow-400/16 px-3 py-1 text-center font-rajdhani text-xl font-bold uppercase text-yellow-50 shadow-[0_10px_25px_rgba(0,0,0,0.45)] [text-shadow:0_2px_10px_rgba(0,0,0,0.9)]">
+        Final map
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-[92%] truncate rounded border border-white/20 bg-black/54 px-3 py-1 text-center font-rajdhani text-xl font-bold uppercase text-white shadow-[0_10px_25px_rgba(0,0,0,0.45)] [text-shadow:0_2px_10px_rgba(0,0,0,0.9)]">
       {teamNameFor(state, team)}
@@ -100,7 +108,7 @@ function PortraitCard({ item, state, index }: { item: VetoCardItem; state: VetoS
 
   return (
     <div
-      className={`relative h-[445px] min-w-0 overflow-hidden rounded border ${theme.border} shadow-[0_28px_60px_rgba(0,0,0,0.42)] animate-[vetoCardIn_0.5s_ease-out_both]`}
+      className={`relative h-full min-h-[520px] min-w-0 overflow-hidden rounded border ${theme.border} shadow-[0_28px_60px_rgba(0,0,0,0.42)] animate-[vetoCardIn_0.5s_ease-out_both]`}
       style={{ animationDelay: `${index * 85}ms` }}
     >
       {image ? <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${image})`, opacity: 0.86 }} /> : null}
@@ -187,26 +195,28 @@ function CardsLayout({ state, items, stale }: { state: VetoSessionState; items: 
   const nextStep = planFor(state.format, state.firstTeam, state.mapPool.length)[state.steps.length] || null;
 
   return (
-    <div className="h-screen w-screen overflow-hidden bg-transparent p-10 text-white">
+    <div className="h-screen w-screen overflow-hidden bg-transparent text-white">
       <OverlayStyles />
-      <div className="mx-auto flex h-full max-w-[1620px] items-center justify-center">
-        <section className="relative min-h-[650px] w-full overflow-hidden rounded-lg border border-white/8 bg-slate-950/72 px-8 py-10 shadow-[0_32px_90px_rgba(0,0,0,0.55)] backdrop-blur-md">
+      <div className="flex h-full w-full items-stretch justify-stretch">
+        <section className="relative h-full w-full overflow-hidden bg-slate-950/72 px-14 py-12 shadow-[0_32px_90px_rgba(0,0,0,0.55)] backdrop-blur-md">
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_12%_12%,rgba(56,189,248,0.16),transparent_34%),radial-gradient(circle_at_88%_90%,rgba(239,68,68,0.18),transparent_34%)]" />
-          <div className="relative z-10">
+          <div className="relative z-10 flex h-full flex-col">
             <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-6">
-              <div className="truncate text-left font-rajdhani text-4xl font-bold uppercase text-white/88">{state.team1}</div>
+              <div className="truncate text-left font-rajdhani text-5xl font-bold uppercase text-white/88">{state.team1}</div>
               <div className="text-center">
-                <div className="font-rajdhani text-3xl font-bold uppercase text-white [text-shadow:0_4px_22px_rgba(0,0,0,0.9)]">MAP VETO</div>
-                <div className="mt-1 text-[11px] font-extrabold uppercase text-cyan-100/70">{formatLabel(state.format)}</div>
+                <div className="font-rajdhani text-4xl font-bold uppercase text-white [text-shadow:0_4px_22px_rgba(0,0,0,0.9)]">MAP VETO</div>
+                <div className="mt-1 text-xs font-extrabold uppercase text-cyan-100/70">{formatLabel(state.format)}</div>
               </div>
-              <div className="truncate text-right font-rajdhani text-4xl font-bold uppercase text-white/88">{state.team2}</div>
+              <div className="truncate text-right font-rajdhani text-5xl font-bold uppercase text-white/88">{state.team2}</div>
             </div>
 
-            <div className="mt-10 flex min-h-[445px] justify-start gap-3 overflow-hidden">
-              {items.map((item, index) => <PortraitCard key={`${item.map}-${item.action}-${item.order}`} item={item} state={state} index={index} />)}
+            <div className="mt-12 grid min-h-0 flex-1 grid-cols-7 gap-3 overflow-hidden">
+              {items.map((item, index) => (
+                <PortraitCard key={`${item.map}-${item.action}-${item.order}`} item={item} state={state} index={index} />
+              ))}
             </div>
 
-            <div className="mt-7 flex items-center justify-center gap-3 text-[11px] font-extrabold uppercase text-white/58">
+            <div className="mt-8 flex items-center justify-center gap-3 text-xs font-extrabold uppercase text-white/58">
               <span className="h-2 w-2 rounded-full bg-emerald-300" style={{ animation: "livePulse 1.6s ease-in-out infinite" }} />
               <span>{state.status === "complete" ? "Veto complete" : nextStep ? `${teamNameFor(state, nextStep.team)} ${nextStep.action}s next` : "Waiting"}</span>
               {stale ? <span className="text-rose-300">Sync reconnecting</span> : null}

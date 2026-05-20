@@ -11,6 +11,10 @@ function routedPath(request: NextRequest) {
   const host = hostname(request);
   const path = request.nextUrl.pathname;
 
+  if (path.startsWith("/map-images/") || path.startsWith("/assets/") || path.startsWith("/public/")) {
+    return path;
+  }
+
   if (host === "cams.ldufk.com") {
     if (path.startsWith("/api/") || path.startsWith("/cams")) return path;
     return `/cams${path === "/" ? "" : path}`;
