@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import type { CSSProperties } from "react";
 import { mapImageFor } from "@/lib/map-assets";
 import {
   actionLabel,
@@ -71,6 +72,24 @@ function actionTheme(action: VetoCardItem["action"]) {
   return actionTheme("pick");
 }
 
+function cardGlowStyle(action: VetoCardItem["action"]): CSSProperties {
+  if (action === "ban") {
+    return {
+      boxShadow: "inset 0 0 58px rgba(239,68,68,0.62), inset 0 0 120px rgba(127,29,29,0.44), 0 0 34px rgba(239,68,68,0.36)"
+    };
+  }
+
+  if (action === "pick") {
+    return {
+      boxShadow: "inset 0 0 58px rgba(99,102,241,0.58), inset 0 0 120px rgba(49,46,129,0.34), 0 0 34px rgba(99,102,241,0.32)"
+    };
+  }
+
+  return {
+    boxShadow: "inset 0 0 62px rgba(250,204,21,0.68), inset 0 0 120px rgba(161,98,7,0.38), 0 0 38px rgba(250,204,21,0.42)"
+  };
+}
+
 function displayItems(state: VetoSessionState): VetoCardItem[] {
   const remaining = remainingMaps(state.mapPool, state.steps);
   const deciderMap = state.status === "complete" ? remaining[0] : null;
@@ -122,6 +141,7 @@ function PortraitCard({ item, state, index }: { item: VetoCardItem; state: VetoS
     >
       {image ? <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${image})`, opacity: 0.86 }} /> : null}
       <div className={`absolute inset-0 bg-gradient-to-b ${theme.wash} opacity-80`} />
+      <div className="pointer-events-none absolute inset-0 z-[1]" style={cardGlowStyle(item.action)} />
       <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/88 via-black/34 to-transparent" />
       <div className="relative z-10 flex h-full flex-col items-center justify-center gap-4 px-3">
         <TeamBadge state={state} team={item.team} />
@@ -147,14 +167,21 @@ function CompactCard({ item, state, index }: { item: VetoCardItem; state: VetoSe
     >
       {image ? <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${image})`, opacity: item.action === "pick" ? 0.88 : 0.68 }} /> : null}
       <div className="absolute inset-0 bg-gradient-to-b from-black/12 via-black/18 to-black/82" />
+      <div className="pointer-events-none absolute inset-0 z-[1]" style={cardGlowStyle(item.action)} />
       <div className={`absolute inset-x-0 top-0 h-8 bg-gradient-to-r ${theme.footer}`} />
       <div className="relative z-10 flex h-full flex-col justify-between">
-        <div className="grid grid-cols-[1fr_auto] items-center gap-1 px-2 py-1.5">
-          <span className="min-w-0 truncate font-rajdhani text-[17px] font-bold uppercase leading-none text-white [text-shadow:0_2px_8px_rgba(0,0,0,1)]">
-            {teamText}
-          </span>
-          <span className={`rounded px-2 py-1 font-rajdhani text-[15px] font-bold uppercase leading-none ${theme.label}`}>{label}</span>
-        </div>
+        {item.action === "decider" ? (
+          <div className="px-2 py-1.5 text-center">
+            <span className="font-rajdhani text-[17px] font-black uppercase leading-none text-white [text-shadow:0_0_12px_rgba(255,255,255,0.55),0_2px_8px_rgba(0,0,0,1)]">{label}</span>
+          </div>
+        ) : (
+          <div className="grid grid-cols-[1fr_auto] items-center gap-1 px-2 py-1.5">
+            <span className="min-w-0 truncate font-rajdhani text-[17px] font-bold uppercase leading-none text-white [text-shadow:0_2px_8px_rgba(0,0,0,1)]">
+              {teamText}
+            </span>
+            <span className={`rounded px-2 py-1 font-rajdhani text-[15px] font-bold uppercase leading-none ${theme.label}`}>{label}</span>
+          </div>
+        )}
         <div className="bg-black/42 px-2 py-2 text-center">
           <div className="truncate font-rajdhani text-[27px] font-bold uppercase leading-none text-white [text-shadow:0_3px_12px_rgba(0,0,0,1)]">{item.map}</div>
         </div>
@@ -163,12 +190,11 @@ function CompactCard({ item, state, index }: { item: VetoCardItem; state: VetoSe
   );
 }
 
-function TeamTurnRow({ label, name, active, neutral = false }: { label: string; name: string; active: boolean; neutral?: boolean }) {
+function TeamTurnRow({ name, active, neutral = false }: { name: string; active: boolean; neutral?: boolean }) {
   return (
-    <div className="rounded px-3 py-1.5 text-center transition">
-      <div className={`text-[9px] font-extrabold uppercase tracking-[0.18em] ${active ? "text-cyan-100" : neutral ? "text-white/50" : "text-white/26"}`}>{label}</div>
+    <div className="grid min-h-0 place-items-center rounded px-2 py-1 text-center transition">
       <div
-        className={`truncate font-rajdhani text-[28px] font-black uppercase leading-none transition ${
+        className={`max-w-full truncate font-rajdhani text-[27px] font-black uppercase leading-none transition ${
           active
             ? "text-cyan-50 [text-shadow:0_0_16px_rgba(103,232,249,0.92),0_3px_12px_rgba(0,0,0,1)]"
             : neutral
@@ -265,23 +291,16 @@ function CompactLayout({ state, items, stale }: { state: VetoSessionState; items
   const nextStep = planFor(state.format, state.firstTeam, state.mapPool.length)[state.steps.length] || null;
   const isTeam1Active = nextStep?.team === "team1";
   const isTeam2Active = nextStep?.team === "team2";
-  const currentAction = state.status === "complete" ? "COMPLETE" : nextStep ? nextStep.action.toUpperCase() : "WAIT";
   const neutralTeams = state.status === "complete" || nextStep?.team === "system";
 
   return (
     <div className="h-screen w-screen overflow-hidden bg-transparent text-white">
       <OverlayStyles />
-      <div className="absolute bottom-12 left-[4vw] grid w-[92vw] max-w-[1760px] grid-cols-[280px_repeat(7,minmax(0,1fr))] items-end gap-3 rounded bg-black/18 px-4 py-3 backdrop-blur-[2px]">
-        <div className="min-h-[118px] rounded border border-white/18 bg-black/64 px-3 py-3 shadow-[0_12px_34px_rgba(0,0,0,0.42)]">
-          <div className="grid grid-cols-[1fr_auto] items-center gap-2">
-            <div className="text-[10px] font-extrabold uppercase tracking-[0.18em] text-cyan-100/70">Map veto</div>
-            <div className="rounded bg-white/10 px-2 py-0.5 font-rajdhani text-[15px] font-bold uppercase text-white">{currentAction}</div>
-          </div>
-          <div className="mt-2 grid gap-1.5">
-            <TeamTurnRow label={isTeam1Active ? "Now" : neutralTeams ? "Ready" : "Waiting"} name={state.team1} active={isTeam1Active} neutral={neutralTeams} />
-            <div className="text-center font-rajdhani text-lg font-bold uppercase leading-none text-white/42">vs</div>
-            <TeamTurnRow label={isTeam2Active ? "Now" : neutralTeams ? "Ready" : "Waiting"} name={state.team2} active={isTeam2Active} neutral={neutralTeams} />
-          </div>
+      <div className="absolute bottom-12 left-[4vw] grid w-[92vw] max-w-[1760px] grid-cols-8 items-end gap-3 rounded bg-black/10 px-4 py-3 backdrop-blur-[2px]">
+        <div className="grid h-[118px] min-w-0 grid-rows-[1fr_auto_1fr] rounded border border-white/18 bg-black/36 px-3 py-2 shadow-[0_12px_34px_rgba(0,0,0,0.42)] backdrop-blur-md">
+          <TeamTurnRow name={state.team1} active={isTeam1Active} neutral={neutralTeams} />
+          <div className="text-center font-rajdhani text-lg font-bold uppercase leading-none text-white/42">vs</div>
+          <TeamTurnRow name={state.team2} active={isTeam2Active} neutral={neutralTeams} />
         </div>
         {items.map((item, index) => <CompactCard key={`${item.map}-${item.action}-${item.order}`} item={item} state={state} index={index} />)}
         {stale ? <div className="ml-2 rounded border border-rose-400/35 bg-rose-500/18 px-2 py-1 text-[10px] font-bold uppercase text-rose-100">reconnect</div> : null}
