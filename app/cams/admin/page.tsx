@@ -1,6 +1,6 @@
 import { headers } from "next/headers";
 import { CopyLinkButton } from "@/components/cams/copy-link-button";
-import { addCameraPlayer, createCameraRoom, deleteCameraPlayer, loginCamsAdmin, logoutCamsAdmin, regenerateCameraToken, removeCamera } from "@/lib/cams/actions";
+import { addCameraPlayer, createCameraRoom, deleteCameraPlayer, deleteCameraRoom, loginCamsAdmin, logoutCamsAdmin, regenerateCameraToken, removeCamera, updateCameraPlayer } from "@/lib/cams/actions";
 import { isCamsAdminAuthed } from "@/lib/cams/auth";
 import { getCamsBaseUrl, isFreshOnline } from "@/lib/cams/server-utils";
 import { getCamsServiceClient } from "@/lib/cams/supabase";
@@ -121,6 +121,10 @@ export default async function CamsAdminPage({ searchParams }: { searchParams: Ad
                       <input readOnly value={roomObsLink} className="w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2 font-mono text-xs text-slate-300 outline-none" />
                       <CopyLinkButton value={roomObsLink} />
                     </div>
+                    <form action={deleteCameraRoom} className="mt-2">
+                      <input type="hidden" name="room_id" value={room.id} />
+                      <button className="rounded-lg border border-red-400/30 bg-red-600/15 px-3 py-2 text-xs font-bold uppercase tracking-wide text-red-100 transition hover:border-red-300/60">Delete match / room</button>
+                    </form>
                   </div>
                   <form action={addCameraPlayer} className="grid gap-2 md:grid-cols-[160px_140px_190px_180px_auto]">
                     <input type="hidden" name="room_id" value={room.id} />
@@ -150,11 +154,17 @@ export default async function CamsAdminPage({ searchParams }: { searchParams: Ad
                         const isOnline = isFreshOnline(player.is_online, player.last_seen);
                         return (
                           <tr key={player.id} className="border-b border-white/5 last:border-0">
-                            <td className="py-3 pr-3">
-                              <div className="font-bold text-white">{player.nickname}</div>
-                              <div className="text-xs text-slate-500">{player.team_name || "No team"}</div>
+                            <td className="py-3 pr-3 align-top">
+                              <form id={`edit-${player.id}`} action={updateCameraPlayer} className="grid gap-2">
+                                <input type="hidden" name="player_id" value={player.id} />
+                                <input name="nickname" defaultValue={player.nickname} required className={`${fieldClass()} font-bold`} />
+                                <input name="team_name" defaultValue={player.team_name || ""} placeholder="team" className={fieldClass()} />
+                                <input name="avatar_url" defaultValue={player.avatar_url || ""} placeholder="avatar optional" className={fieldClass()} />
+                              </form>
                             </td>
-                            <td className="px-3 py-3 font-rajdhani text-base font-bold text-cyan-100">{player.steamid64}</td>
+                            <td className="px-3 py-3 align-top">
+                              <input form={`edit-${player.id}`} name="steamid64" defaultValue={player.steamid64} required className={`${fieldClass()} w-full font-rajdhani text-base font-bold text-cyan-100`} />
+                            </td>
                             <td className="px-3 py-3">
                               <div className="flex items-center gap-2">
                                 <span className={`h-2.5 w-2.5 rounded-full ${isOnline ? "bg-emerald-300 shadow-[0_0_14px_rgba(110,231,183,0.7)]" : "bg-slate-600"}`} />
@@ -178,6 +188,7 @@ export default async function CamsAdminPage({ searchParams }: { searchParams: Ad
                             </td>
                             <td className="py-3 pl-3">
                               <div className="flex justify-end gap-2">
+                                <button form={`edit-${player.id}`} className="rounded-lg border border-emerald-300/30 bg-emerald-300/10 px-3 py-2 text-xs font-bold uppercase tracking-wide text-emerald-100 transition hover:border-emerald-300/60">Save player</button>
                                 <form action={regenerateCameraToken}>
                                   <input type="hidden" name="player_id" value={player.id} />
                                   <button className="rounded-lg border border-cyan-300/20 bg-cyan-300/10 px-3 py-2 text-xs font-bold uppercase tracking-wide text-cyan-100 transition hover:border-cyan-300/50">Regenerate</button>

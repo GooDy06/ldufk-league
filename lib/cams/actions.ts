@@ -111,6 +111,32 @@ export async function addCameraPlayer(formData: FormData) {
   redirect(adminRedirectPath("?saved=player"));
 }
 
+export async function updateCameraPlayer(formData: FormData) {
+  assertCamsAdmin();
+
+  const playerId = text(formData, "player_id");
+  const steamid64 = normalizeSteamId64(text(formData, "steamid64"));
+
+  if (!steamid64) {
+    redirect(adminRedirectPath("?error=steamid"));
+  }
+
+  const supabase = getCamsServiceClient();
+  const { error } = await supabase
+    .from("camera_players")
+    .update({
+      nickname: text(formData, "nickname"),
+      team_name: nullableText(formData, "team_name"),
+      steamid64,
+      avatar_url: nullableText(formData, "avatar_url")
+    })
+    .eq("id", playerId);
+
+  failIfError(error, "player");
+  revalidatePath("/cams/admin");
+  redirect(adminRedirectPath("?saved=player"));
+}
+
 export async function regenerateCameraToken(formData: FormData) {
   assertCamsAdmin();
 
@@ -185,4 +211,26 @@ export async function deleteCameraPlayer(formData: FormData) {
   failIfError(error, "player");
   revalidatePath("/cams/admin");
   redirect(adminRedirectPath("?saved=deleted"));
+}
+
+export async function deleteCameraRoom(formData: FormData) {
+  assertCamsAdmin();
+
+  const roomId = text(formData, "room_id");
+  const supabase = getCamsServiceClient();
+
+  const { data: roomPlayers, error: playerLookupError } = await supabase
+    .from("camera_players")
+    .select("id")
+    .eq("room_id", roomId);
+
+  failIfError(playerLookupError, "players");
+
+  await Promise.all((roomPlayers || []).map((player) => notifySignalingCameraRemoved(player.id)));
+
+  const { error } = await supabase.from("camera_rooms").delete().eq("id", roomId);
+
+  failIfError(error, "room");
+  revalidatePath("/cams/admin");
+  redirect(adminRedirectPath("?saved=room-deleted"));
 }

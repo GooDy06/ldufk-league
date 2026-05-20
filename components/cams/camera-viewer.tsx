@@ -213,8 +213,8 @@ export function CameraViewer({
         className={`absolute inset-0 h-full w-full bg-transparent transition-opacity duration-200 ${mode === "contain" ? "object-contain" : "object-cover"} ${hasVideo ? "opacity-100" : "opacity-0"}`}
       />
       {showNameOverlay && activePlayer?.nickname ? (
-        <div className="pointer-events-none absolute bottom-3 left-3 right-3 text-center">
-          <div className="inline-block max-w-full truncate px-3 py-1 font-rajdhani text-2xl font-bold leading-none text-white [text-shadow:0_3px_12px_rgba(0,0,0,0.95),0_1px_3px_rgba(0,0,0,1)]">
+        <div className="pointer-events-none absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/45 to-transparent px-2 pb-1 pt-8 text-center">
+          <div className="inline-block max-w-full truncate px-3 py-0.5 font-rajdhani text-2xl font-bold leading-none text-white [text-shadow:0_4px_14px_rgba(0,0,0,1),0_1px_4px_rgba(0,0,0,1)]">
             {activePlayer.nickname}
           </div>
         </div>
