@@ -1,87 +1,32 @@
 "use client";
 
-import { useMemo, useState } from "react";
-
-type Format = "bo1" | "bo3" | "bo5";
-type Action = "ban" | "pick" | "decider";
-type TeamKey = "team1" | "team2" | "system";
-
-type VetoStep = {
-  team: TeamKey;
-  action: Action;
-  map: string;
-};
-
-const ACTIVE_MAPS = ["Ancient", "Anubis", "Dust2", "Inferno", "Mirage", "Nuke", "Overpass"];
-
-function formatLabel(format: Format) {
-  if (format === "bo1") return "Best of 1";
-  if (format === "bo5") return "Best of 5";
-  return "Best of 3";
-}
-
-function normalizeMaps(value: string) {
-  return value
-    .split(/\n|,/)
-    .map((map) => map.trim())
-    .filter(Boolean)
-    .filter((map, index, maps) => maps.findIndex((item) => item.toLowerCase() === map.toLowerCase()) === index);
-}
-
-type PlannedVetoStep = Omit<VetoStep, "map">;
-
-function planFor(format: Format, first: TeamKey, totalMaps: number): PlannedVetoStep[] {
-  const second: TeamKey = first === "team1" ? "team2" : "team1";
-
-  if (format === "bo1") {
-    const steps: Array<{ team: TeamKey; action: Action }> = [];
-    for (let index = 0; index < Math.max(0, totalMaps - 1); index += 1) {
-      steps.push({ team: index % 2 === 0 ? first : second, action: "ban" });
-    }
-    steps.push({ team: "system", action: "decider" });
-    return steps;
-  }
-
-  if (format === "bo5") {
-    const picksNeeded = Math.min(4, Math.max(0, totalMaps - 3));
-    return [
-      { team: first, action: "ban" },
-      { team: second, action: "ban" },
-      ...Array.from({ length: picksNeeded }, (_, index) => ({ team: index % 2 === 0 ? first : second, action: "pick" as Action })),
-      { team: "system" as TeamKey, action: "decider" as Action },
-    ];
-  }
-
-  return [
-    { team: first, action: "ban" },
-    { team: second, action: "ban" },
-    { team: first, action: "pick" },
-    { team: second, action: "pick" },
-    { team: first, action: "ban" },
-    { team: second, action: "ban" },
-    { team: "system", action: "decider" },
-  ];
-}
-
-function actionLabel(action: Action) {
-  if (action === "ban") return "banned";
-  if (action === "pick") return "picked";
-  return "picked";
-}
-
-function actionColor(action: Action) {
-  if (action === "ban") return "text-rose-300";
-  return "text-emerald-300";
-}
+import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  ACTIVE_MAPS,
+  actionColor,
+  actionLabel,
+  formatLabel,
+  normalizeMaps,
+  planFor,
+  publicObsUrl,
+  type VetoFormat,
+  type VetoSessionState,
+  type VetoStep,
+  type VetoTeamKey
+} from "@/lib/veto/types";
 
 export function VetoTool() {
   const [team1, setTeam1] = useState("Team 1");
   const [team2, setTeam2] = useState("Team 2");
-  const [format, setFormat] = useState<Format>("bo3");
-  const [first, setFirst] = useState<TeamKey>("team1");
+  const [format, setFormat] = useState<VetoFormat>("bo3");
+  const [first, setFirst] = useState<VetoTeamKey>("team1");
   const [mapText, setMapText] = useState(ACTIVE_MAPS.join("\n"));
   const [steps, setSteps] = useState<VetoStep[]>([]);
-  const [flipState, setFlipState] = useState<{ active: boolean; winner: TeamKey | null; count: number }>({ active: false, winner: null, count: 0 });
+  const [sessionId, setSessionId] = useState<string | null>(null);
+  const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
+  const [flipState, setFlipState] = useState<{ active: boolean; winner: VetoTeamKey | null; count: number }>({ active: false, winner: null, count: 0 });
+  const createInFlightRef = useRef(false);
+  const hasCreatedRef = useRef(false);
 
   const maps = useMemo(() => normalizeMaps(mapText), [mapText]);
   const remaining = maps.filter((map) => !steps.some((step) => step.map.toLowerCase() === map.toLowerCase()));
@@ -89,12 +34,65 @@ export function VetoTool() {
   const next = plan[steps.length];
   const isDone = !next;
 
-  const teamName = (team: TeamKey) => {
+  const teamName = (team: VetoTeamKey) => {
     if (team === "team1") return team1 || "Team 1";
     if (team === "team2") return team2 || "Team 2";
     return "System";
   };
   const actionText = flipState.active ? "??? starts" : isDone ? "Veto complete" : `${teamName(next.team)} ${next.action}s`;
+  const obsLink = sessionId ? publicObsUrl(sessionId) : "";
+
+  useEffect(() => {
+    if (hasCreatedRef.current || createInFlightRef.current) return;
+
+    createInFlightRef.current = true;
+    fetch("/api/veto/sessions", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ team1, team2, format, firstTeam: first, mapPool: maps })
+    })
+      .then((response) => response.json())
+      .then((data: { session?: VetoSessionState }) => {
+        if (data.session?.id) {
+          hasCreatedRef.current = true;
+          setSessionId(data.session.id);
+          setSaveStatus("saved");
+        } else {
+          setSaveStatus("error");
+        }
+      })
+      .catch(() => setSaveStatus("error"))
+      .finally(() => {
+        createInFlightRef.current = false;
+      });
+  }, [first, format, maps, team1, team2]);
+
+  useEffect(() => {
+    if (!sessionId) return;
+
+    setSaveStatus("saving");
+    const timer = window.setTimeout(() => {
+      fetch(`/api/veto/sessions/${sessionId}`, {
+        method: "PATCH",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          team1,
+          team2,
+          format,
+          firstTeam: first,
+          mapPool: maps,
+          steps,
+          status: isDone ? "complete" : steps.length ? "live" : "draft"
+        })
+      })
+        .then((response) => {
+          setSaveStatus(response.ok ? "saved" : "error");
+        })
+        .catch(() => setSaveStatus("error"));
+    }, 250);
+
+    return () => window.clearTimeout(timer);
+  }, [first, format, isDone, maps, sessionId, steps, team1, team2]);
 
   function reset() {
     setSteps([]);
@@ -106,7 +104,7 @@ export function VetoTool() {
   }
 
   function coinFlip() {
-    const winner: TeamKey = Math.random() >= 0.5 ? "team1" : "team2";
+    const winner: VetoTeamKey = Math.random() >= 0.5 ? "team1" : "team2";
     setFlipState((current) => ({ active: true, winner: null, count: current.count + 1 }));
     window.setTimeout(() => {
       setFirst(winner);
@@ -180,6 +178,24 @@ export function VetoTool() {
             <button type="button" onClick={reset} className="rounded-lg border border-rose-400/30 bg-rose-500/10 px-2 py-1.5 text-xs font-bold text-rose-200 transition hover:bg-rose-500/20">
               Reset veto
             </button>
+          </div>
+
+          <div className="rounded-lg border border-accent/25 bg-accent/10 p-2">
+            <div className="text-[10px] font-extrabold uppercase tracking-[0.18em] text-accent">OBS live overlay</div>
+            <input readOnly value={obsLink || "Creating OBS link..."} className="mt-2 w-full rounded-md border border-line bg-bg/60 px-2 py-1.5 font-mono text-[10px] text-slate-300 outline-none" />
+            <div className="mt-2 grid grid-cols-[1fr_auto] items-center gap-2">
+              <div className={`text-[10px] font-bold uppercase tracking-[0.12em] ${saveStatus === "error" ? "text-rose-300" : "text-slate-500"}`}>
+                {saveStatus === "saving" ? "saving" : saveStatus === "error" ? "sync error" : "live sync"}
+              </div>
+              <button
+                type="button"
+                disabled={!obsLink}
+                onClick={() => void navigator.clipboard.writeText(obsLink)}
+                className="rounded-md border border-accent/35 bg-accent/15 px-2 py-1 text-[10px] font-extrabold uppercase tracking-[0.12em] text-accent transition hover:bg-accent hover:text-bg disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                Copy
+              </button>
+            </div>
           </div>
         </div>
       </div>

@@ -20,6 +20,7 @@ function routedPath(request: NextRequest) {
   }
 
   if (host === "veto.ldufk.com") {
+    if (path.startsWith("/api/") || path.startsWith("/veto")) return path;
     return path.startsWith("/veto") ? path : `/veto${path === "/" ? "" : path}`;
   }
 

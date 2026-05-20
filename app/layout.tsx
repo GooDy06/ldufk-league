@@ -27,8 +27,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   const routedPath = requestHeaders.get("x-ldufk-routed-path") || "";
   const host = requestHeaders.get("x-ldufk-hostname") || requestHeaders.get("host") || "";
   const isCamsRoute = routedPath.startsWith("/cams") || host.toLowerCase() === "cams.ldufk.com";
+  const isCleanVetoRoute = routedPath.startsWith("/veto/obs");
 
-  if (isCamsRoute) {
+  if (isCamsRoute || isCleanVetoRoute) {
     return (
       <html lang="uk" className={`${exo.variable} ${rajdhani.variable}`}>
         <body className="font-exo">
