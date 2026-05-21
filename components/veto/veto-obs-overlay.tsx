@@ -47,13 +47,13 @@ function actionTheme(action: VetoCardItem["action"]) {
 
   if (action === "pick") {
     return {
-      border: "border-indigo-400/80",
-      wash: "from-black/36 via-indigo-950/12 to-indigo-950/38",
-      label: "bg-indigo-700/88 text-white",
-      compact: "border-indigo-400/80 bg-indigo-800/74",
-      glow: "shadow-indigo-400/30",
-      footer: "from-indigo-500/86 via-indigo-700/72 to-indigo-950/84",
-      innerGlow: "shadow-[inset_0_0_38px_rgba(99,102,241,0.34),inset_0_-95px_95px_rgba(49,46,129,0.34),0_0_28px_rgba(99,102,241,0.16)]"
+      border: "border-emerald-300/80",
+      wash: "from-black/36 via-emerald-950/12 to-emerald-950/38",
+      label: "bg-emerald-500/90 text-slate-950",
+      compact: "border-emerald-300/80 bg-emerald-700/72",
+      glow: "shadow-emerald-300/30",
+      footer: "from-emerald-300/86 via-emerald-500/70 to-emerald-950/82",
+      innerGlow: "shadow-[inset_0_0_38px_rgba(52,211,153,0.34),inset_0_-95px_95px_rgba(6,78,59,0.34),0_0_28px_rgba(52,211,153,0.16)]"
     };
   }
 
@@ -72,21 +72,27 @@ function actionTheme(action: VetoCardItem["action"]) {
   return actionTheme("pick");
 }
 
-function cardGlowStyle(action: VetoCardItem["action"]): CSSProperties {
+function cardGlowStyle(action: VetoCardItem["action"], strength: "full" | "compact" = "full"): CSSProperties {
   if (action === "ban") {
     return {
-      boxShadow: "inset 0 0 58px rgba(239,68,68,0.62), inset 0 0 120px rgba(127,29,29,0.44), 0 0 34px rgba(239,68,68,0.36)"
+      boxShadow: strength === "compact"
+        ? "inset 0 0 22px rgba(239,68,68,0.24), inset 0 -28px 44px rgba(127,29,29,0.34), 0 0 28px rgba(239,68,68,0.34)"
+        : "inset 0 0 58px rgba(239,68,68,0.62), inset 0 0 120px rgba(127,29,29,0.44), 0 0 34px rgba(239,68,68,0.36)"
     };
   }
 
   if (action === "pick") {
     return {
-      boxShadow: "inset 0 0 58px rgba(99,102,241,0.58), inset 0 0 120px rgba(49,46,129,0.34), 0 0 34px rgba(99,102,241,0.32)"
+      boxShadow: strength === "compact"
+        ? "inset 0 0 20px rgba(52,211,153,0.2), inset 0 -28px 44px rgba(6,78,59,0.3), 0 0 28px rgba(52,211,153,0.3)"
+        : "inset 0 0 58px rgba(52,211,153,0.56), inset 0 0 120px rgba(6,78,59,0.34), 0 0 34px rgba(52,211,153,0.32)"
     };
   }
 
   return {
-    boxShadow: "inset 0 0 62px rgba(250,204,21,0.68), inset 0 0 120px rgba(161,98,7,0.38), 0 0 38px rgba(250,204,21,0.42)"
+    boxShadow: strength === "compact"
+      ? "inset 0 0 24px rgba(250,204,21,0.28), inset 0 -28px 44px rgba(161,98,7,0.32), 0 0 30px rgba(250,204,21,0.38)"
+      : "inset 0 0 62px rgba(250,204,21,0.68), inset 0 0 120px rgba(161,98,7,0.38), 0 0 38px rgba(250,204,21,0.42)"
   };
 }
 
@@ -141,7 +147,7 @@ function PortraitCard({ item, state, index }: { item: VetoCardItem; state: VetoS
     >
       {image ? <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${image})`, opacity: 0.86 }} /> : null}
       <div className={`absolute inset-0 bg-gradient-to-b ${theme.wash} opacity-80`} />
-      <div className="pointer-events-none absolute inset-0 z-[1]" style={cardGlowStyle(item.action)} />
+      <div className="pointer-events-none absolute inset-0 z-[1]" style={cardGlowStyle(item.action, "compact")} />
       <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/88 via-black/34 to-transparent" />
       <div className="relative z-10 flex h-full flex-col items-center justify-center gap-4 px-3">
         <TeamBadge state={state} team={item.team} />
@@ -198,7 +204,7 @@ function TeamTurnRow({ name, active, neutral = false }: { name: string; active: 
           active
             ? "text-cyan-50 [text-shadow:0_0_16px_rgba(103,232,249,0.92),0_3px_12px_rgba(0,0,0,1)]"
             : neutral
-              ? "text-white [text-shadow:0_3px_12px_rgba(0,0,0,1)]"
+              ? "text-white [text-shadow:0_0_10px_rgba(255,255,255,0.2),0_3px_12px_rgba(0,0,0,1)]"
               : "text-white/34 [text-shadow:0_3px_10px_rgba(0,0,0,0.8)]"
         }`}
       >
@@ -297,7 +303,7 @@ function CompactLayout({ state, items, stale }: { state: VetoSessionState; items
     <div className="h-screen w-screen overflow-hidden bg-transparent text-white">
       <OverlayStyles />
       <div className="absolute bottom-12 left-[4vw] grid w-[92vw] max-w-[1760px] grid-cols-8 items-end gap-3 rounded bg-black/10 px-4 py-3 backdrop-blur-[2px]">
-        <div className="grid h-[118px] min-w-0 grid-rows-[1fr_auto_1fr] rounded border border-white/18 bg-black/36 px-3 py-2 shadow-[0_12px_34px_rgba(0,0,0,0.42)] backdrop-blur-md">
+        <div className="grid h-[118px] min-w-0 grid-rows-[1fr_auto_1fr] rounded border border-white/16 bg-black/42 px-3 py-2 shadow-[0_12px_34px_rgba(0,0,0,0.42)] backdrop-blur-xl backdrop-saturate-150">
           <TeamTurnRow name={state.team1} active={isTeam1Active} neutral={neutralTeams} />
           <div className="text-center font-rajdhani text-lg font-bold uppercase leading-none text-white/42">vs</div>
           <TeamTurnRow name={state.team2} active={isTeam2Active} neutral={neutralTeams} />
