@@ -76,7 +76,7 @@ function cardGlowStyle(action: VetoCardItem["action"], strength: "full" | "compa
   if (action === "ban") {
     return {
       boxShadow: strength === "compact"
-        ? "inset 0 0 22px rgba(239,68,68,0.24), inset 0 -28px 44px rgba(127,29,29,0.34), 0 0 28px rgba(239,68,68,0.34)"
+        ? "inset 0 0 10px rgba(239,68,68,0.08), inset 0 -18px 32px rgba(127,29,29,0.22), 0 0 24px rgba(239,68,68,0.34)"
         : "inset 0 0 58px rgba(239,68,68,0.62), inset 0 0 120px rgba(127,29,29,0.44), 0 0 34px rgba(239,68,68,0.36)"
     };
   }
@@ -84,14 +84,14 @@ function cardGlowStyle(action: VetoCardItem["action"], strength: "full" | "compa
   if (action === "pick") {
     return {
       boxShadow: strength === "compact"
-        ? "inset 0 0 20px rgba(52,211,153,0.2), inset 0 -28px 44px rgba(6,78,59,0.3), 0 0 28px rgba(52,211,153,0.3)"
+        ? "inset 0 0 10px rgba(52,211,153,0.08), inset 0 -18px 32px rgba(6,78,59,0.2), 0 0 24px rgba(52,211,153,0.3)"
         : "inset 0 0 58px rgba(52,211,153,0.56), inset 0 0 120px rgba(6,78,59,0.34), 0 0 34px rgba(52,211,153,0.32)"
     };
   }
 
   return {
     boxShadow: strength === "compact"
-      ? "inset 0 0 24px rgba(250,204,21,0.28), inset 0 -28px 44px rgba(161,98,7,0.32), 0 0 30px rgba(250,204,21,0.38)"
+      ? "inset 0 0 12px rgba(250,204,21,0.1), inset 0 -18px 32px rgba(161,98,7,0.22), 0 0 26px rgba(250,204,21,0.38)"
       : "inset 0 0 62px rgba(250,204,21,0.68), inset 0 0 120px rgba(161,98,7,0.38), 0 0 38px rgba(250,204,21,0.42)"
   };
 }
@@ -147,7 +147,7 @@ function PortraitCard({ item, state, index }: { item: VetoCardItem; state: VetoS
     >
       {image ? <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${image})`, opacity: 0.86 }} /> : null}
       <div className={`absolute inset-0 bg-gradient-to-b ${theme.wash} opacity-80`} />
-      <div className="pointer-events-none absolute inset-0 z-[1]" style={cardGlowStyle(item.action, "compact")} />
+      <div className="pointer-events-none absolute inset-0 z-[1]" style={cardGlowStyle(item.action)} />
       <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/88 via-black/34 to-transparent" />
       <div className="relative z-10 flex h-full flex-col items-center justify-center gap-4 px-3">
         <TeamBadge state={state} team={item.team} />
@@ -168,12 +168,12 @@ function CompactCard({ item, state, index }: { item: VetoCardItem; state: VetoSe
 
   return (
     <div
-      className={`relative h-[118px] min-w-0 overflow-hidden rounded border ${theme.compact} shadow-[0_14px_35px_rgba(0,0,0,0.36)] ${theme.glow} ${theme.innerGlow} animate-[vetoPopIn_0.38s_ease-out_both]`}
+      className={`relative h-[118px] min-w-0 overflow-hidden rounded border ${theme.compact} shadow-[0_14px_35px_rgba(0,0,0,0.36)] ${theme.glow} animate-[vetoPopIn_0.38s_ease-out_both]`}
       style={{ animationDelay: `${index * 55}ms` }}
     >
       {image ? <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${image})`, opacity: item.action === "pick" ? 0.88 : 0.68 }} /> : null}
       <div className="absolute inset-0 bg-gradient-to-b from-black/12 via-black/18 to-black/82" />
-      <div className="pointer-events-none absolute inset-0 z-[1]" style={cardGlowStyle(item.action)} />
+      <div className="pointer-events-none absolute inset-0 z-[1]" style={cardGlowStyle(item.action, "compact")} />
       <div className={`absolute inset-x-0 top-0 h-8 bg-gradient-to-r ${theme.footer}`} />
       <div className="relative z-10 flex h-full flex-col justify-between">
         {item.action === "decider" ? (
@@ -205,7 +205,7 @@ function TeamTurnRow({ name, active, neutral = false }: { name: string; active: 
             ? "text-cyan-50 [text-shadow:0_0_16px_rgba(103,232,249,0.92),0_3px_12px_rgba(0,0,0,1)]"
             : neutral
               ? "text-white [text-shadow:0_0_10px_rgba(255,255,255,0.2),0_3px_12px_rgba(0,0,0,1)]"
-              : "text-white/34 [text-shadow:0_3px_10px_rgba(0,0,0,0.8)]"
+              : "text-white/22 [text-shadow:0_3px_10px_rgba(0,0,0,0.75)]"
         }`}
       >
         {name}
@@ -297,7 +297,7 @@ function CompactLayout({ state, items, stale }: { state: VetoSessionState; items
   const nextStep = planFor(state.format, state.firstTeam, state.mapPool.length)[state.steps.length] || null;
   const isTeam1Active = nextStep?.team === "team1";
   const isTeam2Active = nextStep?.team === "team2";
-  const neutralTeams = state.status === "complete" || nextStep?.team === "system";
+  const neutralTeams = state.status === "complete";
 
   return (
     <div className="h-screen w-screen overflow-hidden bg-transparent text-white">
