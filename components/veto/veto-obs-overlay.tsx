@@ -76,7 +76,7 @@ function cardGlowStyle(action: VetoCardItem["action"], strength: "full" | "compa
   if (action === "ban") {
     return {
       boxShadow: strength === "compact"
-        ? "inset 0 0 10px rgba(239,68,68,0.08), inset 0 -18px 32px rgba(127,29,29,0.22), 0 0 24px rgba(239,68,68,0.34)"
+        ? "inset 0 0 18px rgba(239,68,68,0.16), inset 0 0 46px rgba(127,29,29,0.18), inset 0 -22px 36px rgba(127,29,29,0.28), 0 0 27px rgba(239,68,68,0.36)"
         : "inset 0 0 58px rgba(239,68,68,0.62), inset 0 0 120px rgba(127,29,29,0.44), 0 0 34px rgba(239,68,68,0.36)"
     };
   }
@@ -84,14 +84,14 @@ function cardGlowStyle(action: VetoCardItem["action"], strength: "full" | "compa
   if (action === "pick") {
     return {
       boxShadow: strength === "compact"
-        ? "inset 0 0 10px rgba(52,211,153,0.08), inset 0 -18px 32px rgba(6,78,59,0.2), 0 0 24px rgba(52,211,153,0.3)"
+        ? "inset 0 0 18px rgba(52,211,153,0.14), inset 0 0 46px rgba(6,78,59,0.16), inset 0 -22px 36px rgba(6,78,59,0.26), 0 0 27px rgba(52,211,153,0.32)"
         : "inset 0 0 58px rgba(52,211,153,0.56), inset 0 0 120px rgba(6,78,59,0.34), 0 0 34px rgba(52,211,153,0.32)"
     };
   }
 
   return {
     boxShadow: strength === "compact"
-      ? "inset 0 0 12px rgba(250,204,21,0.1), inset 0 -18px 32px rgba(161,98,7,0.22), 0 0 26px rgba(250,204,21,0.38)"
+      ? "inset 0 0 20px rgba(250,204,21,0.18), inset 0 0 48px rgba(161,98,7,0.18), inset 0 -22px 36px rgba(161,98,7,0.28), 0 0 30px rgba(250,204,21,0.4)"
       : "inset 0 0 62px rgba(250,204,21,0.68), inset 0 0 120px rgba(161,98,7,0.38), 0 0 38px rgba(250,204,21,0.42)"
   };
 }
@@ -188,7 +188,7 @@ function CompactCard({ item, state, index }: { item: VetoCardItem; state: VetoSe
             <span className={`rounded px-2 py-1 font-rajdhani text-[15px] font-bold uppercase leading-none ${theme.label}`}>{label}</span>
           </div>
         )}
-        <div className="bg-black/42 px-2 py-2 text-center">
+        <div className="bg-black/[0.42] px-2 py-2 text-center">
           <div className="truncate font-rajdhani text-[27px] font-bold uppercase leading-none text-white [text-shadow:0_3px_12px_rgba(0,0,0,1)]">{item.map}</div>
         </div>
       </div>
@@ -202,10 +202,10 @@ function TeamTurnRow({ name, active, neutral = false }: { name: string; active: 
       <div
         className={`max-w-full truncate font-rajdhani text-[27px] font-black uppercase leading-none transition ${
           active
-            ? "text-cyan-50 [text-shadow:0_0_16px_rgba(103,232,249,0.92),0_3px_12px_rgba(0,0,0,1)]"
+            ? "[color:rgb(236,254,255)] [text-shadow:0_0_16px_rgba(103,232,249,0.92),0_3px_12px_rgba(0,0,0,1)]"
             : neutral
-              ? "text-white [text-shadow:0_0_10px_rgba(255,255,255,0.2),0_3px_12px_rgba(0,0,0,1)]"
-              : "text-white/22 [text-shadow:0_3px_10px_rgba(0,0,0,0.75)]"
+              ? "[color:rgb(255,255,255)] [text-shadow:0_0_10px_rgba(255,255,255,0.2),0_3px_12px_rgba(0,0,0,1)]"
+              : "[color:rgba(255,255,255,0.28)] [text-shadow:0_3px_10px_rgba(0,0,0,0.75)]"
         }`}
       >
         {name}
@@ -302,10 +302,13 @@ function CompactLayout({ state, items, stale }: { state: VetoSessionState; items
   return (
     <div className="h-screen w-screen overflow-hidden bg-transparent text-white">
       <OverlayStyles />
-      <div className="absolute bottom-12 left-[4vw] grid w-[92vw] max-w-[1760px] grid-cols-8 items-end gap-3 rounded bg-black/10 px-4 py-3 backdrop-blur-[2px]">
-        <div className="grid h-[118px] min-w-0 grid-rows-[1fr_auto_1fr] rounded border border-white/16 bg-black/42 px-3 py-2 shadow-[0_12px_34px_rgba(0,0,0,0.42)] backdrop-blur-xl backdrop-saturate-150">
+      <div className="absolute bottom-12 left-[4vw] grid w-[92vw] max-w-[1760px] grid-cols-8 items-end gap-3 rounded bg-black/[0.10] px-4 py-3 backdrop-blur-[2px]">
+        <div
+          className="grid h-[118px] min-w-0 grid-rows-[1fr_auto_1fr] overflow-hidden rounded border border-white/[0.18] bg-slate-950/[0.46] px-3 py-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.16),0_12px_34px_rgba(0,0,0,0.42)] backdrop-blur-2xl backdrop-saturate-150"
+          style={{ backgroundImage: "linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02) 42%, rgba(0,0,0,0.22))" }}
+        >
           <TeamTurnRow name={state.team1} active={isTeam1Active} neutral={neutralTeams} />
-          <div className="text-center font-rajdhani text-lg font-bold uppercase leading-none text-white/42">vs</div>
+          <div className="text-center font-rajdhani text-lg font-bold uppercase leading-none text-white/[0.42]">vs</div>
           <TeamTurnRow name={state.team2} active={isTeam2Active} neutral={neutralTeams} />
         </div>
         {items.map((item, index) => <CompactCard key={`${item.map}-${item.action}-${item.order}`} item={item} state={state} index={index} />)}
