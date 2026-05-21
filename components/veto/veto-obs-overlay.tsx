@@ -37,7 +37,7 @@ function actionTheme(action: VetoCardItem["action"]) {
     return {
       border: "border-red-500/80",
       wash: "from-black/88 via-black/45 to-red-950/72",
-      label: "bg-red-700/86 text-white",
+      label: "bg-red-500/90 text-slate-950",
       compact: "border-red-500/80 bg-red-800/82",
       glow: "shadow-red-500/30",
       footer: "from-red-600/92 via-red-700/80 to-red-950/88",
@@ -76,7 +76,7 @@ function cardGlowStyle(action: VetoCardItem["action"], strength: "full" | "compa
   if (action === "ban") {
     return {
       boxShadow: strength === "compact"
-        ? "inset 0 0 18px rgba(239,68,68,0.16), inset 0 0 46px rgba(127,29,29,0.18), inset 0 -22px 36px rgba(127,29,29,0.28), 0 0 27px rgba(239,68,68,0.36)"
+        ? "inset 0 0 16px rgba(239,68,68,0.12), inset 0 0 62px rgba(127,29,29,0.24), inset 0 -24px 38px rgba(127,29,29,0.3), 0 0 30px rgba(239,68,68,0.38)"
         : "inset 0 0 58px rgba(239,68,68,0.62), inset 0 0 120px rgba(127,29,29,0.44), 0 0 34px rgba(239,68,68,0.36)"
     };
   }
@@ -84,14 +84,14 @@ function cardGlowStyle(action: VetoCardItem["action"], strength: "full" | "compa
   if (action === "pick") {
     return {
       boxShadow: strength === "compact"
-        ? "inset 0 0 18px rgba(52,211,153,0.14), inset 0 0 46px rgba(6,78,59,0.16), inset 0 -22px 36px rgba(6,78,59,0.26), 0 0 27px rgba(52,211,153,0.32)"
+        ? "inset 0 0 16px rgba(52,211,153,0.1), inset 0 0 62px rgba(6,78,59,0.22), inset 0 -24px 38px rgba(6,78,59,0.28), 0 0 30px rgba(52,211,153,0.34)"
         : "inset 0 0 58px rgba(52,211,153,0.56), inset 0 0 120px rgba(6,78,59,0.34), 0 0 34px rgba(52,211,153,0.32)"
     };
   }
 
   return {
     boxShadow: strength === "compact"
-      ? "inset 0 0 20px rgba(250,204,21,0.18), inset 0 0 48px rgba(161,98,7,0.18), inset 0 -22px 36px rgba(161,98,7,0.28), 0 0 30px rgba(250,204,21,0.4)"
+      ? "inset 0 0 18px rgba(250,204,21,0.12), inset 0 0 66px rgba(161,98,7,0.24), inset 0 -24px 38px rgba(161,98,7,0.3), 0 0 32px rgba(250,204,21,0.42)"
       : "inset 0 0 62px rgba(250,204,21,0.68), inset 0 0 120px rgba(161,98,7,0.38), 0 0 38px rgba(250,204,21,0.42)"
   };
 }
@@ -122,14 +122,14 @@ function displayItems(state: VetoSessionState): VetoCardItem[] {
 function TeamBadge({ state, team }: { state: VetoSessionState; team: VetoTeamKey }) {
   if (team === "system") {
     return (
-      <div className="max-w-[92%] truncate rounded border border-yellow-200/30 bg-yellow-400/16 px-3 py-1 text-center font-rajdhani text-xl font-bold uppercase text-yellow-50 shadow-[0_10px_25px_rgba(0,0,0,0.45)] [text-shadow:0_2px_10px_rgba(0,0,0,0.9)]">
+      <div className="max-w-[92%] truncate rounded border border-yellow-200/[0.34] bg-yellow-400/[0.16] px-4 py-2 text-center font-rajdhani text-3xl font-black uppercase text-yellow-50 shadow-[inset_0_1px_0_rgba(255,255,255,0.2),0_14px_34px_rgba(0,0,0,0.5)] backdrop-blur-xl [text-shadow:0_4px_18px_rgba(0,0,0,1),0_0_16px_rgba(250,204,21,0.34)]">
         Final map
       </div>
     );
   }
 
   return (
-    <div className="max-w-[92%] truncate rounded border border-white/20 bg-black/54 px-3 py-1 text-center font-rajdhani text-xl font-bold uppercase text-white shadow-[0_10px_25px_rgba(0,0,0,0.45)] [text-shadow:0_2px_10px_rgba(0,0,0,0.9)]">
+    <div className="max-w-[92%] truncate rounded border border-white/[0.24] bg-slate-950/[0.54] px-4 py-2 text-center font-rajdhani text-3xl font-black uppercase text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.18),0_14px_34px_rgba(0,0,0,0.5)] backdrop-blur-xl [text-shadow:0_4px_18px_rgba(0,0,0,1),0_0_14px_rgba(255,255,255,0.22)]">
       {teamNameFor(state, team)}
     </div>
   );
@@ -302,7 +302,7 @@ function CompactLayout({ state, items, stale }: { state: VetoSessionState; items
   return (
     <div className="h-screen w-screen overflow-hidden bg-transparent text-white">
       <OverlayStyles />
-      <div className="absolute bottom-12 left-[4vw] grid w-[92vw] max-w-[1760px] grid-cols-8 items-end gap-3 rounded bg-black/[0.10] px-4 py-3 backdrop-blur-[2px]">
+      <div className="absolute bottom-12 left-[4vw] grid w-[92vw] max-w-[1760px] grid-cols-8 items-end gap-3">
         <div
           className="grid h-[118px] min-w-0 grid-rows-[1fr_auto_1fr] overflow-hidden rounded border border-white/[0.18] bg-slate-950/[0.46] px-3 py-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.16),0_12px_34px_rgba(0,0,0,0.42)] backdrop-blur-2xl backdrop-saturate-150"
           style={{ backgroundImage: "linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02) 42%, rgba(0,0,0,0.22))" }}

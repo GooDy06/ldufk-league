@@ -32,8 +32,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   if (isCamsRoute || isCleanVetoRoute) {
     return (
       <html lang="uk" className={`${exo.variable} ${rajdhani.variable}`}>
-        <body className="font-exo">
-          <main className="min-h-screen w-full">{children}</main>
+        <body className="bg-transparent font-exo">
+          <main className="min-h-screen w-full bg-transparent">{children}</main>
         </body>
       </html>
     );
