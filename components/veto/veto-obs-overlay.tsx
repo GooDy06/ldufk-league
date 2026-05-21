@@ -122,14 +122,14 @@ function displayItems(state: VetoSessionState): VetoCardItem[] {
 function TeamBadge({ state, team }: { state: VetoSessionState; team: VetoTeamKey }) {
   if (team === "system") {
     return (
-      <div className="max-w-[92%] truncate rounded border border-yellow-200/[0.34] bg-yellow-400/[0.16] px-4 py-2 text-center font-rajdhani text-3xl font-black uppercase text-yellow-50 shadow-[inset_0_1px_0_rgba(255,255,255,0.2),0_14px_34px_rgba(0,0,0,0.5)] backdrop-blur-xl [text-shadow:0_4px_18px_rgba(0,0,0,1),0_0_16px_rgba(250,204,21,0.34)]">
+      <div className="max-w-[96%] truncate rounded border border-yellow-200/[0.34] bg-yellow-400/[0.16] px-4 py-2 text-center font-rajdhani text-3xl font-black uppercase text-yellow-50 shadow-[inset_0_1px_0_rgba(255,255,255,0.2),0_14px_34px_rgba(0,0,0,0.5)] backdrop-blur-xl [text-shadow:0_4px_18px_rgba(0,0,0,1),0_0_16px_rgba(250,204,21,0.34)]">
         Final map
       </div>
     );
   }
 
   return (
-    <div className="max-w-[92%] truncate rounded border border-white/[0.24] bg-slate-950/[0.54] px-4 py-2 text-center font-rajdhani text-3xl font-black uppercase text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.18),0_14px_34px_rgba(0,0,0,0.5)] backdrop-blur-xl [text-shadow:0_4px_18px_rgba(0,0,0,1),0_0_14px_rgba(255,255,255,0.22)]">
+    <div className="max-w-[98%] truncate rounded border border-white/[0.3] bg-white/[0.16] px-4 py-2 text-center font-rajdhani text-3xl font-black uppercase text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.24),0_14px_34px_rgba(0,0,0,0.5)] backdrop-blur-xl [text-shadow:0_5px_20px_rgba(0,0,0,1),0_0_18px_rgba(255,255,255,0.3)]">
       {teamNameFor(state, team)}
     </div>
   );
@@ -178,7 +178,7 @@ function CompactCard({ item, state, index }: { item: VetoCardItem; state: VetoSe
       <div className="relative z-10 flex h-full flex-col justify-between">
         {item.action === "decider" ? (
           <div className="px-2 py-1.5 text-center">
-            <span className="font-rajdhani text-[17px] font-black uppercase leading-none text-white [text-shadow:0_0_12px_rgba(255,255,255,0.55),0_2px_8px_rgba(0,0,0,1)]">{label}</span>
+            <span className="inline-block rounded border border-white/[0.28] bg-white/[0.16] px-2.5 py-1 font-rajdhani text-[17px] font-black uppercase leading-none text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.22),0_8px_18px_rgba(0,0,0,0.42)] backdrop-blur-xl [text-shadow:0_3px_12px_rgba(0,0,0,1),0_0_12px_rgba(255,255,255,0.36)]">{label}</span>
           </div>
         ) : (
           <div className="grid grid-cols-[1fr_auto] items-center gap-1 px-2 py-1.5">
