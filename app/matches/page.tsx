@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import {
   getOwnPlayerSummaries,
@@ -11,6 +12,11 @@ import {
 } from "@/lib/lotgaming";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Матчі",
+  description: "Матчі та статистика LDUFK League."
+};
 
 function formatDate(value: string | null) {
   if (!value) return "Live";
@@ -54,14 +60,14 @@ function SeriesRow({ series, mapStats }: { series: LotMatchSeries; mapStats?: Lo
     : series.team2Wins;
 
   return (
-    <Link href={href} className="grid grid-cols-[52px_minmax(0,1fr)_74px_minmax(0,1fr)] items-center gap-2 border-b border-line bg-surface px-3 py-2.5 transition last:border-0 hover:bg-surface2 sm:grid-cols-[64px_minmax(0,1fr)_92px_minmax(0,1fr)_70px_96px] sm:px-4 sm:py-3 md:grid-cols-[74px_minmax(0,1fr)_120px_minmax(0,1fr)_88px_120px]">
+    <Link href={href} className="grid grid-cols-[42px_minmax(0,1fr)_58px_minmax(0,1fr)] items-center gap-1.5 border-b border-line bg-surface px-2 py-2 transition last:border-0 hover:bg-surface2 sm:grid-cols-[64px_minmax(0,1fr)_92px_minmax(0,1fr)_70px_96px] sm:gap-2 sm:px-4 sm:py-3 md:grid-cols-[74px_minmax(0,1fr)_120px_minmax(0,1fr)_88px_120px]">
       <div>
-        <div className="font-rajdhani text-lg font-bold text-slate-200 sm:text-2xl">{formatTime(series.startTime)}</div>
-        <div className="mt-0.5 text-[10px] font-bold uppercase tracking-[0.14em] text-slate-600">{formatDate(series.startTime)}</div>
+        <div className="font-rajdhani text-sm font-bold leading-none text-slate-200 sm:text-2xl">{formatTime(series.startTime)}</div>
+        <div className="mt-0.5 truncate text-[7px] font-bold uppercase tracking-[0.1em] text-slate-600 sm:text-[10px] sm:tracking-[0.14em]">{formatDate(series.startTime)}</div>
       </div>
-      <div className={`truncate text-right font-rajdhani text-lg font-bold sm:text-2xl ${winner === series.team1 ? "text-white" : "text-slate-400"}`}>{series.team1}</div>
-      <div className="w-[70px] justify-self-center border border-line bg-bg px-2 py-1.5 text-center font-rajdhani text-lg font-bold text-accent sm:w-24 sm:text-2xl md:w-28">{team1Score}:{team2Score}</div>
-      <div className={`truncate font-rajdhani text-lg font-bold sm:text-2xl ${winner === series.team2 ? "text-white" : "text-slate-400"}`}>{series.team2}</div>
+      <div className={`truncate text-right font-rajdhani text-sm font-bold sm:text-2xl ${winner === series.team1 ? "text-white" : "text-slate-400"}`}>{series.team1}</div>
+      <div className="w-[58px] justify-self-center border border-line bg-bg px-1.5 py-1 text-center font-rajdhani text-sm font-bold text-accent sm:w-24 sm:px-2 sm:py-1.5 sm:text-2xl md:w-28">{team1Score}:{team2Score}</div>
+      <div className={`truncate font-rajdhani text-sm font-bold sm:text-2xl ${winner === series.team2 ? "text-white" : "text-slate-400"}`}>{series.team2}</div>
       <div className="hidden text-center text-xs font-extrabold uppercase tracking-[0.18em] text-slate-500 sm:block">{seriesLabel}</div>
       <div className="hidden items-center gap-2 justify-self-start text-xs font-bold uppercase tracking-[0.14em] sm:flex md:justify-self-end">
         <span className={`h-2 w-2 rounded-full ${series.status === "live" ? "live-pulse bg-red-400" : series.status === "cancelled" ? "bg-slate-600" : "bg-emerald-400"}`} />
@@ -89,22 +95,18 @@ export default async function MatchesPage({ searchParams }: { searchParams: { to
   );
 
   return (
-    <div className="py-5 sm:py-8">
-      <section className="mb-8">
-        <div className="text-[10px] font-extrabold uppercase tracking-[0.24em] text-accent">LOT Gaming API</div>
-        <h1 className="mt-2 font-rajdhani text-4xl font-bold leading-none sm:text-5xl md:text-6xl">Матчі та статистика</h1>
-        <p className="mt-3 max-w-3xl text-sm text-slate-400 sm:text-base">
-          Live-матчі, історія і K/D/A гравців тільки з матчів, створених твоїм LOT Gaming акаунтом. Дані оновлюються автоматично з публічного API.
-        </p>
+    <div className="py-3 sm:py-8">
+      <section className="mb-3 sm:mb-8">
+        <h1 className="font-rajdhani text-3xl font-bold leading-none sm:text-5xl md:text-6xl">Матчі та статистика</h1>
       </section>
 
-      <section className="grid gap-4 lg:grid-cols-[1fr_340px]">
-        <div className="grid gap-4">
-          <div className="rounded-2xl border border-line bg-surface p-3 sm:p-4">
-            <div className="mb-3 flex items-center justify-between">
+      <section className="grid gap-3 sm:gap-4 lg:grid-cols-[1fr_340px]">
+        <div className="grid gap-3 sm:gap-4">
+          <div className="rounded-xl border border-line bg-surface p-2 sm:rounded-2xl sm:p-4">
+            <div className="mb-2 flex items-center justify-between sm:mb-3">
               <div>
-                <div className="text-[10px] font-extrabold uppercase tracking-[0.2em] text-red-300">Live</div>
-                <h2 className="font-rajdhani text-2xl font-bold">Активні матчі</h2>
+                <div className="text-[8px] font-extrabold uppercase tracking-[0.16em] text-red-300 sm:text-[10px] sm:tracking-[0.2em]">Live</div>
+                <h2 className="font-rajdhani text-xl font-bold sm:text-2xl">Активні матчі</h2>
               </div>
               <div className="text-sm font-bold text-slate-500">{liveSeries.length}</div>
             </div>
@@ -113,11 +115,11 @@ export default async function MatchesPage({ searchParams }: { searchParams: { to
             </div>
           </div>
 
-          <div className="rounded-2xl border border-line bg-surface p-3 sm:p-4">
-            <div className="mb-3 flex flex-wrap items-end justify-between gap-2">
+          <div className="rounded-xl border border-line bg-surface p-2 sm:rounded-2xl sm:p-4">
+            <div className="mb-2 flex flex-wrap items-end justify-between gap-2 sm:mb-3">
               <div>
-                <div className="text-[10px] font-extrabold uppercase tracking-[0.2em] text-slate-500">History</div>
-                <h2 className="font-rajdhani text-2xl font-bold">{tournamentName(selectedSeason, selectedTournament)}</h2>
+                <div className="text-[8px] font-extrabold uppercase tracking-[0.16em] text-slate-500 sm:text-[10px] sm:tracking-[0.2em]">History</div>
+                <h2 className="font-rajdhani text-xl font-bold sm:text-2xl">{tournamentName(selectedSeason, selectedTournament)}</h2>
               </div>
               <div className="text-sm font-bold text-slate-500">{finishedSeries.length} матчів</div>
             </div>

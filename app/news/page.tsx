@@ -1,8 +1,14 @@
+import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import type { NewsItem } from "@/lib/types";
 import { NewsCard } from "@/components/ui";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Новини",
+  description: "Новини LDUFK League."
+};
 
 export default async function NewsPage() {
   const supabase = createClient();

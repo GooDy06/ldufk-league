@@ -1,10 +1,15 @@
+import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import type { Player, Team } from "@/lib/types";
-import { Panel } from "@/components/ui";
 import { RankingList } from "@/components/ranking-list";
 import { getAllPlayerStats } from "@/lib/player-stats";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Рейтинг",
+  description: "Рейтинг команд LDUFK League."
+};
 
 export default async function RankingPage({ searchParams }: { searchParams: { division?: string } }) {
   const division = searchParams.division === "School" ? "School" : "University";
@@ -38,18 +43,27 @@ export default async function RankingPage({ searchParams }: { searchParams: { di
   const teams = baseTeams.map((team) => ({ ...team, players: playersByTeam.get(team.id) || [] }));
 
   return (
-    <div className="py-8">
-      <div className="mb-5 text-center">
-        <div className="text-[10px] font-bold uppercase tracking-[0.24em] text-accent">LDUFK Ranking</div>
-        <h1 className="font-rajdhani text-5xl font-bold">{division} Division</h1>
+    <div className="py-3 sm:py-4">
+      <div className="mb-2 text-center sm:mb-3">
+        <div className="text-[8px] font-bold uppercase tracking-[0.22em] text-accent sm:text-[10px] sm:tracking-[0.24em]">LDUFK Ranking</div>
+        <h1 className="font-rajdhani text-3xl font-bold leading-none sm:text-4xl">{division} Division</h1>
       </div>
-      <div className="mb-4 flex justify-center gap-2">
-        <a className={`rounded-lg border px-4 py-2 text-sm font-bold ${division === "University" ? "border-accent bg-accent/10 text-accent" : "border-line text-slate-400"}`} href="/ranking?division=University">University</a>
-        <a className={`rounded-lg border px-4 py-2 text-sm font-bold ${division === "School" ? "border-school bg-school/10 text-school" : "border-line text-slate-400"}`} href="/ranking?division=School">School</a>
+      <div className="mb-2 flex justify-center gap-1.5 sm:mb-3 sm:gap-2">
+        <a className={`rounded-md border px-3 py-1.5 text-xs font-bold sm:rounded-lg sm:px-4 sm:py-2 sm:text-sm ${division === "University" ? "border-accent bg-accent/10 text-accent" : "border-line text-slate-400"}`} href="/ranking?division=University">University</a>
+        <a className={`rounded-md border px-3 py-1.5 text-xs font-bold sm:rounded-lg sm:px-4 sm:py-2 sm:text-sm ${division === "School" ? "border-school bg-school/10 text-school" : "border-line text-slate-400"}`} href="/ranking?division=School">School</a>
       </div>
-      <Panel title="Рейтинг команд" eyebrow="Top 4 отримують LAN Invite">
+      <section className="soft-enter rounded-xl border border-line bg-surface p-2">
+        <div className="mb-2 flex items-center justify-between gap-3">
+          <div>
+            <div className="text-[8px] font-extrabold uppercase tracking-[0.18em] text-slate-500 sm:text-[10px] sm:tracking-[0.2em]">Top 4 отримують LAN Invite</div>
+            <h2 className="font-rajdhani text-base font-bold tracking-wide sm:text-lg">Рейтинг команд</h2>
+          </div>
+          <div className="rounded-full border border-accent/25 bg-accent/10 px-2 py-1 text-[8px] font-extrabold uppercase tracking-[0.14em] text-accent sm:text-[10px]">
+            {teams.length} teams
+          </div>
+        </div>
         <RankingList teams={teams} />
-      </Panel>
+      </section>
     </div>
   );
 }

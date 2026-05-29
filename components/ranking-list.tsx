@@ -22,43 +22,48 @@ export function RankingList({ teams }: { teams: RankingTeam[] }) {
   }
 
   return (
-    <div className="grid gap-3">
+    <div className="grid gap-1.5 sm:gap-1">
       {teams.map((team, index) => {
         const isOpen = openIds.includes(team.id);
         const trendLabel = team.trend > 0 ? `+${team.trend}` : String(team.trend);
+        const rosterLine = team.players?.length ? team.players.slice(0, 5).map((player) => player.nick).join(" · ") : team.org;
 
         return (
-          <article key={team.id} className={`interactive-card overflow-hidden rounded-2xl border bg-surface2 ${isOpen ? "border-accent/45 shadow-[0_0_30px_rgba(0,213,255,0.08)]" : "border-line"}`}>
-            <button type="button" onClick={() => toggleTeam(team.id)} className="grid w-full grid-cols-[42px_40px_minmax(0,1fr)_auto] items-center gap-2 p-3 text-left sm:grid-cols-[52px_46px_minmax(0,1fr)_auto_auto] sm:gap-3">
-              <div className={`font-rajdhani text-xl font-bold sm:text-2xl ${rankColor(index)}`}>#{index + 1}</div>
+          <article key={team.id} className={`interactive-card overflow-hidden rounded-md border bg-surface2 sm:rounded-lg ${isOpen ? "border-line sm:border-accent/45 sm:shadow-[0_0_24px_rgba(0,213,255,0.07)]" : "border-line"}`}>
+            <button type="button" onClick={() => toggleTeam(team.id)} aria-expanded={isOpen} className="grid min-h-[48px] w-full grid-cols-[31px_28px_minmax(0,1fr)_52px] items-center gap-1.5 p-1.5 text-left sm:min-h-[48px] sm:grid-cols-[40px_34px_minmax(0,1fr)_auto_auto] sm:gap-2 sm:p-1.5">
+              <div className={`font-rajdhani text-base font-bold leading-none sm:text-xl ${rankColor(index)}`}>#{index + 1}</div>
               <div
-                className="grid h-9 w-9 place-items-center overflow-hidden rounded-lg border border-white/10 bg-cover bg-center text-xs font-bold sm:h-10 sm:w-10"
+                className="grid h-7 w-7 place-items-center overflow-hidden rounded-md border border-white/10 bg-cover bg-center text-[8px] font-bold sm:h-8 sm:w-8 sm:rounded-md sm:text-[10px]"
                 style={team.logo_url ? { backgroundImage: `url(${team.logo_url})` } : { background: `${team.color}22`, color: team.color }}
               >
                 {team.logo_url ? null : team.name.split(/\s+/).map((word) => word[0]).join("").slice(0, 3)}
               </div>
               <div className="min-w-0">
-                <div className="flex min-w-0 flex-wrap items-center gap-1.5 sm:gap-2">
-                  <h3 className="truncate font-rajdhani text-lg font-bold leading-none sm:text-xl">{team.name}</h3>
-                  {index < 4 ? <span className="rounded-full border border-gold/30 bg-gold/10 px-1.5 py-0.5 text-[8px] font-extrabold uppercase tracking-widest text-gold sm:px-2 sm:py-1 sm:text-[10px]">LAN Invite</span> : null}
+                <div className="flex min-w-0 items-center gap-1.5 sm:flex-wrap sm:gap-2">
+                  <h3 className="min-w-0 truncate font-rajdhani text-base font-bold leading-none sm:text-lg">{team.name}</h3>
+                  {index < 4 ? (
+                    <span className="shrink-0 rounded-full border border-gold/30 bg-gold/10 px-1 py-0.5 text-[7px] font-extrabold uppercase leading-none tracking-[0.08em] text-gold sm:px-2 sm:py-1 sm:text-[10px] sm:tracking-widest">
+                      <span className="sm:hidden">LAN</span>
+                      <span className="hidden sm:inline">LAN Invite</span>
+                    </span>
+                  ) : null}
                   {index === 0 ? <span className="hidden rounded-full border border-emerald-400/30 bg-emerald-400/10 px-2 py-1 text-[10px] font-extrabold uppercase tracking-widest text-emerald-300 sm:inline-flex">Champion Form</span> : null}
                 </div>
-                <div className="mt-0.5 truncate text-[11px] text-slate-500 sm:text-xs">{team.org}</div>
+                <div className="mt-0.5 truncate text-[9px] leading-none text-slate-500 sm:text-[11px]">{rosterLine}</div>
               </div>
-              <div className={`hidden text-sm font-bold sm:block ${team.trend > 0 ? "text-emerald-300" : team.trend < 0 ? "text-red-300" : "text-slate-500"}`}>{team.trend === 0 ? "" : trendLabel}</div>
+              <div className={`hidden text-xs font-bold sm:block ${team.trend > 0 ? "text-emerald-300" : team.trend < 0 ? "text-red-300" : "text-slate-500"}`}>{team.trend === 0 ? "" : trendLabel}</div>
               <div className="text-right">
-                <div className="font-rajdhani text-lg font-bold sm:text-xl">{team.points}</div>
-                <div className="text-[8px] uppercase tracking-widest text-slate-500 sm:text-[10px]">points</div>
+                <div className="font-rajdhani text-base font-bold leading-none sm:text-lg">{team.points}</div>
+                <div className="text-[7px] uppercase leading-none tracking-[0.12em] text-slate-500 sm:text-[10px] sm:tracking-widest">points</div>
               </div>
             </button>
 
             {isOpen ? (
-              <div className="border-t border-line bg-bg/20 p-3">
-                <div className="mb-2 flex items-center justify-between gap-3">
-                  <div className="text-[10px] font-extrabold uppercase tracking-[0.2em] text-slate-500">Roster</div>
-                  <Link href={`/teams/${team.slug}`} className="text-sm font-bold text-accent hover:text-white">Профіль команди</Link>
-                </div>
-                <RosterShowcase players={team.players || []} />
+              <div className="border-t border-line bg-bg/20 p-1.5 sm:p-2">
+                <RosterShowcase players={team.players || []} compact />
+                <Link href={`/teams/${team.slug}`} className="mt-1.5 block rounded-md border border-line bg-surface/70 px-2 py-1.5 text-center text-[10px] font-bold text-accent transition hover:border-accent/50 hover:text-white sm:hidden">
+                  Профіль команди
+                </Link>
               </div>
             ) : null}
           </article>

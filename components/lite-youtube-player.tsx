@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-export function LiteYoutubePlayer({ videoId, title }: { videoId: string | null; title: string }) {
+export function LiteYoutubePlayer({ videoId, title, className = "aspect-video" }: { videoId: string | null; title: string; className?: string }) {
   const [active, setActive] = useState(false);
 
   if (!videoId) {
@@ -17,7 +17,7 @@ export function LiteYoutubePlayer({ videoId, title }: { videoId: string | null; 
   const iframeUrl = `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1&playsinline=1&color=white`;
 
   return (
-    <div className="group relative aspect-video overflow-hidden rounded-lg border border-line bg-black">
+    <div className={`group relative overflow-hidden rounded-lg border border-line bg-black ${className}`}>
       {active ? (
         <iframe
           className="h-full w-full"

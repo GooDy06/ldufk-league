@@ -4,12 +4,12 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "NEXT_DIST_DIR=.next-build next build",
     "parse-demo": "node scripts/parse-demo.cjs",
     "sync-r2-demos": "node scripts/sync-r2-demos.cjs",
     "sync-school-rosters": "node scripts/sync-school-rosters.cjs",
     "sync-data": "npm run sync-r2-demos && npm run sync-school-rosters",
-    "start": "next start",
+    "start": "NEXT_DIST_DIR=.next-build next start",
     "lint": "next lint"
   },
   "dependencies": {

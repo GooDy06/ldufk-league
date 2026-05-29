@@ -13,7 +13,10 @@ const rajdhani = Rajdhani({
 });
 
 export const metadata: Metadata = {
-  title: "LDUFK League",
+  title: {
+    default: "LDUFK League",
+    template: "%s | LDUFK League"
+  },
   description: "Український портал навчальної CS2-ліги",
   icons: {
     icon: "/assets/logo.png",

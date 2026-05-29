@@ -60,6 +60,137 @@ select {
   animation: softEnter 0.58s ease-out both;
 }
 
+.season-title-shine {
+  position: relative;
+  display: inline-block;
+  color: #edf4ff;
+}
+
+.season-title-shine::after {
+  content: attr(data-title);
+  position: absolute;
+  inset: 0;
+  color: transparent;
+  background: linear-gradient(
+    105deg,
+    transparent 0%,
+    transparent 20%,
+    rgba(0, 213, 255, 0.2) 34%,
+    rgba(255, 245, 184, 0.72) 44%,
+    #ffffff 50%,
+    rgba(120, 237, 255, 0.98) 56%,
+    rgba(0, 213, 255, 0.24) 68%,
+    transparent 82%,
+    transparent 100%
+  );
+  background-repeat: no-repeat;
+  background-size: 42% 100%;
+  background-position: -55% 50%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter:
+    drop-shadow(0 0 12px rgba(120, 237, 255, 0.36))
+    drop-shadow(0 0 22px rgba(255, 245, 184, 0.18));
+  pointer-events: none;
+  opacity: 0;
+  animation: seasonTitleTextSweep 2.25s linear 0.35s both;
+}
+
+@keyframes seasonTitleTextSweep {
+  0% {
+    background-position: -55% 50%;
+    opacity: 0;
+  }
+  8% {
+    background-position: -42% 50%;
+    opacity: 1;
+  }
+  14% {
+    background-position: 12% 50%;
+  }
+  34% {
+    background-position: 86% 50%;
+  }
+  54% {
+    background-position: 124% 50%;
+  }
+  82% {
+    background-position: 158% 50%;
+  }
+  92% {
+    background-position: 176% 50%;
+    opacity: 1;
+  }
+  100% {
+    background-position: 190% 50%;
+    opacity: 0;
+  }
+}
+
+.prize-sparkle {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.prize-sparkle > * {
+  position: relative;
+  z-index: 1;
+}
+
+.prize-sparkle::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-image:
+    radial-gradient(circle, rgba(255, 245, 180, 0.72) 0 1px, transparent 1.7px),
+    radial-gradient(circle, rgba(250, 204, 21, 0.48) 0 1px, transparent 1.8px),
+    radial-gradient(circle, rgba(255, 255, 255, 0.42) 0 0.8px, transparent 1.5px);
+  background-position: 12px 72px, 46px 94px, 82px 116px;
+  background-size: 72px 72px, 94px 94px, 116px 116px;
+  opacity: 0.2;
+  pointer-events: none;
+  animation: prizeSparkLift 8.4s linear infinite;
+}
+
+.prize-sparkle::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: linear-gradient(110deg, transparent 12%, rgba(255, 232, 128, 0.12) 44%, transparent 68%);
+  transform: translateX(-120%);
+  pointer-events: none;
+  animation: prizeSoftGlint 7.6s ease-in-out infinite;
+}
+
+@keyframes prizeSparkLift {
+  from {
+    background-position: 12px 72px, 46px 94px, 82px 116px;
+  }
+  to {
+    background-position: 12px 0, 46px 0, 82px 0;
+  }
+}
+
+@keyframes prizeSoftGlint {
+  0%,
+  58% {
+    transform: translateX(-120%);
+    opacity: 0;
+  }
+  68% {
+    opacity: 0.62;
+  }
+  86%,
+  100% {
+    transform: translateX(120%);
+    opacity: 0;
+  }
+}
+
 .interactive-card {
   position: relative;
   transition:
@@ -113,8 +244,15 @@ select {
 
 @media (prefers-reduced-motion: reduce) {
   .soft-enter,
-  .live-pulse {
+  .live-pulse,
+  .season-title-shine::after,
+  .prize-sparkle::before,
+  .prize-sparkle::after {
     animation: none;
+  }
+
+  .season-title-shine::after {
+    opacity: 0;
   }
 
   .interactive-card {
