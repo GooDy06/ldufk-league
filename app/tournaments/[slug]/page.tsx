@@ -1,8 +1,9 @@
 import { notFound } from "next/navigation";
-import Link from "next/link";
 import { getCircuitTournamentBySlug } from "@/lib/circuit-tournaments";
 import { createClient } from "@/lib/supabase/server";
 import type { Tournament } from "@/lib/types";
+import { CalendarDays, CircleDollarSign, Gamepad2, GraduationCap, Monitor, ShieldCheck, Sparkles, Trophy, UsersRound } from "lucide-react";
+import { BackButton } from "@/components/back-button";
 
 export const dynamic = "force-dynamic";
 
@@ -20,6 +21,9 @@ export default async function TournamentDetailPage({ params }: { params: { slug:
 
   return (
     <article className="mx-auto max-w-4xl py-8">
+      <div className="mb-4">
+        <BackButton fallbackHref="/tournaments" label="Назад до турнірів" />
+      </div>
       <div className="mb-4 h-72 rounded-2xl border border-line bg-cover bg-center" style={{ backgroundImage: `url(${tournament.banner_url || "/assets/winners-hero.png"})` }} />
       <div className="text-[10px] font-bold uppercase tracking-[0.24em] text-accent">{tournament.division} · {tournament.type}</div>
       <h1 className="mt-2 font-rajdhani text-5xl font-bold">{tournament.name}</h1>
@@ -50,9 +54,7 @@ function CircuitTournamentDetail({ league, tournament }: NonNullable<ReturnType<
 
   return (
     <article className="mx-auto max-w-5xl py-5 sm:py-8">
-      <Link href="/tournaments" className="focus-ring inline-flex rounded-lg border border-line bg-surface2 px-3 py-2 text-xs font-extrabold uppercase tracking-[0.14em] text-slate-400 transition hover:border-accent/35 hover:text-accent">
-        Назад до турнірів
-      </Link>
+      <BackButton fallbackHref="/tournaments" label="Назад до турнірів" />
 
       <section className={`mt-4 overflow-hidden rounded-3xl border bg-surface ${isRegistration ? "border-emerald-300/45 shadow-[0_0_40px_rgba(52,211,153,0.12)]" : "border-line"}`}>
         <div className="relative min-h-[280px] bg-cover bg-center p-4 sm:p-6" style={{ backgroundImage: "url('/map-images/de_mirage.jpg')" }}>
@@ -65,29 +67,29 @@ function CircuitTournamentDetail({ league, tournament }: NonNullable<ReturnType<
             <h1 className="mt-2 font-rajdhani text-4xl font-bold leading-none sm:text-6xl">{tournament.name}</h1>
             <p className="mt-4 text-sm leading-6 text-slate-300 sm:text-base">{tournament.description}</p>
             {isRegistration ? (
-              <a href="https://t.me/ldufk_cup" target="_blank" rel="noreferrer" className="focus-ring mt-5 inline-flex rounded-lg border border-emerald-300/40 bg-emerald-300 px-4 py-3 text-sm font-extrabold uppercase tracking-[0.14em] text-bg transition hover:bg-emerald-200">
+              <button type="button" className="focus-ring mt-5 inline-flex rounded-lg border border-emerald-300/40 bg-emerald-300 px-4 py-3 text-sm font-extrabold uppercase tracking-[0.14em] text-bg transition hover:bg-emerald-200">
                 Зареєструватися
-              </a>
+              </button>
             ) : null}
           </div>
         </div>
 
-        <div className="grid gap-2 p-3 sm:grid-cols-2 sm:p-4 lg:grid-cols-4">
-          <Info label="Дисципліна" value="Counter-Strike 2" />
-          <Info label="Призовий фонд" value={tournament.prizePool} tone="gold" />
-          <Info label="Поточний етап" value={isRegistration ? "Реєстрація" : tournament.status} />
-          <Info label="Формат" value={tournament.format} />
-          <Info label="Ліга" value={leagueLabel} />
-          <Info label="Місяць" value={tournament.month} />
-          <Info label="Склад" value="5 або 4+1" />
-          <Info label="LDUFK Points" value={tournament.points ? `${tournament.points} points` : "Не нараховуються"} />
+        <div className="grid grid-cols-2 gap-x-2 gap-y-3 border-t border-line p-3 sm:grid-cols-4 sm:gap-x-4 sm:p-4">
+          <DetailFact icon={Gamepad2} label="Дисципліна" value="Counter-Strike 2" />
+          <DetailFact icon={Trophy} label="Призовий фонд" value={tournament.prizePool} tone="gold" />
+          <DetailFact icon={ShieldCheck} label="Поточний етап" value={isRegistration ? "Реєстрація" : tournament.status} />
+          <DetailFact icon={Monitor} label="Формат" value={tournament.format} />
+          <DetailFact icon={GraduationCap} label="Ліга" value={leagueLabel} />
+          <DetailFact icon={CalendarDays} label="Місяць" value={tournament.month} />
+          <DetailFact icon={UsersRound} label="Склад" value="5 або 4+1" />
+          <DetailFact icon={CircleDollarSign} label="LDUFK Points" value={tournament.points ? `${tournament.points} points` : "Не нараховуються"} />
         </div>
       </section>
 
       <section className="mt-4 rounded-2xl border border-line bg-surface p-4 sm:p-5">
         <div className="mb-4 flex flex-col justify-between gap-2 md:flex-row md:items-end">
           <div>
-            <div className="text-[10px] font-extrabold uppercase tracking-[0.22em] text-gold">Tournament timeline</div>
+            <div className="text-[10px] font-extrabold uppercase tracking-[0.22em] text-gold">Етапи турніру</div>
             <h2 className="mt-1 font-rajdhani text-3xl font-bold">Графік турніру</h2>
           </div>
           <p className="max-w-xl text-sm leading-6 text-slate-400">
@@ -98,24 +100,33 @@ function CircuitTournamentDetail({ league, tournament }: NonNullable<ReturnType<
       </section>
 
       <section className="mt-4 rounded-2xl border border-line bg-surface p-4 sm:p-5">
-        <div className="text-[10px] font-extrabold uppercase tracking-[0.22em] text-accent">Registration</div>
+        <div className="text-[10px] font-extrabold uppercase tracking-[0.22em] text-accent">Умови участі</div>
         <h2 className="mt-1 font-rajdhani text-3xl font-bold">Реєстрація на турнір</h2>
         <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-400">
-          Участь безкоштовна. Команда представляє свій заклад освіти, грає онлайн на FACEIT та бореться за перші LDUFK Points сезону. Команда може грати повним складом свого закладу або використати опцію 4+1.
+          Участь безкоштовна. Команда представляє свій заклад освіти, грає онлайн та бореться за перші LDUFK Points сезону. Команда може грати повним складом свого закладу або використати опцію 4+1.
         </p>
-        <div className="mt-4 grid gap-2 md:grid-cols-2">
+        <div className="mt-4 grid gap-3 sm:grid-cols-2">
           {[
-            "Основний варіант: 5 гравців з одного закладу освіти.",
-            `Опція 4+1: якщо потрібно, можна взяти до 1 запрошеного ${invitedLabel}.`,
-            "Запрошений гравець не може мати найвищий FACEIT ELO у команді.",
-            "Матчі проходять онлайн у форматі FACEIT Online.",
-            "Призовий фонд етапу: 50 000 грн та 200 LDUFK Points."
-          ].map((item) => (
-            <div key={item} className="rounded-xl border border-line bg-bg/45 p-3 text-sm font-semibold leading-5 text-slate-300">
-              {item}
+            ["Склад", "5 гравців з одного закладу освіти."],
+            ["Опція 4+1", `За потреби можна взяти до 1 запрошеного ${invitedLabel}.`],
+            ["Обмеження", "Запрошений гравець не може мати найвищий FACEIT ELO у команді."],
+            ["Матчі", "Усі матчі етапу проходять онлайн."],
+            ["Нагорода", "50 000 грн та 200 LDUFK Points."]
+          ].map(([title, text]) => (
+            <div key={title} className="flex gap-2 border-l border-emerald-300/30 pl-2.5 text-sm leading-5">
+              <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-emerald-200/80" strokeWidth={1.8} />
+              <div>
+                <div className="text-[9px] font-extrabold uppercase tracking-[0.16em] text-emerald-200/80">{title}</div>
+                <div className="text-slate-300">{text}</div>
+              </div>
             </div>
           ))}
         </div>
+        {isRegistration ? (
+          <button type="button" className="focus-ring mt-5 inline-flex rounded-lg border border-emerald-300/40 bg-emerald-300 px-4 py-3 text-sm font-extrabold uppercase tracking-[0.14em] text-bg transition hover:bg-emerald-200">
+            Зареєструватися
+          </button>
+        ) : null}
       </section>
     </article>
   );
@@ -156,7 +167,7 @@ function tournamentTimeline(month: string, isRegistration: boolean): TimelineSte
     {
       date: dates[3],
       title: "Матчі",
-      description: "Основна онлайн-сітка етапу на FACEIT.",
+      description: "Основна онлайн-сітка етапу.",
       state: "upcoming"
     },
     {
@@ -171,9 +182,9 @@ function tournamentTimeline(month: string, isRegistration: boolean): TimelineSte
 function TournamentTimeline({ steps }: { steps: TimelineStep[] }) {
   return (
     <div className="overflow-x-auto pb-2">
-      <div className="relative grid min-w-[860px] grid-cols-5 gap-3 rounded-xl border border-line bg-bg/35 p-4 pb-12">
-        <div className="absolute bottom-[34px] left-10 right-10 h-1 rounded-full bg-slate-700/70" />
-        <div className="absolute bottom-[34px] left-10 h-1 w-[28%] rounded-full bg-gradient-to-r from-gold/60 via-gold to-emerald-300" />
+      <div className="relative grid min-w-[860px] grid-cols-5 gap-3 rounded-xl border border-line bg-bg/35 px-4 pb-4 pt-14">
+        <div className="absolute left-10 right-10 top-[34px] h-1 rounded-full bg-slate-700/70" />
+        <div className="absolute left-10 top-[34px] h-1 w-[28%] rounded-full bg-gradient-to-r from-gold/60 via-gold to-emerald-300" />
         {steps.map((step) => {
           const isActive = step.state === "active";
           const isDone = step.state === "done";
@@ -184,15 +195,27 @@ function TournamentTimeline({ steps }: { steps: TimelineStep[] }) {
               : "border-slate-300 bg-slate-700";
 
           return (
-            <div key={step.title} className={`relative z-10 min-h-[170px] rounded-xl border p-3 ${isActive ? "border-emerald-300/45 bg-emerald-300/10" : "border-transparent"}`}>
+            <div key={step.title} className={`relative z-10 min-h-[154px] rounded-xl border p-3 ${isActive ? "border-emerald-300/45 bg-emerald-300/10" : "border-transparent"}`}>
+              <div className={`absolute left-3 top-[-31px] h-5 w-5 rounded-full border-2 ${dotClass}`} />
               <div className={`text-[10px] font-extrabold uppercase tracking-[0.16em] ${isActive || isDone ? "text-gold" : "text-slate-500"}`}>{step.date}</div>
               {isActive ? <div className="mt-1 inline-flex rounded-full border border-emerald-300/30 bg-emerald-300/10 px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-[0.14em] text-emerald-200">Зараз</div> : null}
               <h3 className={`mt-2 font-rajdhani text-2xl font-bold leading-tight ${isActive ? "text-white" : isDone ? "text-slate-300" : "text-slate-500"}`}>{step.title}</h3>
               <p className="mt-1 text-xs leading-5 text-slate-400">{step.description}</p>
-              <div className={`absolute bottom-[-2px] left-3 h-5 w-5 rounded-full border-2 ${dotClass}`} />
             </div>
           );
         })}
+      </div>
+    </div>
+  );
+}
+
+function DetailFact({ icon: Icon, label, value, tone = "default" }: { icon: typeof CalendarDays; label: string; value: string; tone?: "default" | "gold" }) {
+  return (
+    <div className="flex min-w-0 items-center gap-2 border-l border-white/10 pl-2">
+      <Icon className={`h-4 w-4 shrink-0 ${tone === "gold" ? "text-gold" : "text-accent/80"}`} strokeWidth={1.8} />
+      <div className="min-w-0">
+        <div className="text-[8px] font-extrabold uppercase tracking-[0.14em] text-slate-500">{label}</div>
+        <div className={`truncate font-rajdhani text-lg font-bold leading-tight ${tone === "gold" ? "text-gold" : "text-slate-100"}`}>{value}</div>
       </div>
     </div>
   );

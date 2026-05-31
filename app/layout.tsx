@@ -3,6 +3,7 @@ import { headers } from "next/headers";
 import { Exo_2, Rajdhani } from "next/font/google";
 import "./globals.css";
 import { SiteHeader } from "@/components/site-header";
+import { PageScrollControls } from "@/components/page-scroll-controls";
 import { socialLinks } from "@/lib/site-config";
 
 const exo = Exo_2({ subsets: ["latin", "cyrillic"], variable: "--font-exo" });
@@ -47,6 +48,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="font-exo">
         <SiteHeader />
         <main className="mx-auto min-h-screen w-full max-w-6xl px-3 pb-10 sm:px-4 sm:pb-12">{children}</main>
+        <PageScrollControls />
         <footer className="border-t border-line py-5">
           <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-4 text-xs tracking-wide text-slate-500 sm:flex-row">
             <div>

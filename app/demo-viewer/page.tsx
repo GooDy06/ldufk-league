@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { BackButton } from "@/components/back-button";
 import { demoFiles, demoViewerHref } from "@/lib/demo-files";
 
 export const dynamic = "force-static";
@@ -6,7 +7,7 @@ export const dynamic = "force-static";
 export default function DemoViewerIndexPage() {
   return (
     <div className="py-8">
-      <Link href="/matches" className="text-sm font-bold text-accent hover:text-white">Назад до матчів</Link>
+      <BackButton fallbackHref="/matches" label="Назад до матчів" />
 
       <section className="mt-5 rounded-2xl border border-line bg-surface p-5">
         <div className="text-[10px] font-extrabold uppercase tracking-[0.24em] text-accent">Demo Viewer</div>

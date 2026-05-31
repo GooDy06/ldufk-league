@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { BackButton } from "@/components/back-button";
 import {
   finalDayPoints,
   pointsRules,
@@ -30,9 +31,7 @@ export default function LdufkPointsPage() {
   return (
     <div className="space-y-3 py-3 sm:space-y-7 sm:py-8">
       <section className="soft-enter rounded-xl border border-line bg-[linear-gradient(135deg,rgba(0,213,255,0.12),rgba(13,20,32,0.98)_42%,rgba(7,10,16,0.98))] p-3 sm:rounded-3xl sm:p-6">
-        <Link href="/tournaments" className="focus-ring inline-flex rounded-md border border-line bg-surface2 px-2 py-1.5 text-[8px] font-extrabold uppercase tracking-[0.12em] text-slate-300 transition hover:border-accent/35 hover:text-accent sm:rounded-lg sm:px-3 sm:py-2 sm:text-[10px] sm:tracking-[0.14em]">
-          Назад до турнірів
-        </Link>
+        <BackButton fallbackHref="/tournaments" label="Назад до турнірів" />
         <div className="mt-3 grid gap-3 sm:mt-5 sm:gap-5 lg:grid-cols-[1fr_360px] lg:items-end">
           <div>
             <div className="text-[8px] font-extrabold uppercase tracking-[0.18em] text-accent sm:text-[10px] sm:tracking-[0.22em]">Ranking formula</div>

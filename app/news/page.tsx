@@ -16,7 +16,7 @@ export default async function NewsPage() {
   const news = (data || []) as NewsItem[];
 
   return (
-    <div className="py-5 sm:py-8">
+    <div className="soft-enter py-5 sm:py-8">
       <h1 className="mb-4 font-rajdhani text-4xl font-bold sm:mb-5 sm:text-5xl">Новини</h1>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">{news.map((item) => <NewsCard key={item.id} item={item} />)}</div>
     </div>

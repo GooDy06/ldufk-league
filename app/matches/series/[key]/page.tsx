@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { BackButton } from "@/components/back-button";
 import { notFound } from "next/navigation";
 import {
   getMatchMapStats,
@@ -143,7 +144,7 @@ export default async function MatchSeriesPage({ params, searchParams }: { params
 
   return (
     <div className="py-5 sm:py-8">
-      <Link href="/matches" className="text-sm font-bold text-accent hover:text-white">Назад до матчів</Link>
+      <BackButton fallbackHref="/matches" label="Назад до матчів" />
 
       <section className="mx-auto mt-4 max-w-5xl overflow-hidden rounded-2xl border border-line bg-surface">
         <div className="border-b border-line px-3 py-2">

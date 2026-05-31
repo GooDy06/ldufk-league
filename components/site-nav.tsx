@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const links = [
-  ["Загальна", "/"],
+  ["Головна", "/"],
   ["Рейтинг", "/ranking"],
   ["Турніри", "/tournaments"],
   ["Матчі", "/matches"],
@@ -37,7 +37,8 @@ export function SiteNav({ hasLiveMatch, hasRegistration }: { hasLiveMatch: boole
               </span>
             ) : null}
             {href === "/tournaments" && hasRegistration ? (
-              <span aria-hidden="true" className="absolute -right-5 -top-2 rounded-full border border-emerald-200/40 bg-emerald-300 px-1.5 py-0.5 text-[8px] font-extrabold uppercase leading-none tracking-[0.08em] text-bg shadow-[0_0_16px_rgba(52,211,153,0.25)]">
+              <span aria-hidden="true" className="pointer-events-none absolute -right-2 -top-2 inline-flex items-center gap-1 text-[6px] font-extrabold uppercase leading-none tracking-[0.06em] text-school sm:-right-3 sm:text-[7px]">
+                <span className="h-1.5 w-1.5 rounded-full bg-school shadow-[0_0_9px_rgba(110,231,183,0.85)]" />
                 Реєстрація
               </span>
             ) : null}

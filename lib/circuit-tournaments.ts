@@ -8,7 +8,7 @@ export type CircuitTournament = {
   stage: CircuitStageKey;
   name: string;
   month: string;
-  format: "FACEIT Online" | "LAN";
+  format: "Online" | "LAN";
   status: CircuitTournamentStatus;
   role: string;
   description: string;
@@ -80,7 +80,7 @@ const lanPrizePool = "150 000 грн";
 
 export const circuitConceptSteps = [
   {
-    title: "Що це",
+    title: "Суть сезону",
     text: "LDUFK CS2 Season — щорічна кіберспортивна серія турнірів з Counter-Strike 2 для школярів та студентів України."
   },
   {
@@ -210,7 +210,7 @@ export const circuitLeagues: CircuitLeague[] = [
         stage: "open",
         name: "LDUFK School Open 2026",
         month: "Жовтень 2026",
-        format: "FACEIT Online",
+        format: "Online",
         status: "Реєстрація",
         role: "Старт сезону",
         description: "Перший турнір сезону, де всі команди починають шлях з нуля та отримують перші LDUFK Points.",
@@ -223,7 +223,7 @@ export const circuitLeagues: CircuitLeague[] = [
         stage: "showdown",
         name: "LDUFK School Showdown 2026",
         month: "Листопад–грудень 2026",
-        format: "FACEIT Online",
+        format: "Online",
         status: "Coming Soon",
         role: "Перше велике зіткнення",
         description: "Другий етап сезону, де фаворити підтверджують свій рівень, а нові претенденти борються за місце в рейтингу.",
@@ -236,7 +236,7 @@ export const circuitLeagues: CircuitLeague[] = [
         stage: "rivals",
         name: "LDUFK School Rivals 2027",
         month: "Лютий 2027",
-        format: "FACEIT Online",
+        format: "Online",
         status: "Coming Soon",
         role: "Принципові протистояння",
         description: "Етап реваншів, суперництва між командами та боротьби за важливі позиції в LDUFK Points.",
@@ -249,7 +249,7 @@ export const circuitLeagues: CircuitLeague[] = [
         stage: "bounty",
         name: "LDUFK School Bounty 2027",
         month: "Квітень 2027",
-        format: "FACEIT Online",
+        format: "Online",
         status: "Coming Soon",
         role: "Полювання за очками",
         description: "Фінальний онлайн-етап сезону, де кожна команда бореться за останні важливі очки перед LAN.",
@@ -284,7 +284,7 @@ export const circuitLeagues: CircuitLeague[] = [
         stage: "open",
         name: "LDUFK University Open 2026",
         month: "Жовтень 2026",
-        format: "FACEIT Online",
+        format: "Online",
         status: "Реєстрація",
         role: "Старт сезону",
         description: "Перший етап студентської ліги, який відкриває сезон та формує стартовий рейтинг.",
@@ -297,7 +297,7 @@ export const circuitLeagues: CircuitLeague[] = [
         stage: "showdown",
         name: "LDUFK University Showdown 2026",
         month: "Листопад–грудень 2026",
-        format: "FACEIT Online",
+        format: "Online",
         status: "Coming Soon",
         role: "Перше велике зіткнення",
         description: "Другий етап сезону, де команди борються за стабільність і високі позиції в рейтингу.",
@@ -310,7 +310,7 @@ export const circuitLeagues: CircuitLeague[] = [
         stage: "rivals",
         name: "LDUFK University Rivals 2027",
         month: "Лютий 2027",
-        format: "FACEIT Online",
+        format: "Online",
         status: "Coming Soon",
         role: "Принципові протистояння",
         description: "Турнір реваншів, суперництва та боротьби за місця у верхній частині таблиці.",
@@ -323,7 +323,7 @@ export const circuitLeagues: CircuitLeague[] = [
         stage: "bounty",
         name: "LDUFK University Bounty 2027",
         month: "Квітень 2027",
-        format: "FACEIT Online",
+        format: "Online",
         status: "Coming Soon",
         role: "Полювання за очками",
         description: "Останній онлайн-етап перед фіналом, де команди борються за вирішальні LDUFK Points.",

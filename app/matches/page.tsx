@@ -60,7 +60,7 @@ function SeriesRow({ series, mapStats }: { series: LotMatchSeries; mapStats?: Lo
     : series.team2Wins;
 
   return (
-    <Link href={href} className="grid grid-cols-[42px_minmax(0,1fr)_58px_minmax(0,1fr)] items-center gap-1.5 border-b border-line bg-surface px-2 py-2 transition last:border-0 hover:bg-surface2 sm:grid-cols-[64px_minmax(0,1fr)_92px_minmax(0,1fr)_70px_96px] sm:gap-2 sm:px-4 sm:py-3 md:grid-cols-[74px_minmax(0,1fr)_120px_minmax(0,1fr)_88px_120px]">
+    <Link href={href} className="soft-enter grid grid-cols-[42px_minmax(0,1fr)_58px_minmax(0,1fr)] items-center gap-1.5 border-b border-line bg-surface px-2 py-2 transition last:border-0 hover:bg-surface2 sm:grid-cols-[64px_minmax(0,1fr)_92px_minmax(0,1fr)_70px_96px] sm:gap-2 sm:px-4 sm:py-3 md:grid-cols-[74px_minmax(0,1fr)_120px_minmax(0,1fr)_88px_120px]">
       <div>
         <div className="font-rajdhani text-sm font-bold leading-none text-slate-200 sm:text-2xl">{formatTime(series.startTime)}</div>
         <div className="mt-0.5 truncate text-[7px] font-bold uppercase tracking-[0.1em] text-slate-600 sm:text-[10px] sm:tracking-[0.14em]">{formatDate(series.startTime)}</div>
@@ -95,7 +95,7 @@ export default async function MatchesPage({ searchParams }: { searchParams: { to
   );
 
   return (
-    <div className="py-3 sm:py-8">
+    <div className="soft-enter py-3 sm:py-8">
       <section className="mb-3 sm:mb-8">
         <h1 className="font-rajdhani text-3xl font-bold leading-none sm:text-5xl md:text-6xl">Матчі та статистика</h1>
       </section>
@@ -153,18 +153,18 @@ export default async function MatchesPage({ searchParams }: { searchParams: { to
           </div>
 
           <div className="rounded-2xl border border-line bg-surface p-4">
-            <div className="text-[10px] font-extrabold uppercase tracking-[0.2em] text-slate-500">Player Stats</div>
+            <div className="text-[10px] font-extrabold uppercase tracking-[0.2em] text-slate-500">Player Stats 2.0</div>
             <h2 className="font-rajdhani text-2xl font-bold">Топ за Rating</h2>
             <div className="mt-4 grid gap-2">
               {players.map((player, index) => (
-                <div key={player.steamId} className="grid grid-cols-[28px_1fr_auto] items-center gap-3 rounded-xl border border-line bg-surface2 p-3">
+                <Link href={`/players/${encodeURIComponent(player.name)}`} key={player.steamId} className="interactive-card grid grid-cols-[28px_1fr_auto] items-center gap-3 rounded-xl border border-line bg-surface2 p-3 transition hover:border-accent/45">
                   <div className={`font-rajdhani text-xl font-bold ${index === 0 ? "text-gold" : index === 1 ? "text-slate-300" : index === 2 ? "text-amber-700" : "text-slate-500"}`}>{index + 1}</div>
                   <div>
                     <div className="font-bold">{player.name}</div>
                     <div className="text-xs text-slate-600">K/D {player.kills}/{player.deaths}</div>
                   </div>
                   <div className="text-right font-rajdhani text-xl font-bold text-accent">{Number(player.rating || 0).toFixed(2)}</div>
-                </div>
+                </Link>
               ))}
               {!players.length ? <div className="rounded-xl border border-line bg-surface2 p-3 text-sm text-slate-500">Ще немає статистики гравців у твоїх останніх матчах.</div> : null}
             </div>

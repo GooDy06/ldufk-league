@@ -13,6 +13,7 @@ import {
 import { getDemoAnalysis, type DemoAnalysis, type DemoAnalysisPlayer } from "@/lib/demo-analysis";
 import { demoFileProxyHref, demoViewerHref, getDemoFile } from "@/lib/demo-files";
 import { mapImageFor } from "@/lib/map-assets";
+import { BackButton } from "@/components/back-button";
 
 export const dynamic = "force-dynamic";
 
@@ -311,7 +312,7 @@ export default async function MatchDetailPage({ params, searchParams }: { params
 
   return (
     <div className="py-5 sm:py-8">
-      <Link href="/matches" className="text-sm font-bold text-accent hover:text-white">Назад до матчів</Link>
+      <BackButton fallbackHref="/matches" label="Назад до матчів" />
 
       <section
         className="mx-auto mt-4 overflow-hidden rounded-2xl border border-line bg-surface bg-cover bg-center"
@@ -362,43 +363,43 @@ export default async function MatchDetailPage({ params, searchParams }: { params
         </section>
       ) : null}
 
-      <section className="mx-auto mt-4 grid gap-3 lg:grid-cols-[0.95fr_1fr]">
-        <div className="relative overflow-hidden rounded-2xl border border-line bg-surface">
+      <section className="mx-auto mt-4 grid items-start gap-3 lg:grid-cols-[1.08fr_0.92fr]">
+        <div className="relative overflow-hidden rounded-xl border border-line bg-surface">
           {mapImage ? (
             <div
               className="absolute inset-0 scale-110 bg-cover bg-center opacity-55 blur-sm"
               style={{ backgroundImage: `linear-gradient(rgba(2, 6, 12, 0.5), rgba(2, 6, 12, 0.78)), url(${mapImage})` }}
             />
           ) : null}
-          <div className="relative bg-accent/15 px-4 py-2 text-center text-sm font-bold text-white backdrop-blur-[2px]">{seasonName}</div>
-          <div className="relative grid grid-cols-[1fr_76px_1fr] items-center gap-2 px-3 py-3 text-center sm:grid-cols-[1fr_100px_1fr] sm:gap-3 sm:px-4 sm:py-4">
+          <div className="relative bg-accent/15 px-3 py-1.5 text-center text-xs font-bold text-white backdrop-blur-[2px]">{seasonName}</div>
+          <div className="relative grid grid-cols-[1fr_68px_1fr] items-center gap-2 px-3 py-2 text-center sm:grid-cols-[1fr_88px_1fr] sm:gap-3">
             <div>
-              <div className="truncate font-rajdhani text-xl font-bold md:text-3xl">{match.team1_string}</div>
-              <div className={`mt-1 font-rajdhani text-3xl font-bold ${team1Score > team2Score ? "text-emerald-300" : "text-red-300"}`}>{team1Score}</div>
+              <div className="truncate font-rajdhani text-xl font-bold md:text-2xl">{match.team1_string}</div>
+              <div className={`font-rajdhani text-2xl font-bold ${team1Score > team2Score ? "text-emerald-300" : "text-red-300"}`}>{team1Score}</div>
             </div>
             <div className="text-sm font-extrabold uppercase tracking-[0.18em] text-slate-500">Map<br /><span className="text-white">{cleanMapName(firstMap?.map_name || null)}</span></div>
             <div>
-              <div className="truncate font-rajdhani text-xl font-bold md:text-3xl">{match.team2_string}</div>
-              <div className={`mt-1 font-rajdhani text-3xl font-bold ${team2Score > team1Score ? "text-emerald-300" : "text-red-300"}`}>{team2Score}</div>
+              <div className="truncate font-rajdhani text-xl font-bold md:text-2xl">{match.team2_string}</div>
+              <div className={`font-rajdhani text-2xl font-bold ${team2Score > team1Score ? "text-emerald-300" : "text-red-300"}`}>{team2Score}</div>
             </div>
           </div>
-          <div className="relative divide-y divide-line border-t border-line bg-surface/90 text-sm backdrop-blur-[2px]">
-            <div className="grid grid-cols-[1fr_auto] px-4 py-2"><strong>Breakdown</strong><span><span className="text-red-300">{team1Score}</span> <span className="text-white">:</span> <span className="text-emerald-300">{team2Score}</span></span></div>
-            <div className="grid grid-cols-[1fr_auto] px-4 py-2"><strong>Team rating</strong><span>{teamRating(team1Players)} <span className="text-white">:</span> {teamRating(team2Players)}</span></div>
-            {(hasOpeningStats || demoAnalysis) ? <div className="grid grid-cols-[1fr_auto] px-4 py-2"><strong>Opening kills</strong><span>{team1OpeningKills} <span className="text-white">:</span> {team2OpeningKills}</span></div> : null}
-            <div className="grid grid-cols-[1fr_auto] px-4 py-2"><strong>Clutches won</strong><span>{teamClutches(team1Players)} <span className="text-white">:</span> {teamClutches(team2Players)}</span></div>
-            <div className="grid grid-cols-[1fr_auto] px-4 py-2"><strong>Started</strong><span>{formatDate(firstMap?.start_time || match.start_time)}</span></div>
+          <div className="relative divide-y divide-line border-t border-line bg-surface/90 text-xs backdrop-blur-[2px]">
+            <div className="grid grid-cols-[1fr_auto] px-3 py-1.5"><strong>Breakdown</strong><span><span className="text-red-300">{team1Score}</span> <span className="text-white">:</span> <span className="text-emerald-300">{team2Score}</span></span></div>
+            <div className="grid grid-cols-[1fr_auto] px-3 py-1.5"><strong>Team rating</strong><span>{teamRating(team1Players)} <span className="text-white">:</span> {teamRating(team2Players)}</span></div>
+            {(hasOpeningStats || demoAnalysis) ? <div className="grid grid-cols-[1fr_auto] px-3 py-1.5"><strong>Opening kills</strong><span>{team1OpeningKills} <span className="text-white">:</span> {team2OpeningKills}</span></div> : null}
+            <div className="grid grid-cols-[1fr_auto] px-3 py-1.5"><strong>Clutches won</strong><span>{teamClutches(team1Players)} <span className="text-white">:</span> {teamClutches(team2Players)}</span></div>
+            <div className="grid grid-cols-[1fr_auto] px-3 py-1.5"><strong>Started</strong><span>{formatDate(firstMap?.start_time || match.start_time)}</span></div>
           </div>
         </div>
 
-        <div className="grid gap-2">
+        <div className="grid grid-cols-2 gap-2">
           {leaders.map((item) => (
-            <div key={item.label} className="grid grid-cols-[1fr_auto] items-center rounded-xl border border-line bg-surface2 px-4 py-3">
+            <div key={item.label} className="grid grid-cols-[1fr_auto] items-center gap-2 rounded-lg border border-line bg-surface2 px-3 py-2">
               <div>
-                <div className="font-rajdhani text-2xl font-bold text-slate-200">{item.name}</div>
-                <div className="text-sm text-slate-500">{item.label}</div>
+                <div className="truncate font-rajdhani text-lg font-bold leading-none text-slate-200">{item.name}</div>
+                <div className="mt-0.5 truncate text-[10px] text-slate-500">{item.label}</div>
               </div>
-              <div className="font-rajdhani text-3xl font-bold text-accent">{item.value}</div>
+              <div className="font-rajdhani text-xl font-bold text-accent">{item.value}</div>
             </div>
           ))}
         </div>

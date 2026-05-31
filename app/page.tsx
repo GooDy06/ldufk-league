@@ -5,6 +5,7 @@ import type { HomepageChampion, NewsItem, Team, Tournament, Player } from "@/lib
 import { ChampionCard, HeroTitle, NewsCard, Panel, TeamRow } from "@/components/ui";
 import { DEFAULT_PLAYER_AVATAR } from "@/components/roster-showcase";
 import { LiteYoutubePlayer } from "@/components/lite-youtube-player";
+import { HomeLeagueTabs } from "@/components/home-league-tabs";
 
 export const dynamic = "force-dynamic";
 
@@ -67,27 +68,27 @@ export default async function HomePage() {
     <>
       <HeroTitle />
 
-      <section className="grid grid-cols-2 gap-2 sm:gap-4">
-        {universityWinner ? <ChampionCard tournament={universityWinner} /> : null}
-        {schoolWinner ? <ChampionCard tournament={schoolWinner} /> : null}
+      <section className="mt-1">
+        <div className="hidden grid-cols-2 gap-4 md:grid">
+          <LeagueFeature label="School League" tone="school">
+            {schoolWinner ? <ChampionCard tournament={schoolWinner} /> : null}
+          </LeagueFeature>
+          <LeagueFeature label="University League" tone="university">
+            {universityWinner ? <ChampionCard tournament={universityWinner} /> : null}
+          </LeagueFeature>
+        </div>
+        <HomeLeagueTabs
+          school={schoolWinner ? <ChampionCard tournament={schoolWinner} /> : null}
+          university={universityWinner ? <ChampionCard tournament={universityWinner} /> : null}
+        />
       </section>
 
-      <section className="mt-3 grid grid-cols-2 gap-2 sm:mt-5 sm:gap-4">
-        <Panel
-          eyebrow="University Ranking"
-          title="Топ університетів"
-          action={<Link className="focus-ring whitespace-nowrap rounded-md border border-line px-2 py-1 text-[10px] font-bold text-slate-300 transition hover:border-accent/40 hover:bg-accent/10 hover:text-accent sm:rounded-lg sm:px-3 sm:py-2 sm:text-sm" href="/ranking?division=University">Весь топ</Link>}
-        >
-          <div className="grid gap-2">{universityTeams.map((team, index) => <TeamRow key={team.id} team={team} index={index} />)}</div>
-        </Panel>
-
-        <Panel
-          eyebrow="School Ranking"
-          title="Топ шкіл"
-          action={<Link className="focus-ring whitespace-nowrap rounded-md border border-line px-2 py-1 text-[10px] font-bold text-slate-300 transition hover:border-school/40 hover:bg-school/10 hover:text-school sm:rounded-lg sm:px-3 sm:py-2 sm:text-sm" href="/ranking?division=School">Весь топ</Link>}
-        >
-          <div className="grid gap-2">{schoolTeams.map((team, index) => <TeamRow key={team.id} team={team} index={index} />)}</div>
-        </Panel>
+      <section className="mt-3 sm:mt-5">
+        <div className="hidden grid-cols-2 gap-4 md:grid">
+          <SchoolRanking teams={schoolTeams} />
+          <UniversityRanking teams={universityTeams} />
+        </div>
+        <HomeLeagueTabs school={<SchoolRanking teams={schoolTeams} />} university={<UniversityRanking teams={universityTeams} />} />
       </section>
 
       <section className="mt-3 grid gap-3 sm:mt-5 sm:gap-4 lg:grid-cols-2">
@@ -97,10 +98,10 @@ export default async function HomePage() {
               index === 0 ? (
                 <TopPlayerHighlight key={player.id} player={player} />
               ) : (
-                <Link href={`/players/${encodeURIComponent(player.nick)}`} key={player.id} className="interactive-card grid grid-cols-[18px_24px_minmax(0,1fr)] items-center gap-1.5 rounded-lg border border-line bg-surface2 p-1.5 sm:grid-cols-[34px_34px_1fr_auto] sm:gap-3 sm:rounded-xl sm:p-3">
+                <Link href={`/players/${encodeURIComponent(player.nick)}`} key={player.id} className="interactive-card soft-enter grid grid-cols-[18px_26px_minmax(0,1fr)] items-center gap-1.5 rounded-lg border border-line bg-surface2 p-1.5 sm:grid-cols-[22px_30px_minmax(0,1fr)_64px] sm:gap-2 sm:rounded-xl sm:p-2">
                   <div className={`font-rajdhani text-base font-bold leading-none sm:text-xl ${index === 1 ? "text-slate-300" : index === 2 ? "text-amber-700" : "text-slate-500"}`}>{index + 1}</div>
                   <div
-                    className="h-6 w-6 overflow-hidden rounded-full bg-gradient-to-br from-accent to-violet-600 bg-cover bg-center sm:h-9 sm:w-9"
+                    className="h-6 w-6 overflow-hidden rounded-full bg-gradient-to-br from-accent to-school bg-cover bg-center sm:h-8 sm:w-8"
                     style={{ backgroundImage: `url(${player.avatar_url || DEFAULT_PLAYER_AVATAR})` }}
                   />
                   <div className="min-w-0">
@@ -129,11 +130,11 @@ function TopPlayerHighlight({ player }: { player: Player }) {
   const videoId = youtubeVideoId(player.highlight_youtube_url);
 
   return (
-    <div className="col-span-2 overflow-hidden rounded-lg border border-accent/30 bg-surface2 sm:col-span-1 sm:rounded-xl">
-      <div className="grid grid-cols-[28px_34px_1fr_auto] items-center gap-2 border-b border-line p-2 sm:grid-cols-[34px_42px_1fr_auto] sm:gap-3 sm:p-3">
+    <div className="soft-enter col-span-2 overflow-hidden rounded-lg border border-accent/30 bg-surface2 sm:col-span-1 sm:rounded-xl">
+      <div className="grid grid-cols-[18px_34px_minmax(0,1fr)_48px] items-center gap-1.5 border-b border-line p-2 sm:grid-cols-[22px_36px_minmax(0,1fr)_64px] sm:gap-2">
         <div className="font-rajdhani text-xl font-bold text-gold sm:text-2xl">1</div>
         <div
-          className="h-9 w-9 overflow-hidden rounded-full bg-gradient-to-br from-accent to-violet-600 bg-cover bg-center sm:h-11 sm:w-11"
+          className="h-8 w-8 overflow-hidden rounded-full bg-gradient-to-br from-accent to-school bg-cover bg-center sm:h-9 sm:w-9"
           style={{ backgroundImage: `url(${player.avatar_url || DEFAULT_PLAYER_AVATAR})` }}
         />
         <div className="min-w-0">
@@ -169,5 +170,38 @@ function TopPlayerHighlight({ player }: { player: Player }) {
         </div>
       </div>
     </div>
+  );
+}
+
+function LeagueFeature({ label, tone, children }: { label: string; tone: "school" | "university"; children: React.ReactNode }) {
+  return (
+    <div className="soft-enter">
+      <div className={`mb-2 text-[10px] font-extrabold uppercase tracking-[0.2em] ${tone === "school" ? "text-school" : "text-accent"}`}>{label}</div>
+      {children}
+    </div>
+  );
+}
+
+function SchoolRanking({ teams }: { teams: Team[] }) {
+  return (
+    <Panel
+      eyebrow="School Ranking"
+      title="Топ шкіл"
+      action={<Link className="focus-ring whitespace-nowrap rounded-md border border-line px-2 py-1 text-[10px] font-bold text-slate-300 transition hover:border-school/40 hover:bg-school/10 hover:text-school sm:rounded-lg sm:px-3 sm:py-2 sm:text-sm" href="/ranking?division=School">Весь топ</Link>}
+    >
+      <div className="grid gap-2">{teams.map((team, index) => <TeamRow key={team.id} team={team} index={index} />)}</div>
+    </Panel>
+  );
+}
+
+function UniversityRanking({ teams }: { teams: Team[] }) {
+  return (
+    <Panel
+      eyebrow="University Ranking"
+      title="Топ університетів"
+      action={<Link className="focus-ring whitespace-nowrap rounded-md border border-line px-2 py-1 text-[10px] font-bold text-slate-300 transition hover:border-accent/40 hover:bg-accent/10 hover:text-accent sm:rounded-lg sm:px-3 sm:py-2 sm:text-sm" href="/ranking?division=University">Весь топ</Link>}
+    >
+      <div className="grid gap-2">{teams.map((team, index) => <TeamRow key={team.id} team={team} index={index} />)}</div>
+    </Panel>
   );
 }

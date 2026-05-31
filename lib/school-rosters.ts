@@ -40,7 +40,7 @@ export const schoolRosters: ManualSchoolTeam[] = [
     name: "VLMIA",
     slug: "vlmia",
     org: "LDUFK School Cup 2026",
-    color: "#a78bfa",
+    color: "#6ee7b7",
     players: ["Klin", "TheEvilBoys", "_ome1ya17_", "manrase2", "s0lanaflip3r"]
   },
   {

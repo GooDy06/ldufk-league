@@ -4,13 +4,13 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "NEXT_DIST_DIR=.next-build next build",
     "build:local": "NEXT_DIST_DIR=.next-build next build",
     "parse-demo": "node scripts/parse-demo.cjs",
     "sync-r2-demos": "node scripts/sync-r2-demos.cjs",
     "sync-school-rosters": "node scripts/sync-school-rosters.cjs",
     "sync-data": "npm run sync-r2-demos && npm run sync-school-rosters",
-    "start": "next start",
+    "start": "NEXT_DIST_DIR=.next-build next start",
     "start:local": "NEXT_DIST_DIR=.next-build next start",
     "lint": "next lint"
   },
@@ -19,6 +19,7 @@
     "@laihoe/demoparser2": "^0.41.3",
     "@supabase/ssr": "^0.5.2",
     "@supabase/supabase-js": "^2.48.1",
+    "lucide-react": "^0.468.0",
     "next": "^14.2.23",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",

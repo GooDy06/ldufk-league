@@ -12,7 +12,7 @@ const config: Config = {
         muted: "#8fa5be",
         accent: "#00d5ff",
         gold: "#e8c84a",
-        school: "#a78bfa"
+        school: "#6ee7b7"
       },
       fontFamily: {
         rajdhani: ["var(--font-rajdhani)", "sans-serif"],
