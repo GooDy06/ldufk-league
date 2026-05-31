@@ -6,6 +6,7 @@ import { ChampionCard, HeroTitle, NewsCard, Panel, TeamRow } from "@/components/
 import { DEFAULT_PLAYER_AVATAR } from "@/components/roster-showcase";
 import { LiteYoutubePlayer } from "@/components/lite-youtube-player";
 import { HomeLeagueTabs } from "@/components/home-league-tabs";
+import { publicImageUrl } from "@/lib/image-url";
 
 export const dynamic = "force-dynamic";
 
@@ -77,10 +78,14 @@ export default async function HomePage() {
             {universityWinner ? <ChampionCard tournament={universityWinner} /> : null}
           </LeagueFeature>
         </div>
-        <HomeLeagueTabs
-          school={schoolWinner ? <ChampionCard tournament={schoolWinner} /> : null}
-          university={universityWinner ? <ChampionCard tournament={universityWinner} /> : null}
-        />
+        <div className="grid grid-cols-2 gap-2 md:hidden">
+          <LeagueFeature label="School League" tone="school">
+            {schoolWinner ? <ChampionCard tournament={schoolWinner} /> : null}
+          </LeagueFeature>
+          <LeagueFeature label="University League" tone="university">
+            {universityWinner ? <ChampionCard tournament={universityWinner} /> : null}
+          </LeagueFeature>
+        </div>
       </section>
 
       <section className="mt-3 sm:mt-5">
@@ -102,7 +107,7 @@ export default async function HomePage() {
                   <div className={`font-rajdhani text-base font-bold leading-none sm:text-xl ${index === 1 ? "text-slate-300" : index === 2 ? "text-amber-700" : "text-slate-500"}`}>{index + 1}</div>
                   <div
                     className="h-6 w-6 overflow-hidden rounded-full bg-gradient-to-br from-accent to-school bg-cover bg-center sm:h-8 sm:w-8"
-                    style={{ backgroundImage: `url(${player.avatar_url || DEFAULT_PLAYER_AVATAR})` }}
+                    style={{ backgroundImage: `url(${publicImageUrl(player.avatar_url || DEFAULT_PLAYER_AVATAR)})` }}
                   />
                   <div className="min-w-0">
                     <div className="truncate text-xs font-bold leading-none sm:text-base">{player.nick}</div>
@@ -135,7 +140,7 @@ function TopPlayerHighlight({ player }: { player: Player }) {
         <div className="font-rajdhani text-xl font-bold text-gold sm:text-2xl">1</div>
         <div
           className="h-8 w-8 overflow-hidden rounded-full bg-gradient-to-br from-accent to-school bg-cover bg-center sm:h-9 sm:w-9"
-          style={{ backgroundImage: `url(${player.avatar_url || DEFAULT_PLAYER_AVATAR})` }}
+          style={{ backgroundImage: `url(${publicImageUrl(player.avatar_url || DEFAULT_PLAYER_AVATAR)})` }}
         />
         <div className="min-w-0">
           <div className="truncate font-rajdhani text-xl font-bold leading-none sm:text-2xl">{player.nick}</div>

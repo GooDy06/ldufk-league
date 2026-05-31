@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { HomepageChampion, Team, Tournament, NewsItem } from "@/lib/types";
+import { publicImageUrl } from "@/lib/image-url";
 
 function formatNewsDate(value: string | null) {
   if (!value) return "Дата буде уточнена";
@@ -69,7 +70,7 @@ export function TeamRow({ team, index }: { team: Team; index: number }) {
       <div className={`font-rajdhani text-base font-bold leading-none sm:text-xl ${rankColor}`}>{index + 1}</div>
       <div
         className="grid h-6 w-6 place-items-center overflow-hidden rounded-md border border-white/10 bg-cover bg-center text-[8px] font-bold sm:h-8 sm:w-8 sm:rounded-lg sm:text-xs"
-        style={team.logo_url ? { backgroundImage: `url(${team.logo_url})` } : { background: `${team.color}22`, color: team.color }}
+        style={team.logo_url ? { backgroundImage: `url(${publicImageUrl(team.logo_url)})` } : { background: `${team.color}22`, color: team.color }}
       >
         {team.logo_url ? null : team.name.split(/\s+/).map((w) => w[0]).join("").slice(0, 3)}
       </div>
@@ -96,7 +97,7 @@ export function ChampionCard({ tournament }: { tournament: Tournament | Homepage
     <Link href={detailsUrl} className="interactive-card group soft-enter block overflow-hidden rounded-xl border border-line bg-surface sm:rounded-2xl">
       <div
         className="relative min-h-[160px] overflow-hidden bg-cover bg-center p-2 sm:min-h-[280px] sm:p-4"
-        style={{ backgroundImage: `url(${imageUrl || "/assets/winners-hero.png"})` }}
+        style={{ backgroundImage: `url(${publicImageUrl(imageUrl || "/assets/winners-hero.png")})` }}
       >
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(4,8,14,0.08),rgba(4,8,14,0.42)_48%,rgba(4,8,14,0.9)),radial-gradient(circle_at_76%_14%,rgba(0,213,255,0.16),transparent_36%)]" />
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-bg/95 to-transparent" />
@@ -124,7 +125,7 @@ export function NewsCard({ item }: { item: NewsItem }) {
     <Link href={`/news/${item.slug}`} className="interactive-card soft-enter group flex h-full flex-col overflow-hidden rounded-xl border border-line bg-surface sm:rounded-2xl">
       <div
         className="h-20 border-b border-line bg-cover bg-center transition duration-500 group-hover:scale-[1.03] sm:h-36"
-        style={{ backgroundImage: `url(${item.image_url || "/assets/winners-hero.png"})` }}
+        style={{ backgroundImage: `url(${publicImageUrl(item.image_url || "/assets/winners-hero.png")})` }}
       />
       <div className="flex flex-1 flex-col p-2 sm:p-4">
         <div className="mb-1 flex items-center justify-between gap-2 text-[7px] font-extrabold uppercase tracking-[0.12em] sm:mb-2 sm:gap-3 sm:text-[10px] sm:tracking-widest">

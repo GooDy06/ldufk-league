@@ -2,6 +2,7 @@ import type { Player } from "@/lib/types";
 import Link from "next/link";
 import Image from "next/image";
 import { slugifyPlayerNick } from "@/lib/school-rosters";
+import { publicImageUrl } from "@/lib/image-url";
 
 export const DEFAULT_PLAYER_AVATAR = "https://i.ibb.co/Ps7G5vnD/players.png";
 
@@ -21,7 +22,7 @@ export function RosterShowcase({ players, compact = false }: { players: Player[]
           <Link key={player.id} href={`/players/${slugifyPlayerNick(player.nick)}`} className="interactive-card group min-w-0 overflow-hidden rounded-md border border-line bg-[#202c3a] text-center shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] sm:rounded-lg lg:rounded-md">
             <div className="relative h-14 overflow-hidden border-b border-line bg-gradient-to-b from-[#374656] via-[#293746] to-[#172232] sm:h-[68px] lg:h-[64px] xl:h-[68px]">
               <Image
-                src={player.avatar_url || DEFAULT_PLAYER_AVATAR}
+                src={publicImageUrl(player.avatar_url || DEFAULT_PLAYER_AVATAR)}
                 alt={player.nick}
                 fill
                 sizes="(max-width: 640px) 72px, (max-width: 1024px) 180px, 220px"
@@ -47,7 +48,7 @@ export function RosterShowcase({ players, compact = false }: { players: Player[]
         <Link key={player.id} href={`/players/${slugifyPlayerNick(player.nick)}`} className="interactive-card group overflow-hidden rounded-lg border border-line bg-surface text-center">
           <div className="relative aspect-[16/9] border-b border-line bg-gradient-to-b from-[#263545] to-[#111b29] sm:aspect-[16/10]">
             <Image
-              src={player.avatar_url || DEFAULT_PLAYER_AVATAR}
+              src={publicImageUrl(player.avatar_url || DEFAULT_PLAYER_AVATAR)}
               alt={player.nick}
               fill
               sizes="(max-width: 640px) 42vw, (max-width: 1024px) 28vw, 180px"

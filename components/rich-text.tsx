@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { publicImageUrl } from "@/lib/image-url";
 
 function isSafeUrl(value: string) {
   return value.startsWith("https://") || value.startsWith("http://");
@@ -45,7 +46,7 @@ function renderParagraph(block: string, index: number) {
   if (imageMatch && isSafeUrl(imageMatch[2])) {
     return (
       <figure key={index} className="my-8 overflow-hidden rounded-2xl border border-line bg-surface">
-        <img src={imageMatch[2]} alt={imageMatch[1]} className="max-h-[520px] w-full object-cover" />
+        <img src={publicImageUrl(imageMatch[2])} alt={imageMatch[1]} className="max-h-[520px] w-full object-cover" />
         {imageMatch[1] ? <figcaption className="px-4 py-3 text-sm text-slate-500">{imageMatch[1]}</figcaption> : null}
       </figure>
     );
@@ -55,7 +56,7 @@ function renderParagraph(block: string, index: number) {
   if (isSafeUrl(rawImageUrl) && isImageUrl(rawImageUrl)) {
     return (
       <figure key={index} className="my-8 overflow-hidden rounded-2xl border border-line bg-surface">
-        <img src={rawImageUrl} alt="" className="max-h-[520px] w-full object-cover" />
+        <img src={publicImageUrl(rawImageUrl)} alt="" className="max-h-[520px] w-full object-cover" />
       </figure>
     );
   }

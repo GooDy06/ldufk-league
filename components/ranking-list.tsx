@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import type { Player, Team } from "@/lib/types";
 import { RosterShowcase } from "@/components/roster-showcase";
+import { publicImageUrl } from "@/lib/image-url";
 
 type RankingTeam = Team & { players?: Player[] };
 
@@ -34,7 +35,7 @@ export function RankingList({ teams }: { teams: RankingTeam[] }) {
               <div className={`font-rajdhani text-base font-bold leading-none sm:text-xl ${rankColor(index)}`}>#{index + 1}</div>
               <div
                 className="grid h-7 w-7 place-items-center overflow-hidden rounded-md border border-white/10 bg-cover bg-center text-[8px] font-bold sm:h-7 sm:w-7 sm:rounded-md sm:text-[10px]"
-                style={team.logo_url ? { backgroundImage: `url(${team.logo_url})` } : { background: `${team.color}22`, color: team.color }}
+                style={team.logo_url ? { backgroundImage: `url(${publicImageUrl(team.logo_url)})` } : { background: `${team.color}22`, color: team.color }}
               >
                 {team.logo_url ? null : team.name.split(/\s+/).map((word) => word[0]).join("").slice(0, 3)}
               </div>

@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import type { Player } from "@/lib/types";
 import { DEFAULT_PLAYER_AVATAR } from "@/components/roster-showcase";
 import { BackButton } from "@/components/back-button";
+import { publicImageUrl } from "@/lib/image-url";
 import { PlayerSideStats } from "@/components/player-side-stats";
 import { getManualTeamForNick, getPlayerStatsByNick, type PlayerComputedStats } from "@/lib/player-stats";
 
@@ -80,7 +81,7 @@ function analyticHero(stats: PlayerComputedStats | null, rating: number, player:
   const ratingState = ratingGrade(rating);
   const teamWatermark = teamLogo ? (
     <span className="absolute left-1/2 top-6 z-[1] hidden h-44 w-44 -translate-x-1/2 place-items-center opacity-40 sm:grid sm:h-52 sm:w-52">
-      <img src={teamLogo} alt={teamName} className="h-full w-full object-contain drop-shadow-[0_18px_30px_rgba(0,0,0,0.8)]" />
+      <img src={publicImageUrl(teamLogo)} alt={teamName} className="h-full w-full object-contain drop-shadow-[0_18px_30px_rgba(0,0,0,0.8)]" />
     </span>
   ) : null;
   return (
@@ -91,7 +92,7 @@ function analyticHero(stats: PlayerComputedStats | null, rating: number, player:
           <div className="absolute inset-0 opacity-20" style={{ background: `linear-gradient(135deg, transparent 36%, ${teamColor} 37%, transparent 66%)` }} />
           {socialIcons(player, "mobile")}
           {teamSlug && teamWatermark ? <Link href={`/teams/${teamSlug}`} aria-label={teamName}>{teamWatermark}</Link> : teamWatermark}
-          <img src={player?.avatar_url || DEFAULT_PLAYER_AVATAR} alt={displayNick} className="absolute bottom-0 right-0 z-[2] h-[112px] w-[52%] object-contain object-bottom sm:inset-x-1 sm:mx-auto sm:h-[98%] sm:w-[96%]" />
+          <img src={publicImageUrl(player?.avatar_url || DEFAULT_PLAYER_AVATAR)} alt={displayNick} className="absolute bottom-0 right-0 z-[2] h-[112px] w-[52%] object-contain object-bottom sm:inset-x-1 sm:mx-auto sm:h-[98%] sm:w-[96%]" />
           <div className="absolute inset-x-0 bottom-0 z-[3] bg-gradient-to-t from-[#111a24] via-[#111a24]/25 to-transparent px-3 pb-2 pt-10 sm:px-4 sm:pb-1.5 sm:pt-16">
             <h1 className="max-w-[58%] break-words font-rajdhani text-[1.9rem] font-bold leading-[0.9] text-white sm:max-w-none sm:text-[2.1rem]">{displayNick}</h1>
             <div className="mt-0.5 max-w-[58%] truncate text-[11px] font-semibold text-slate-400 sm:max-w-none">{teamName}</div>
