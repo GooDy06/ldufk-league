@@ -9,6 +9,8 @@ export function PageScrollControls() {
   const [isAtBottom, setIsAtBottom] = useState(false);
 
   useEffect(() => {
+    let frame = 0;
+
     function update() {
       const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
       setIsLongPage(maxScroll > 420);
@@ -16,16 +18,25 @@ export function PageScrollControls() {
       setIsAtBottom(maxScroll - window.scrollY < 2);
     }
 
+    function scheduleUpdate() {
+      if (frame) return;
+      frame = window.requestAnimationFrame(() => {
+        frame = 0;
+        update();
+      });
+    }
+
     update();
-    const resizeObserver = new ResizeObserver(update);
+    const resizeObserver = new ResizeObserver(scheduleUpdate);
     resizeObserver.observe(document.body);
-    window.addEventListener("scroll", update, { passive: true });
-    window.addEventListener("resize", update);
+    window.addEventListener("scroll", scheduleUpdate, { passive: true });
+    window.addEventListener("resize", scheduleUpdate);
 
     return () => {
+      if (frame) window.cancelAnimationFrame(frame);
       resizeObserver.disconnect();
-      window.removeEventListener("scroll", update);
-      window.removeEventListener("resize", update);
+      window.removeEventListener("scroll", scheduleUpdate);
+      window.removeEventListener("resize", scheduleUpdate);
     };
   }, []);
 

@@ -1,10 +1,13 @@
 import { headers } from "next/headers";
+import Link from "next/link";
+import { redirect } from "next/navigation";
 import { CopyLinkButton } from "@/components/cams/copy-link-button";
 import { CustomDelayLinks } from "@/components/cams/custom-delay-links";
-import { addCameraPlayer, createCameraRoom, deleteCameraPlayer, deleteCameraRoom, loginCamsAdmin, logoutCamsAdmin, regenerateCameraToken, removeCamera, updateCameraPlayer } from "@/lib/cams/actions";
-import { isCamsAdminAuthed } from "@/lib/cams/auth";
+import { addCameraPlayer, createCameraRoom, deleteCameraPlayer, deleteCameraRoom, regenerateCameraToken, removeCamera, updateCameraPlayer } from "@/lib/cams/actions";
 import { getCamsBaseUrl, isFreshOnline } from "@/lib/cams/server-utils";
 import { getCamsServiceClient } from "@/lib/cams/supabase";
+import { signOut } from "@/lib/admin-actions";
+import { requireAdmin } from "@/lib/supabase/server";
 import type { CameraPlayer, CameraRoom } from "@/lib/cams/types";
 
 export const dynamic = "force-dynamic";
@@ -44,31 +47,41 @@ async function getRoomsAndPlayers() {
   };
 }
 
-function LoginPanel({ error }: { error?: string }) {
+function adminLoginUrl(host: string) {
+  return host.toLowerCase().includes("cams.ldufk.com") ? "https://admin.ldufk.com" : "/admin";
+}
+
+function AccessDeniedPanel({ adminUrl }: { adminUrl: string }) {
   return (
     <div className="min-h-screen bg-[radial-gradient(circle_at_16%_0%,rgba(0,213,255,0.16),transparent_34%),linear-gradient(135deg,#05080d,#0a1320_55%,#02050a)] px-4 py-10 text-white">
       <div className="mx-auto max-w-md rounded-lg border border-white/10 bg-white/[0.05] p-5 shadow-2xl backdrop-blur">
         <div className="text-[10px] font-bold uppercase tracking-[0.28em] text-cyan-200/70">LDUFK Cams</div>
-        <h1 className="mt-2 font-rajdhani text-4xl font-bold">Admin access</h1>
-        <p className="mt-2 text-sm leading-6 text-slate-400">Керування room, токенами і live-статусами камер.</p>
-        {error ? <p className="mt-4 rounded-lg border border-red-300/20 bg-red-500/10 p-3 text-sm text-red-100">Невірний пароль або сесія закінчилась.</p> : null}
-        <form action={loginCamsAdmin} className="mt-5 grid gap-3">
-          <input name="password" type="password" required placeholder="CAMS_ADMIN_PASSWORD" className={fieldClass()} />
-          <button className="rounded-lg bg-cyan-300 px-4 py-3 font-rajdhani text-lg font-bold uppercase tracking-wide text-black transition hover:bg-emerald-300">Sign in</button>
-        </form>
+        <h1 className="mt-2 font-rajdhani text-4xl font-bold">Недостатньо прав</h1>
+        <p className="mt-2 text-sm leading-6 text-slate-400">
+          Камери доступні тільки для ролей "Адмін" і "Головний адмін". Зверніться до головного адміна, якщо потрібен доступ.
+        </p>
+        <Link href={adminUrl} className="mt-5 inline-flex rounded-lg border border-white/10 bg-white/[0.04] px-4 py-2 text-sm font-bold text-slate-200 transition hover:border-cyan-300/40 hover:text-cyan-100">
+          Назад в адмінку
+        </Link>
       </div>
     </div>
   );
 }
 
 export default async function CamsAdminPage({ searchParams }: { searchParams: AdminSearchParams }) {
-  const authed = isCamsAdminAuthed();
+  const requestHeaders = headers();
+  const host = requestHeaders.get("x-ldufk-hostname") || requestHeaders.get("host") || "";
+  const adminUrl = adminLoginUrl(host);
+  const { user, role } = await requireAdmin();
 
-  if (!authed) {
-    return <LoginPanel error={searchParams.error} />;
+  if (!user) {
+    redirect(adminUrl);
   }
 
-  const requestHeaders = headers();
+  if (role !== "main_admin" && role !== "admin") {
+    return <AccessDeniedPanel adminUrl={adminUrl} />;
+  }
+
   const baseUrl = getCamsBaseUrl(requestHeaders.get("host"), requestHeaders.get("x-forwarded-proto") || "https");
   const { rooms, players } = await getRoomsAndPlayers();
   const playersByRoom = new Map<string, CameraPlayer[]>();
@@ -88,9 +101,15 @@ export default async function CamsAdminPage({ searchParams }: { searchParams: Ad
             <h1 className="mt-2 font-rajdhani text-5xl font-bold leading-none">Camera Control</h1>
             <p className="mt-2 text-sm text-slate-400">Rooms, player links, live camera status and token rotation.</p>
           </div>
-          <form action={logoutCamsAdmin}>
-            <button className="rounded-lg border border-white/10 bg-white/[0.04] px-4 py-2 text-sm font-bold text-slate-200 transition hover:border-cyan-300/40 hover:text-cyan-100">Sign out</button>
-          </form>
+          <div className="flex flex-wrap gap-2">
+            <Link href={adminUrl} className="rounded-lg border border-white/10 bg-white/[0.04] px-4 py-2 text-sm font-bold text-slate-200 transition hover:border-cyan-300/40 hover:text-cyan-100">
+              Назад в адмінку
+            </Link>
+            <form action={signOut}>
+              <input type="hidden" name="redirect_to" value={adminUrl} />
+              <button className="rounded-lg border border-white/10 bg-white/[0.04] px-4 py-2 text-sm font-bold text-slate-200 transition hover:border-cyan-300/40 hover:text-cyan-100">Sign out</button>
+            </form>
+          </div>
         </header>
 
         {searchParams.saved ? <div className="rounded-lg border border-emerald-300/20 bg-emerald-400/10 px-4 py-3 text-sm text-emerald-100">Saved.</div> : null}

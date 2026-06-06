@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import type { Tournament } from "@/lib/types";
 import { CalendarDays, CircleDollarSign, Gamepad2, GraduationCap, Monitor, ShieldCheck, Sparkles, Trophy, UsersRound } from "lucide-react";
 import { BackButton } from "@/components/back-button";
-import { publicImageUrl } from "@/lib/image-url";
+import { FALLBACK_HERO_IMAGE, publicImageUrl } from "@/lib/image-url";
 
 export const dynamic = "force-dynamic";
 
@@ -25,7 +25,7 @@ export default async function TournamentDetailPage({ params }: { params: { slug:
       <div className="mb-4">
         <BackButton fallbackHref="/tournaments" label="Назад до турнірів" />
       </div>
-      <div className="mb-4 h-72 rounded-2xl border border-line bg-cover bg-center" style={{ backgroundImage: `url(${publicImageUrl(tournament.banner_url || "/assets/winners-hero.png")})` }} />
+      <div className="mb-4 h-72 rounded-2xl border border-line bg-cover bg-center" style={{ backgroundImage: `url(${publicImageUrl(tournament.banner_url || FALLBACK_HERO_IMAGE)})` }} />
       <div className="text-[10px] font-bold uppercase tracking-[0.24em] text-accent">{tournament.division} · {tournament.type}</div>
       <h1 className="mt-2 font-rajdhani text-5xl font-bold">{tournament.name}</h1>
       <p className="mt-4 text-lg leading-8 text-slate-300">{tournament.description}</p>

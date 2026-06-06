@@ -1,3 +1,5 @@
+export const FALLBACK_HERO_IMAGE = "/assets/winners-hero-1400.jpg";
+
 export function publicImageUrl(url: string | null | undefined) {
   if (!url || url.startsWith("/") || url.startsWith("data:")) return url || "";
 

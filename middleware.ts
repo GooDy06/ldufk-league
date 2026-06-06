@@ -78,11 +78,34 @@ export async function middleware(request: NextRequest) {
   const { data } = await supabase.auth.getUser();
   const isAdminRoute = path.startsWith("/admin");
   const isAdminHome = path === "/admin";
+  const isCamsAdminRoute = path.startsWith("/cams/admin");
   const email = data.user?.email?.trim().toLowerCase();
   const allowedEmail = process.env.ADMIN_EMAIL?.trim().toLowerCase();
 
-  if (isAdminRoute && !isAdminHome && (!email || email !== allowedEmail)) {
-    return NextResponse.redirect(new URL(hostname(request) === "admin.ldufk.com" ? "/" : "/admin", request.url));
+  if (isAdminRoute && !isAdminHome) {
+    let hasAdminAccess = Boolean(email && email === allowedEmail);
+
+    if (email && !hasAdminAccess) {
+      const { data: adminUser } = await supabase.from("admin_users").select("role").eq("email", email).maybeSingle();
+      hasAdminAccess = Boolean(adminUser?.role);
+    }
+
+    if (!hasAdminAccess) {
+      return NextResponse.redirect(new URL(hostname(request) === "admin.ldufk.com" ? "/" : "/admin", request.url));
+    }
+  }
+
+  if (isCamsAdminRoute) {
+    let hasAdminAccess = Boolean(email && email === allowedEmail);
+
+    if (email && !hasAdminAccess) {
+      const { data: adminUser } = await supabase.from("admin_users").select("role").eq("email", email).maybeSingle();
+      hasAdminAccess = Boolean(adminUser?.role);
+    }
+
+    if (!hasAdminAccess) {
+      return NextResponse.redirect(new URL(hostname(request) === "cams.ldufk.com" ? "https://admin.ldufk.com" : "/admin", request.url));
+    }
   }
 
   return response;

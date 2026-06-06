@@ -3,9 +3,9 @@
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { clearCamsAdminCookie, isCamsAdminAuthed, setCamsAdminCookie } from "@/lib/cams/auth";
 import { generateJoinToken, normalizeSteamId64 } from "@/lib/cams/server-utils";
 import { getCamsServiceClient } from "@/lib/cams/supabase";
+import { requireAdmin } from "@/lib/supabase/server";
 
 function text(formData: FormData, key: string) {
   return String(formData.get(key) || "").trim();
@@ -22,9 +22,15 @@ function adminRedirectPath(search = "") {
   return `${base}${search}`;
 }
 
-function assertCamsAdmin() {
-  if (!isCamsAdminAuthed()) {
-    redirect(adminRedirectPath("?error=session"));
+async function assertCamsAdmin() {
+  const { user, role } = await requireAdmin();
+
+  if (!user) {
+    redirect("/admin");
+  }
+
+  if (role !== "main_admin" && role !== "admin") {
+    redirect(adminRedirectPath("?error=forbidden"));
   }
 }
 
@@ -56,25 +62,8 @@ async function notifySignalingCameraRemoved(playerId: string) {
   }
 }
 
-export async function loginCamsAdmin(formData: FormData) {
-  const expectedPassword = process.env.CAMS_ADMIN_PASSWORD;
-  const password = text(formData, "password");
-
-  if (!expectedPassword || password !== expectedPassword) {
-    redirect(adminRedirectPath("?error=password"));
-  }
-
-  setCamsAdminCookie();
-  redirect(adminRedirectPath());
-}
-
-export async function logoutCamsAdmin() {
-  clearCamsAdminCookie();
-  redirect(adminRedirectPath());
-}
-
 export async function createCameraRoom(formData: FormData) {
-  assertCamsAdmin();
+  await assertCamsAdmin();
 
   const supabase = getCamsServiceClient();
   const { error } = await supabase.from("camera_rooms").insert({
@@ -88,7 +77,7 @@ export async function createCameraRoom(formData: FormData) {
 }
 
 export async function addCameraPlayer(formData: FormData) {
-  assertCamsAdmin();
+  await assertCamsAdmin();
 
   const steamid64 = normalizeSteamId64(text(formData, "steamid64"));
   if (!steamid64) {
@@ -112,7 +101,7 @@ export async function addCameraPlayer(formData: FormData) {
 }
 
 export async function updateCameraPlayer(formData: FormData) {
-  assertCamsAdmin();
+  await assertCamsAdmin();
 
   const playerId = text(formData, "player_id");
   const steamid64 = normalizeSteamId64(text(formData, "steamid64"));
@@ -138,7 +127,7 @@ export async function updateCameraPlayer(formData: FormData) {
 }
 
 export async function regenerateCameraToken(formData: FormData) {
-  assertCamsAdmin();
+  await assertCamsAdmin();
 
   const supabase = getCamsServiceClient();
   const playerId = text(formData, "player_id");
@@ -169,7 +158,7 @@ export async function regenerateCameraToken(formData: FormData) {
 }
 
 export async function removeCamera(formData: FormData) {
-  assertCamsAdmin();
+  await assertCamsAdmin();
 
   const playerId = text(formData, "player_id");
   const supabase = getCamsServiceClient();
@@ -199,7 +188,7 @@ export async function removeCamera(formData: FormData) {
 }
 
 export async function deleteCameraPlayer(formData: FormData) {
-  assertCamsAdmin();
+  await assertCamsAdmin();
 
   const playerId = text(formData, "player_id");
   const supabase = getCamsServiceClient();
@@ -214,7 +203,7 @@ export async function deleteCameraPlayer(formData: FormData) {
 }
 
 export async function deleteCameraRoom(formData: FormData) {
-  assertCamsAdmin();
+  await assertCamsAdmin();
 
   const roomId = text(formData, "room_id");
   const supabase = getCamsServiceClient();

@@ -20,9 +20,9 @@ export const metadata: Metadata = {
   },
   description: "Український портал навчальної CS2-ліги",
   icons: {
-    icon: "/assets/logo.png",
-    shortcut: "/assets/logo.png",
-    apple: "/assets/logo.png"
+    icon: "/assets/logo-160.png",
+    shortcut: "/assets/logo-160.png",
+    apple: "/assets/logo-160.png"
   }
 };
 
@@ -58,7 +58,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               {socialLinks.map((link) => (
                 <a key={link.label} href={link.href} target="_blank" rel="noreferrer" className="relative grid h-8 w-8 place-items-center overflow-hidden rounded-lg border border-line bg-surface text-[10px] font-extrabold text-slate-500 transition hover:border-accent/40 hover:bg-accent/10 hover:text-accent">
                   <span>{link.shortLabel}</span>
-                  <img src={link.iconUrl} alt={link.label} className="absolute inset-0 m-auto h-4 w-4 object-contain" />
+                  <img src={link.iconUrl} alt={link.label} width={16} height={16} loading="lazy" decoding="async" className="absolute inset-0 m-auto h-4 w-4 object-contain" />
                 </a>
               ))}
             </div>

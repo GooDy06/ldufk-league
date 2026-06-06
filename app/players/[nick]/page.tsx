@@ -51,8 +51,8 @@ function ratingGrade(rating: number) {
 function socialIcons(player: Player | null, placement: "mobile" | "desktop") {
   const links = [
     { key: "x", label: "X", href: player?.x_url, node: <span className="font-rajdhani text-[10px] font-bold leading-none">X</span>, className: "bg-black/85 text-slate-200 hover:text-white" },
-    { key: "twitch", label: "Twitch", href: player?.twitch_url, node: <img src="/assets/twitch.png" alt="" className="h-2.5 w-2.5 object-contain" />, className: "bg-[#6441a5] hover:bg-[#7653bd]" },
-    { key: "instagram", label: "Instagram", href: player?.instagram_url, node: <img src="/assets/instagram.png" alt="" className="h-2.5 w-2.5 object-contain" />, className: "bg-[#d62976] hover:bg-[#e13f89]" },
+    { key: "twitch", label: "Twitch", href: player?.twitch_url, node: <img src="/assets/twitch-64.png" alt="" width={10} height={10} decoding="async" className="h-2.5 w-2.5 object-contain" />, className: "bg-[#6441a5] hover:bg-[#7653bd]" },
+    { key: "instagram", label: "Instagram", href: player?.instagram_url, node: <img src="/assets/instagram-64.png" alt="" width={10} height={10} decoding="async" className="h-2.5 w-2.5 object-contain" />, className: "bg-[#d62976] hover:bg-[#e13f89]" },
     { key: "faceit", label: "FACEIT", href: player?.faceit_url, node: <span className="block h-0 w-0 border-y-[4px] border-l-[7px] border-y-transparent border-l-orange-500" />, className: "bg-black/85 hover:bg-black" },
   ];
   const visible = links.filter((link) => link.href);
@@ -81,7 +81,7 @@ function analyticHero(stats: PlayerComputedStats | null, rating: number, player:
   const ratingState = ratingGrade(rating);
   const teamWatermark = teamLogo ? (
     <span className="absolute left-1/2 top-6 z-[1] hidden h-44 w-44 -translate-x-1/2 place-items-center opacity-40 sm:grid sm:h-52 sm:w-52">
-      <img src={publicImageUrl(teamLogo)} alt={teamName} className="h-full w-full object-contain drop-shadow-[0_18px_30px_rgba(0,0,0,0.8)]" />
+      <img src={publicImageUrl(teamLogo)} alt={teamName} loading="lazy" decoding="async" className="h-full w-full object-contain drop-shadow-[0_18px_30px_rgba(0,0,0,0.8)]" />
     </span>
   ) : null;
   return (
@@ -92,7 +92,7 @@ function analyticHero(stats: PlayerComputedStats | null, rating: number, player:
           <div className="absolute inset-0 opacity-20" style={{ background: `linear-gradient(135deg, transparent 36%, ${teamColor} 37%, transparent 66%)` }} />
           {socialIcons(player, "mobile")}
           {teamSlug && teamWatermark ? <Link href={`/teams/${teamSlug}`} aria-label={teamName}>{teamWatermark}</Link> : teamWatermark}
-          <img src={publicImageUrl(player?.avatar_url || DEFAULT_PLAYER_AVATAR)} alt={displayNick} className="absolute bottom-0 right-0 z-[2] h-[112px] w-[52%] object-contain object-bottom sm:inset-x-1 sm:mx-auto sm:h-[98%] sm:w-[96%]" />
+          <img src={publicImageUrl(player?.avatar_url || DEFAULT_PLAYER_AVATAR)} alt={displayNick} decoding="async" className="absolute bottom-0 right-0 z-[2] h-[112px] w-[52%] object-contain object-bottom sm:inset-x-1 sm:mx-auto sm:h-[98%] sm:w-[96%]" />
           <div className="absolute inset-x-0 bottom-0 z-[3] bg-gradient-to-t from-[#111a24] via-[#111a24]/25 to-transparent px-3 pb-2 pt-10 sm:px-4 sm:pb-1.5 sm:pt-16">
             <h1 className="max-w-[58%] break-words font-rajdhani text-[1.9rem] font-bold leading-[0.9] text-white sm:max-w-none sm:text-[2.1rem]">{displayNick}</h1>
             <div className="mt-0.5 max-w-[58%] truncate text-[11px] font-semibold text-slate-400 sm:max-w-none">{teamName}</div>
@@ -103,8 +103,8 @@ function analyticHero(stats: PlayerComputedStats | null, rating: number, player:
           className="relative overflow-hidden p-2 sm:p-2.5"
         >
           <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(245,158,11,0.06),transparent_42%,rgba(56,189,248,0.07))]" />
-          <img src="https://www.hltv.org/img/static/stats/t-bg.png" alt="" className="pointer-events-none absolute -left-2 top-3 hidden h-[74%] w-auto max-w-none object-contain opacity-[0.16] sm:block" />
-          <img src="https://www.hltv.org/img/static/stats/ct-bg.png" alt="" className="pointer-events-none absolute -right-2 top-3 hidden h-[74%] w-auto max-w-none object-contain opacity-[0.16] sm:block" />
+          <img src="https://www.hltv.org/img/static/stats/t-bg.png" alt="" loading="lazy" decoding="async" className="pointer-events-none absolute -left-2 top-3 hidden h-[74%] w-auto max-w-none object-contain opacity-[0.16] sm:block" />
+          <img src="https://www.hltv.org/img/static/stats/ct-bg.png" alt="" loading="lazy" decoding="async" className="pointer-events-none absolute -right-2 top-3 hidden h-[74%] w-auto max-w-none object-contain opacity-[0.16] sm:block" />
           <div className="absolute inset-0 bg-[#17212b]/62" />
           {socialIcons(player, "desktop")}
           <div className="relative">

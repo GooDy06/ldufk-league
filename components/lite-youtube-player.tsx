@@ -34,7 +34,7 @@ export function LiteYoutubePlayer({ videoId, title, className = "aspect-video" }
           className="relative h-full w-full overflow-hidden text-left outline-none"
           aria-label={`Play ${title}`}
         >
-          <img src={publicImageUrl(thumbnail)} alt="" className="h-full w-full object-cover opacity-80 transition duration-300 group-hover:scale-[1.03] group-hover:opacity-95" />
+          <img src={publicImageUrl(thumbnail)} alt="" loading="lazy" decoding="async" className="h-full w-full object-cover opacity-80 transition duration-300 group-hover:scale-[1.03] group-hover:opacity-95" />
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-black/30" />
           <div className="absolute left-4 top-4 rounded-full border border-white/10 bg-black/35 px-3 py-1 text-[10px] font-extrabold uppercase tracking-[0.2em] text-white/80 backdrop-blur-md">
             LDUFK Highlight

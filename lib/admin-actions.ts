@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { createClient as createSupabaseServiceClient } from "@supabase/supabase-js";
 import { createClient, requireAdmin } from "@/lib/supabase/server";
 import type { AdminRole } from "@/lib/types";
 import { getPlayerStatsByNick } from "@/lib/player-stats";
@@ -45,6 +46,45 @@ async function assertAdmin(roles: AdminRole[] = ["main_admin", "admin", "moderat
     throw new Error("Недостатньо прав для цієї дії.");
   }
   return { supabase, user, role, email: user.email?.trim().toLowerCase() || null };
+}
+
+function createServiceClient() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY;
+
+  if (!url || !key) {
+    throw new Error("Не налаштовано SUPABASE_SERVICE_ROLE_KEY для перевірки користувачів Auth.");
+  }
+
+  return createSupabaseServiceClient(url, key, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false
+    }
+  });
+}
+
+async function authUserExistsByEmail(email: string) {
+  const supabase = createServiceClient();
+  const perPage = 1000;
+
+  for (let page = 1; page <= 10; page += 1) {
+    const { data, error } = await supabase.auth.admin.listUsers({ page, perPage });
+    if (error) {
+      console.error("Supabase auth users lookup error:", error.message);
+      throw new Error(`Не вдалося перевірити користувача в Supabase Auth: ${error.message}`);
+    }
+
+    if ((data.users || []).some((user) => user.email?.trim().toLowerCase() === email)) {
+      return true;
+    }
+
+    if ((data.users || []).length < perPage) {
+      return false;
+    }
+  }
+
+  return false;
 }
 
 export async function signIn(formData: FormData) {
@@ -298,6 +338,10 @@ export async function saveAdminUser(formData: FormData) {
 
   if (targetEmail === email && requestedRole !== "main_admin") {
     throw new Error("Не можна понизити свою роль через сайт, щоб не втратити доступ.");
+  }
+
+  if (!await authUserExistsByEmail(targetEmail)) {
+    redirect("/admin/admins?error=auth_user_missing");
   }
 
   const payload = {

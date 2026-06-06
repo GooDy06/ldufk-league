@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-export const runtime = "edge";
+export const revalidate = 86400;
 
 const ALLOWED_HOSTS = new Set(["i.ibb.co", "i.ytimg.com"]);
 
@@ -23,10 +23,21 @@ export async function GET(request: NextRequest) {
     return new NextResponse("Image host is not allowed", { status: 403 });
   }
 
-  const response = await fetch(imageUrl, {
-    headers: { Accept: "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8" },
-    next: { revalidate: 86400 }
-  });
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 8000);
+
+  let response: Response;
+  try {
+    response = await fetch(imageUrl, {
+      headers: { Accept: "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8" },
+      next: { revalidate: 86400 },
+      signal: controller.signal
+    });
+  } catch {
+    return new NextResponse("Image unavailable", { status: 504 });
+  } finally {
+    clearTimeout(timeout);
+  }
 
   if (!response.ok) return new NextResponse("Image unavailable", { status: response.status });
 
